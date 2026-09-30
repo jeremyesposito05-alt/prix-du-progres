@@ -13,7 +13,7 @@
    =================================================================== */
 :root{
   --bs-navy:#1A2047; --bs-wgrey:#9C9895; --bs-orange:#CA5007; --bs-gold:#F3BE31;
-  --serif:"SangBleu OG Sans","SangBleu Sans",Georgia,serif;
+  --serif:"SangBleu OG Sans","SangBleu Sans","Didot","Bodoni MT","Playfair Display",Georgia,serif;
   --sans:Calibri,"Segoe UI",system-ui,sans-serif;
   --fond:#241C16; --fond2:#30251C; --papier:#EFE5D4; --accent:#C8872B;
   --trait:#5A4736; --vert:#8FBF7A; --rouge:#D97A5A;
@@ -672,51 +672,89 @@ body[data-niveau="II"] .situ .ex{color:#3D474F}
 /* ---------- l'écran de titre ---------------------------------------
    La charte de l'école tient cette page : marine, or, SangBleu. Le
    décor du niveau I reste visible derrière, mais très assombri.       */
-body.surtitre #scene{filter:saturate(.55) brightness(.75)}
+body.surtitre #scene{display:none}
+body.surtitre main{max-width:none;padding:0;justify-content:stretch}
+
 body.surtitre footer{opacity:0}
-.titre-ecran{
-  text-align:center; padding:7vh 24px 5vh; position:relative; max-width:860px; margin:0 auto;
-  background:
-    linear-gradient(180deg, rgba(26,32,71,.96) 0%, rgba(20,56,127,.86) 48%, rgba(20,24,54,.97) 100%),
-    var(--illu, none);
-  background-size:cover; background-position:center;
-  border:1px solid rgba(243,190,49,.35); border-radius:3px;
-  box-shadow:0 26px 60px rgba(0,0,0,.65), inset 0 0 90px rgba(0,0,0,.45);
-  animation:paraitre .7s ease-out;
+.titre-ecran{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center}
+
+/* L'illustration occupe tout l'écran : elle raconte les trois
+   révolutions d'un seul regard, il serait dommage de la masquer. */
+.titre-ecran .illu{
+  position:absolute; inset:0;
+  background:url("img/accueil.jpg") center/cover no-repeat, linear-gradient(160deg,#20264E,#0F1430);
+  animation:zoomlent 26s ease-in-out infinite alternate;
 }
-@keyframes paraitre{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.titre-ecran .blason-grand{width:74px;height:74px;color:#fff;opacity:.95;margin-bottom:10px}
+@keyframes zoomlent{from{transform:scale(1)}to{transform:scale(1.06)}}
+
+/* La lisibilité ne vient pas d'un panneau opaque mais d'un voile qui
+   s'épaissit là où se trouve le texte. Le haut de l'image reste net. */
+.titre-ecran .voile{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 70% 52% at 50% 58%, rgba(15,18,42,.86) 0%, rgba(15,18,42,.55) 55%, transparent 100%),
+    linear-gradient(180deg, rgba(26,32,71,.72) 0%, rgba(20,24,54,.26) 28%, rgba(15,18,42,.80) 100%);
+}
+.titre-ecran .dedans{
+  position:relative; text-align:center; padding:26px 22px;
+  animation:paraitre .8s ease-out; max-width:940px;
+}
+@keyframes paraitre{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.titre-ecran .logo-bs{height:clamp(38px,5.4vw,58px);width:auto;margin-bottom:26px;
+  filter:drop-shadow(0 3px 14px rgba(0,0,0,.8))}
+.titre-ecran .logo-txt{font-family:var(--serif);font-size:15px;letter-spacing:.2em;
+  color:#fff;margin-bottom:26px;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+
+.titre-ecran .surtitre-txt{
+  font-size:clamp(11px,1.5vw,14px); letter-spacing:.34em; text-transform:uppercase;
+  color:var(--bs-gold); margin-bottom:14px; text-shadow:0 2px 14px rgba(0,0,0,.9);
+}
+.titre-ecran .surtitre-txt i{font-style:normal;opacity:.5;margin:0 .35em}
+
 .titre-ecran h1{
   font-family:var(--serif); font-weight:normal; color:#fff;
-  font-size:clamp(34px,7vw,74px); line-height:1.05; margin:.05em 0 .12em;
-  letter-spacing:.01em; text-shadow:0 3px 26px rgba(0,0,0,.75);
+  font-size:clamp(46px,10.5vw,124px); line-height:.92; margin:0;
+  letter-spacing:-.012em;
+  text-shadow:0 4px 40px rgba(0,0,0,.92), 0 1px 3px rgba(0,0,0,.7);
+}
+.titre-ecran h1 span{
+  display:block;
+  background:linear-gradient(180deg,#FFF3D2 15%,var(--bs-gold) 92%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 4px 30px rgba(0,0,0,.85));
 }
 .titre-ecran .filet{
-  width:132px; height:2px; margin:14px auto 20px;
-  background:linear-gradient(90deg, transparent, var(--bs-gold), transparent);
+  width:min(340px,70%); height:1px; margin:26px auto 22px;
+  background:linear-gradient(90deg,transparent,rgba(243,190,49,.85) 22%,rgba(243,190,49,.85) 78%,transparent);
+  box-shadow:0 0 18px rgba(243,190,49,.45);
 }
 .titre-ecran .accroche{
-  font-size:clamp(15px,2.1vw,20px); line-height:1.6; color:#DCE2F0;
-  margin:0 0 30px; text-shadow:0 2px 12px rgba(0,0,0,.6);
+  font-size:clamp(15px,2.05vw,21px); line-height:1.65; color:#E6EAF5;
+  margin:0 0 34px; text-shadow:0 2px 16px rgba(0,0,0,.9);
 }
+.titre-ecran .accroche strong{color:#fff;font-weight:normal;font-family:var(--serif);
+  font-size:1.12em}
 .titre-ecran .demarrer{
-  font-family:var(--serif); font-size:clamp(19px,2.6vw,25px); letter-spacing:.06em;
-  padding:15px 54px; margin:0; border-radius:2px; color:#1A2047;
-  background:linear-gradient(180deg,#F7D46A,var(--bs-gold));
-  border:1px solid #C39A1E;
-  box-shadow:0 12px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.55);
+  font-family:var(--serif); font-size:clamp(19px,2.5vw,26px); letter-spacing:.09em;
+  padding:16px 62px; margin:0; border-radius:2px; color:#1A2047;
+  background:linear-gradient(180deg,#FFE79C,var(--bs-gold) 60%,#D9A622);
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 14px 36px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.7);
 }
 .titre-ecran .demarrer:hover{
-  transform:translateY(-3px);
-  box-shadow:0 18px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.6);
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:0 20px 48px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.8);
 }
 .titre-ecran .mention{
-  margin:34px 0 0; font-size:12px; letter-spacing:.09em; text-transform:uppercase;
-  color:#9FA9C4;
+  margin:30px 0 0; font-size:clamp(10px,1.3vw,12px); letter-spacing:.14em;
+  text-transform:uppercase; color:#A9B2CC; text-shadow:0 2px 10px rgba(0,0,0,.9);
 }
-/* l'illustration, si elle existe */
-body[data-niveau="I"] .titre-ecran{--illu:url("img/accueil.jpg")}
-@media(max-width:700px){ .titre-ecran{padding:5vh 16px 4vh} }
+@media(max-width:700px){
+  .titre-ecran .dedans{padding:20px 16px}
+  .titre-ecran .filet{margin:18px auto 16px}
+  .titre-ecran .demarrer{padding:14px 44px}
+}
 
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
@@ -2808,12 +2846,19 @@ function titre(){
   N = NIVEAUX.I;
   app.innerHTML=`
   <div class="titre-ecran">
-    <svg class="blason-grand" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="currentColor" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg>
-    <h1>Le prix du progrès</h1>
-    <div class="filet"></div>
-    <p class="accroche">Trois révolutions industrielles.<br>Une même question : qui paie le progrès ?</p>
-    <button class="demarrer" onclick="demarrer()">Démarrer</button>
-    <p class="mention">Collège Alpin Beau Soleil · Unité 1 — Quand l’innovation change la société</p>
+    <div class="illu" aria-hidden="true"></div>
+    <div class="voile" aria-hidden="true"></div>
+    <div class="dedans">
+      <img class="logo-bs" src="img/logo-beausoleil.png" alt="Collège Alpin Beau Soleil"
+           onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-txt',textContent:'COLLÈGE ALPIN BEAU SOLEIL'}))">
+      <div class="surtitre-txt">Manchester <i>·</i> Detroit <i>·</i> Demain</div>
+      <h1>Le prix<br><span>du progrès</span></h1>
+      <div class="filet"></div>
+      <p class="accroche">Vous décidez. Quatre forces vous jugent.<br>
+        <strong>Une seule question : qui paie le progrès ?</strong></p>
+      <button class="demarrer" onclick="demarrer()">Démarrer</button>
+      <p class="mention">Unité 1 — Quand l’innovation change la société · Grade 10</p>
+    </div>
   </div>`;
 }
 
