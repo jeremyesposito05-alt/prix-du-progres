@@ -466,6 +466,135 @@ body[data-niveau="II"] button.plein{background:linear-gradient(180deg,#3E5C79,#2
 .d-lettre .sign{color:#8E2413}
 .d-lettre .prov{color:var(--enc2);border-top:1px solid var(--fil)}
 </style>
+<style>
+/* ===================================================================
+   LA COMPOSITION : un tableau au mur, un bureau en dessous
+
+   On quitte la colonne centrée pour une scène. Le tableau des forces
+   est accroché au mur, le bureau occupe le bas, et les documents y ont
+   chacun leur place : la décision et l'enquête à gauche, l'affaire du
+   jour au centre, le courrier à droite, les propositions devant vous.
+
+   Aucune transformation 3D sur les textes : la perspective est suggérée
+   par l'arête du plateau et par l'inclinaison des feuilles. Un titre en
+   perspective serait joli une seconde et illisible au vidéoprojecteur.
+   =================================================================== */
+main{max-width:1240px}
+
+/* ---------- le tableau accroché au mur ------------------------------ */
+.tableau{
+  width:min(760px,100%); margin:0 auto 30px; position:relative;
+  padding:26px 20px 18px;
+  border:13px solid #46301E;
+  background:linear-gradient(170deg, rgba(38,27,18,.62), rgba(20,14,9,.72));
+  box-shadow:0 18px 40px rgba(0,0,0,.6), inset 0 0 0 2px #6A4A2A,
+             inset 0 0 40px rgba(0,0,0,.5);
+}
+body[data-niveau="II"] .tableau{border-color:#2A323B;box-shadow:0 18px 40px rgba(0,0,0,.6),
+  inset 0 0 0 2px #46525E, inset 0 0 40px rgba(0,0,0,.5)}
+/* la cordelette de suspension */
+.tableau::before{
+  content:""; position:absolute; left:50%; top:-26px; width:2px; height:26px;
+  background:linear-gradient(180deg,transparent,#6A4A2A); transform:translateX(-50%);
+}
+.tableau .plaque{
+  position:absolute; top:-1px; left:50%; transform:translate(-50%,-50%);
+  background:#B8894A; color:#221709; font-size:10.5px; letter-spacing:.16em;
+  text-transform:uppercase; padding:3px 14px; border-radius:2px; font-weight:bold;
+  box-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+body[data-niveau="II"] .tableau .plaque{background:#8FA3B5;color:#141A20}
+.tableau .forces{margin-bottom:0}
+
+/* ---------- le bureau ----------------------------------------------- */
+.bureau{position:relative;margin-top:6px}
+/* l'arête du plateau : une ligne claire, une ombre dessous, rien de plus */
+.bureau::before{
+  content:""; position:absolute; left:-4vw; right:-4vw; top:-14px; height:14px;
+  background:linear-gradient(180deg,#6B4A2C,#3A2716);
+  box-shadow:0 7px 22px rgba(0,0,0,.6);
+  border-radius:3px 3px 0 0;
+}
+body[data-niveau="II"] .bureau::before{background:linear-gradient(180deg,#4A5762,#252D35)}
+/* le plateau lui-même, qui s'assombrit vers le fond de l'écran */
+.bureau::after{
+  content:""; position:absolute; left:-4vw; right:-4vw; top:0; bottom:-40px; z-index:-1;
+  background:linear-gradient(180deg, rgba(58,39,22,.5), rgba(28,19,11,.25) 60%, transparent);
+}
+body[data-niveau="II"] .bureau::after{
+  background:linear-gradient(180deg, rgba(37,45,53,.5), rgba(20,25,30,.25) 60%, transparent);
+}
+
+.plateau{
+  display:grid; grid-template-columns:0.92fr 1.55fr 0.78fr;
+  gap:18px 20px; align-items:start; padding-top:22px;
+}
+.plateau .col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.plateau .rep{grid-column:1 / -1;margin-top:6px}
+
+/* les feuilles ne sont pas alignées au cordeau : chacune a sa place */
+.col-g > *{transform:rotate(-1.1deg)}
+.col-c > *{transform:rotate(.25deg)}
+.col-d > *{transform:rotate(1.4deg)}
+.col-g > *:hover,.col-d > *:hover{transform:rotate(0)}
+.d-enquete{transition:transform .2s}
+
+/* ---------- le courrier ---------------------------------------------- */
+.courrier{
+  background:linear-gradient(158deg,#EFE2C6,#DCCBA6) !important;
+  border:1px solid #C2A470 !important; border-radius:2px;
+  padding:15px 16px 14px; color:#2A1F12 !important;
+  box-shadow:0 10px 24px rgba(0,0,0,.46);
+}
+/* l'enveloppe : un rabat triangulaire, deux traits */
+.courrier .env{
+  height:46px; margin:2px 0 11px; border:1px solid #B79A63; border-radius:2px;
+  background:
+    linear-gradient(135deg, transparent 49.4%, #B79A63 49.4% 50.6%, transparent 50.6%),
+    linear-gradient(225deg, transparent 49.4%, #B79A63 49.4% 50.6%, transparent 50.6%),
+    linear-gradient(160deg,#F3E8CE,#E3D3AE);
+  background-size:100% 62%,100% 62%,100% 100%;
+  background-position:top left,top left,center;
+  background-repeat:no-repeat;
+  position:relative;
+}
+.courrier .cd{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:#8E2413;font-weight:bold;margin-bottom:4px}
+.courrier .cq{font-size:13.5px;line-height:1.45;color:#3A2E22}
+.courrier .cq.vide{font-style:italic;color:#7D6A4E}
+/* un pli non ouvert : le cachet, et il remue */
+.courrier.attente .env::after{
+  content:""; position:absolute; left:50%; top:52%; width:22px; height:22px;
+  transform:translate(-50%,-50%);
+  border-radius:47% 53% 51% 49%/49% 47% 53% 51%;
+  background:radial-gradient(circle at 36% 30%, #D4553A, #8E2413 62%, #5A140A);
+  box-shadow:0 2px 5px rgba(0,0,0,.5);
+}
+.courrier.attente{animation:frisson 2.4s ease-in-out infinite}
+@keyframes frisson{
+  0%,88%,100%{transform:rotate(1.4deg)}
+  91%{transform:rotate(.2deg) translateX(-1.5px)}
+  94%{transform:rotate(2.4deg) translateX(1.5px)}
+  97%{transform:rotate(1deg)}
+}
+
+/* ---------- la frappe ------------------------------------------------ */
+/* un curseur tant que la ligne s'écrit, et une hauteur réservée pour que
+   rien ne saute quand le texte s'allonge */
+.situ .t{min-height:1.2em}
+.situ .d{min-height:3.1em}
+
+/* ---------- petits écrans -------------------------------------------- */
+@media(max-width:1000px){
+  .plateau{grid-template-columns:1fr}
+  .plateau .col{gap:14px}
+  .col-g > *,.col-c > *,.col-d > *{transform:none}
+  .courrier.attente{animation:none}
+  .tableau{padding:22px 14px 14px;border-width:9px}
+  .bureau::before{left:-8px;right:-8px}
+  .bureau::after{left:-8px;right:-8px}
+}
+</style>
 </head>
 <body>
 <!-- La fenêtre du bureau. Décor peint en CSS/SVG : aucune image requise. -->
@@ -747,6 +876,7 @@ function nouvellePartie(mode,niv){
   if(niv) N=NIVEAUX[niv];
   document.body.dataset.niveau=N.id; peindreVille(); chercherVue();
   if(E&&E.timer){ clearInterval(E.timer); }
+  stopperMachines();
   E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],evVus:[],derEv:-9,consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
@@ -901,25 +1031,37 @@ function rendre(){
   const trois=["a","b","c"].filter(k=>c[k]);
 
   app.innerHTML=`
-  ${barresForces()}
-  ${E.consq?`<div class="consq dossier d-decision" ${D()}>
-      <span class="onglet">Rapport de décision</span>
-      ${esc(E.consq)}<br><span style="color:#8E7C66">${E.entassement}</span></div>`:""}
-  <div class="situ dossier d-situation" ${D()}>
-    <span class="onglet">Affaire du jour</span>
-    <div class="ct">Une nouvelle affaire vous arrive</div>
-    <div class="t">${esc(c.t)}</div>
-    <div class="parle">${esc(c.qui)}</div>
-    <div class="d">${esc(c.d)}</div></div>
-  ${c.f?`<details class="dossier d-enquete" ${D()}>
-      <summary><span class="onglet">Rapport d’enquête</span>
-        Le bureau d’enquête a joint une note à ce dossier.
-        <span class="pli"></span></summary>
-      <div class="corps">${esc(c.f)}</div></details>`:""}
-  <div class="rep ${trois.length===2?"deux":""}" ${D()}>
-    ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
-      <span class="q">${esc(c[k].q)}</span><span class="impacts">${impacts(c[k].e)}</span></button>`).join("")}
+  <div class="tableau" ${D()}>
+    <span class="plaque">État des forces</span>
+    ${barresForces()}
   </div>
+  <div class="bureau"><div class="plateau">
+    <div class="col col-g">
+      ${E.consq?`<div class="consq dossier d-decision" ${D()}>
+          <span class="onglet">Rapport de décision</span>
+          ${esc(E.consq)}<br><span class="ent">${esc(E.entassement||"")}</span></div>`:""}
+      ${c.f?`<details class="dossier d-enquete" ${D()}>
+          <summary><span class="onglet">Rapport d’enquête</span>
+            Le bureau d’enquête a joint une note.
+            <span class="pli"></span></summary>
+          <div class="corps">${esc(c.f)}</div></details>`:""}
+    </div>
+    <div class="col col-c">
+      <div class="situ dossier d-situation" ${D()}>
+        <span class="onglet">Affaire du jour</span>
+        <div class="ct">Une nouvelle affaire vous arrive</div>
+        <div class="t"></div>
+        <div class="parle">${esc(c.qui)}</div>
+        <div class="d"></div></div>
+    </div>
+    <div class="col col-d">
+      ${courrier(D())}
+    </div>
+    <div class="rep ${trois.length===2?"deux":""}" ${D()}>
+      ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
+        <span class="q">${esc(c[k].q)}</span><span class="impacts">${impacts(c[k].e)}</span></button>`).join("")}
+    </div>
+  </div></div>
   <div class="pied">
     ${E.mode==="campagne"?`<span>Année <b>${AN(E.tour)}</b></span><span>Décision <b>${E.tour+1}</b> sur ${N.tours}</span>`
                          :`<span>Mode survie — décision <b>${E.tour+1}</b></span>`}
@@ -927,6 +1069,7 @@ function rendre(){
     <span class="cond">${CONDITIONS.map(x=>`<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
   </div>`;
   app.classList.remove("presse");
+  ecrire(c.t, c.d);
   majVue();
 }
 
@@ -934,6 +1077,7 @@ function rendre(){
 document.addEventListener("click",e=>{
   if(e.target.closest("button, summary, a")) return;
   app.classList.add("presse");
+  finirEcriture();
 });
 /* On compte les rapports d'enquête réellement ouverts : le rapport final
    dira au professeur qui a enquêté et qui a tranché à l'aveugle. */
@@ -1037,6 +1181,74 @@ function suiteEvenement(){
   if(mort) return finir(mort);
   if(E.mode==="campagne" && E.tour>=N.tours) return finir("verdict");
   piocher(); rendre();
+}
+
+/* ==================================================================
+   LE COURRIER ET LA MACHINE À ÉCRIRE
+   ================================================================== */
+
+/* Un pli est-il sur le point d'arriver ? On rejoue la condition de
+   evenementDu() pour le tour suivant. En survie il n'y a pas de
+   calendrier, donc rien à annoncer : l'enveloppe reste muette. */
+function courrierProche(){
+  if(!E || E.mode!=="campagne") return false;
+  const reste = N.ev.filter(v=>!E.evVus.includes(v.t));
+  if(!reste.length) return false;
+  if((E.tour+1) - E.derEv < 3) return false;
+  const an = AN(Math.min(E.tour+1, N.tours-1));
+  return reste.some(v=>v.an <= an);
+}
+
+function courrier(attr){
+  const proche = courrierProche();
+  const der = E.evVus.length
+    ? N.ev.find(v=>v.t===E.evVus[E.evVus.length-1]) : null;
+  let corps;
+  if(proche) corps = `<div class="cd">À l’instant</div>
+      <div class="cq">Un pli vient d’arriver. Il n’est pas encore ouvert.</div>`;
+  else if(der) corps = `<div class="cd">${esc(der.date)}</div>
+      <div class="cq">${esc(der.t)}</div>`;
+  else corps = `<div class="cq vide">Rien au courrier ce matin.</div>`;
+  return `<div class="courrier dossier ${proche?"attente":""} ${der&&!proche?"ouvert":""}" ${attr}>
+    <span class="onglet">Courrier</span>
+    <div class="env"></div>${corps}</div>`;
+}
+
+/* Le titre s'inscrit, puis la réplique. On garde le texte de côté pour
+   pouvoir le poser d'un coup si le joueur clique. */
+function ecrire(titre, replique){
+  stopperMachines();
+  E.ecrit = {t:titre, d:replique};
+  const t=app.querySelector(".situ .t"), r=app.querySelector(".situ .d");
+  if(!t||!r) return;
+  if(window.SANS_CHRONO || app.classList.contains("presse")){
+    t.textContent=titre; r.textContent=replique; return;
+  }
+  t.textContent=""; r.textContent="";
+  E.machines=[ taper(t, titre, 21, ()=>{ E.machines.push(taper(r, replique, 12)); }) ];
+}
+
+function taper(el, txt, ms, fin){
+  let i=0;
+  const id=setInterval(()=>{
+    el.textContent = txt.slice(0, ++i);
+    if(i>=txt.length){ clearInterval(id); if(fin) fin(); }
+  }, ms);
+  return id;
+}
+
+function stopperMachines(){
+  if(E && E.machines) E.machines.forEach(clearInterval);
+  if(E) E.machines=[];
+}
+
+/* Un clic n'importe où pose le texte en entier. */
+function finirEcriture(){
+  stopperMachines();
+  if(!E || !E.ecrit) return;
+  const t=app.querySelector(".situ .t"), r=app.querySelector(".situ .d");
+  if(t) t.textContent=E.ecrit.t;
+  if(r) r.textContent=E.ecrit.d;
 }
 
 /* ---------- fins ---------- */
