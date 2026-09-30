@@ -756,6 +756,118 @@ body.surtitre footer{opacity:0}
   .titre-ecran .demarrer{padding:14px 44px}
 }
 
+/* ---------- le menu : des feuilles posées sur la table --------------
+   L'écran de titre porte la marque ; ici on est déjà dans le bureau.
+   Quatre fiches numérotées expliquent, un filet sépare, trois dossiers
+   proposent les époques.                                              */
+body.surmenu main{max-width:1080px}
+
+.menu-ecran{position:relative}
+.menu-ecran .dedans-menu{position:relative;width:100%;padding:10px 0 20px;
+  animation:paraitre .5s ease-out}
+@keyframes paraitre{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.menu-ecran .entete{text-align:center;margin-bottom:26px}
+.menu-ecran .entete h1{
+  font-family:var(--serif);font-weight:normal;color:var(--pap);
+  font-size:clamp(30px,5.4vw,52px);line-height:1.02;margin:.08em 0 0;
+  text-shadow:0 3px 24px rgba(0,0,0,.75);
+}
+.menu-ecran .entete .surtitre-txt{
+  font-size:clamp(11px,1.5vw,13.5px);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--lai);text-shadow:0 2px 10px rgba(0,0,0,.8);
+}
+
+/* les quatre temps de l'explication, en fiches de papier */
+.etapes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.etapes{grid-template-columns:1fr}}
+.etape{
+  display:flex; gap:15px; align-items:flex-start;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 26%),
+    repeating-linear-gradient(94deg, rgba(160,140,110,.045) 0 2px, transparent 2px 5px),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  border:1px solid var(--fil); border-radius:2px; padding:17px 19px;
+  color:var(--enc); box-shadow:0 11px 26px rgba(0,0,0,.46);
+}
+.etape:nth-child(1){transform:rotate(-.5deg)}
+.etape:nth-child(2){transform:rotate(.35deg)}
+.etape:nth-child(3){transform:rotate(.3deg)}
+.etape:nth-child(4){transform:rotate(-.4deg)}
+.etape .num{
+  flex:0 0 auto; width:33px; height:33px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--serif); font-size:18px; color:#FFF4DE;
+  background:radial-gradient(circle at 34% 30%, #C79A4E, var(--lai) 55%, #6A4A22);
+  box-shadow:0 3px 9px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.etape h3{
+  font-family:var(--serif); font-weight:normal; color:var(--enc);
+  font-size:19.5px; margin:1px 0 7px; line-height:1.2;
+}
+.etape p{margin:0;font-size:14.5px;line-height:1.6;color:var(--enc2)}
+.etape p strong{color:var(--enc);font-weight:bold}
+
+.mini-forces{display:flex;flex-wrap:wrap;gap:15px;margin:0 0 10px}
+.mini-forces span{display:flex;align-items:center;gap:6px}
+.mini-forces svg{width:19px;height:19px;fill:var(--enc2)}
+.mini-forces i{font-style:normal;font-size:11.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--rge);font-weight:bold}
+
+/* la bascule vers le choix */
+.separation{position:relative;text-align:center;margin:36px 0 20px}
+.separation::before{
+  content:""; position:absolute; left:0; right:0; top:50%; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,137,74,.55) 25%,rgba(184,137,74,.55) 75%,transparent);
+}
+.separation span{
+  position:relative; padding:0 18px;
+  font-family:var(--serif); font-size:clamp(17px,2.3vw,23px);
+  color:var(--pap); text-shadow:0 2px 14px rgba(0,0,0,.85);
+}
+.separation span::before{
+  content:""; position:absolute; inset:-4px -2px; z-index:-1;
+  background:radial-gradient(ellipse at center, rgba(20,14,9,.85) 30%, transparent 75%);
+}
+.note-menu{
+  margin:28px auto 0; max-width:74ch; text-align:center;
+  font-size:12.5px; line-height:1.6; color:#A08A68;
+  text-shadow:0 2px 10px rgba(0,0,0,.8);
+}
+
+/* Le rôle et ses notes, sur papier : l'encre, jamais un gris pâle. */
+.role .note-role{margin:.8em 0 0;font-size:15px;line-height:1.6;color:var(--enc2)}
+.role .note-role strong{color:var(--enc)}
+.role .note-source{margin:.8em 0 0;padding-top:.7em;font-size:13.5px;line-height:1.55;
+  color:var(--enc2);border-top:1px solid var(--fil);opacity:.92}
+
+/* La réglette de volume, dans le bandeau, à côté de l'interrupteur. */
+.son-reglage{display:flex;align-items:center;gap:9px;margin-left:14px}
+#volson{
+  -webkit-appearance:none; appearance:none; width:86px; height:16px;
+  background:transparent; cursor:pointer; margin:0; padding:0; border:none;
+}
+#volson::-webkit-slider-runnable-track{
+  height:4px; border-radius:2px;
+  background:linear-gradient(90deg, var(--bs-gold), rgba(255,255,255,.28));
+}
+#volson::-moz-range-track{
+  height:4px; border-radius:2px;
+  background:linear-gradient(90deg, var(--bs-gold), rgba(255,255,255,.28));
+}
+#volson::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:13px; height:13px; margin-top:-4.5px;
+  border-radius:50%; background:#fff; border:1px solid rgba(0,0,0,.35);
+  box-shadow:0 1px 4px rgba(0,0,0,.5);
+}
+#volson::-moz-range-thumb{
+  width:13px; height:13px; border-radius:50%; background:#fff;
+  border:1px solid rgba(0,0,0,.35); box-shadow:0 1px 4px rgba(0,0,0,.5);
+}
+#volson:hover::-webkit-slider-thumb{background:var(--bs-gold)}
+#volson:hover::-moz-range-thumb{background:var(--bs-gold)}
+@media(max-width:620px){ #volson{width:58px} }
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -860,7 +972,12 @@ body[data-niveau="II"] .question{color:#D9E3ED}
   <svg class="blason" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="#fff" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg>
   <span class="titre">LE PRIX DU PROGRÈS</span>
   <span class="ecole">COLLÈGE ALPIN BEAU SOLEIL · G10</span>
-  <button id="btson" onclick="SON.couper(!SON.actif)" title="Couper le son">♪</button>
+  <span class="son-reglage">
+    <button id="btson" onclick="SON.couper(!SON.actif)" title="Couper le son">♪</button>
+    <input id="volson" type="range" min="0" max="100" step="1" value="85"
+           aria-label="Volume" title="Volume"
+           oninput="SON.volume(this.value/100)">
+  </span>
 </header>
 
 <main id="app"></main>
@@ -896,7 +1013,7 @@ const BOUCLES = {
 const CROISE = 2.5;   // secondes de fondu entre les deux lecteurs
 
 const SON = {
-  ctx:null, pret:false, actif:true, amb:null,
+  ctx:null, pret:false, actif:true, amb:null, vmax:.85,
   maitre:null, bruit:null, tension:0, tic:null,
   lecteurs:[], actifL:0, filtre:null, gainMus:null, veille:null, volume:.55,
   horloge:null, prochain:0, battue:0,
@@ -909,7 +1026,7 @@ const SON = {
       const AC = window.AudioContext||window.webkitAudioContext;
       this.ctx = new AC();
       this.maitre = this.ctx.createGain();
-      this.maitre.gain.value = this.actif ? .85 : 0;
+      this.maitre.gain.value = this.actif ? this.vmax : 0;
       this.maitre.connect(this.ctx.destination);
       const n = this.ctx.sampleRate*2;
       this.bruit = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
@@ -970,11 +1087,20 @@ const SON = {
   couper(v){
     this.actif = v;
     try{ localStorage.setItem("pdp_son", v?"1":"0") }catch(e){}
-    if(this.maitre) this.glisser(this.maitre.gain, v?.85:0, .3);
+    if(this.maitre) this.glisser(this.maitre.gain, v?this.vmax:0, .3);
     this.lecteurs.forEach(L=>{ if(!L) return;
       if(v){ if(L.a.src) L.a.play().catch(()=>{}) } else L.a.pause(); });
     const b=document.getElementById("btson");
     if(b){ b.textContent = v?"♪":"♪̸"; b.title = v?"Couper le son":"Rétablir le son"; }
+  },
+
+  /* La réglette. Rétablit le son si on la remonte alors qu'il était coupé :
+     personne ne comprendrait qu'on pousse le volume sans rien entendre. */
+  volume(v){
+    this.vmax = Math.max(0, Math.min(1, v));
+    try{ localStorage.setItem("pdp_vol", this.vmax.toFixed(2)) }catch(e){}
+    if(this.vmax > 0 && !this.actif){ this.couper(true); return; }
+    if(this.maitre) this.glisser(this.maitre.gain, this.actif ? this.vmax : 0, .12);
   },
 
   glisser(param, val, t){
@@ -1148,7 +1274,13 @@ const SON = {
   },
 };
 
-try{ SON.actif = localStorage.getItem("pdp_son") !== "0"; }catch(e){}
+try{ SON.actif = localStorage.getItem("pdp_son") !== "0";
+     const v = parseFloat(localStorage.getItem("pdp_vol"));
+     if(!isNaN(v)) SON.vmax = Math.max(0, Math.min(1, v)); }catch(e){}
+try{ const r=document.getElementById("volson");
+     if(r) r.value = Math.round(SON.vmax*100);
+     const b=document.getElementById("btson");
+     if(b && !SON.actif){ b.textContent="♪̸"; b.title="Rétablir le son"; } }catch(e){}
 ["pointerdown","keydown"].forEach(ev=>
   document.addEventListener(ev, ()=>SON.reveiller(), {once:true}));
 
@@ -1427,6 +1559,7 @@ const AN=t=>Math.round(N.a0+(N.a1-N.a0)*t/(N.tours-1));
 
 function nouvellePartie(mode,niv){
   if(niv) N=NIVEAUX[niv];
+  document.body.classList.remove("surmenu");
   document.body.dataset.niveau=N.id; peindreVille(); chercherVue();
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
@@ -1812,13 +1945,15 @@ function ecrire(titre, expose, replique){
   if(window.SANS_CHRONO || app.classList.contains("presse")){
     t.textContent=titre; if(x) x.textContent=E.ecrit.ex; r.textContent=replique; return;
   }
-  t.textContent=""; r.textContent="";
-  /* L'exposé se pose d'un coup : à 382 caractères, l'écrire lettre à
-     lettre coûtait près d'une minute par partie sans rien ajouter.
-     Seuls le titre puis la réplique se tapent, et vite. */
-  if(x) x.textContent = E.ecrit.ex;
-  E.machines=[ taper(t, titre, 16, ()=>{
-    E.machines.push(taper(r, replique, 8));
+  t.textContent=""; if(x) x.textContent=""; r.textContent="";
+  /* Toute l'affaire s'écrit : le titre, puis l'exposé, puis la réplique.
+     L'exposé défile vite — il fait près de quatre cents caractères — et
+     un clic n'importe où pose l'ensemble d'un coup. */
+  E.machines=[ taper(t, titre, 15, ()=>{
+    if(!x || !E.ecrit.ex){ E.machines.push(taper(r, replique, 7)); return; }
+    E.machines.push(taper(x, E.ecrit.ex, 4, ()=>{
+      E.machines.push(taper(r, replique, 7));
+    }));
   }) ];
 }
 
@@ -2885,17 +3020,64 @@ function accueil(){
       <span class="lieu">${n.lieu}</span>
       <span class="per">${n.sous.replace(n.lieu+", ","")}</span>
       <span class="rec">${r?`Record : ${fmt(r)} ${n.unite2}`:"Jamais joué"}</span></button>`; };
+  document.body.classList.add("surmenu");
   app.innerHTML=`
-  <h1>Le prix du progrès</h1>
-  <p class="sous">Trois révolutions industrielles, une même question : qui paie le progrès ?</p>
-  <div class="niveaux">${carte("I",1)}${carte("II",1)}${carte("III",0)}</div>
-  <div class="bilan"><h2 style="margin-top:0">La règle, quelle que soit l’époque</h2>
-    <p style="margin:.3em 0">Quatre forces vous jugent. Chaque décision en contente une et en fâche une autre.
-    <strong>Si l’une d’elles tombe à zéro, la partie s’arrête.</strong> Il n’existe aucune réponse qui plaise à tout le monde —
-    c’est le sujet même du cours.</p></div>`;
+  <div class="menu-ecran">
+    <div class="dedans-menu">
+
+      <div class="entete">
+        <div class="surtitre-txt">Avant de commencer</div>
+        <h1>Comment on joue</h1>
+      </div>
+
+      <div class="etapes">
+        <div class="etape">
+          <span class="num">1</span>
+          <div>
+            <h3>Vous êtes celui qui tranche</h3>
+            <p>Ni le patron, ni l’ouvrier, ni le député. Chaque affaire vous arrive par
+            quelqu’un qui vient plaider sa cause — et vous devez répondre.</p>
+          </div>
+        </div>
+        <div class="etape">
+          <span class="num">2</span>
+          <div>
+            <h3>Quatre forces vous jugent</h3>
+            <div class="mini-forces">${CLES.map(k=>`<span title="${esc(NIVEAUX.I.forces[k].nom)}">
+              ${icone(k)}<i>${esc(NIVEAUX.I.forces[k].nom)}</i></span>`).join("")}</div>
+            <p>Chaque décision en contente une et en fâche une autre.
+            <strong>Aucune réponse ne plaît à tout le monde</strong> — c’est le sujet même du cours.</p>
+          </div>
+        </div>
+        <div class="etape">
+          <span class="num">3</span>
+          <div>
+            <h3>Si l’une tombe à zéro, tout s’arrête</h3>
+            <p>Vous êtes prévenu bien avant. Menez votre ville — ou votre usine — jusqu’au bout
+            de la période, et découvrez quel monde vous aurez bâti.</p>
+          </div>
+        </div>
+        <div class="etape">
+          <span class="num">4</span>
+          <div>
+            <h3>Rien ne se perd</h3>
+            <p>À la fin, vous emportez votre carnet de décisions, un questionnaire noté sur ce que
+            vous avez rencontré, et votre propre réflexion sur la partie.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="separation"><span>Choisissez votre époque</span></div>
+      <div class="niveaux">${carte("I",1)}${carte("II",1)}${carte("III",0)}</div>
+
+      <p class="note-menu">Les personnages qui vous parlent sont des figures composites.
+      Les événements datés, eux, sont authentiques — le jeu cite ses sources.</p>
+    </div>
+  </div>`;
 }
 
 function menuNiveau(id){
+  document.body.classList.remove("surmenu");
   N=NIVEAUX[id]; document.body.dataset.niveau=id; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
   const rec=record();
   app.innerHTML=`
@@ -2905,8 +3087,8 @@ function menuNiveau(id){
     <div class="r">${N.role}</div>
     <p style="margin:.3em 0">${N.qui}</p>
     <p style="margin:.6em 0 0"><strong>Si l’une des quatre forces tombe à zéro, la partie s’arrête.</strong> ${N.but}</p>
-    <p style="margin:.7em 0 0;font-size:14.5px;color:#A6947C">${N.note}</p>
-    <p style="margin:.7em 0 0;font-size:13px;color:#8E7C66">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
+    <p class="note-role">${N.note}</p>
+    <p class="note-source">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
   </div>
   <div class="acteurs">${CLES.map(k=>`<div class="acteur">
      <div class="tete">${icone(k)}<span>${N.forces[k].nom}</span></div>
