@@ -585,6 +585,26 @@ body[data-niveau="II"] .situ .ex{color:#3D474F}
 .acteur .role{font-size:13.5px;line-height:1.55;color:var(--enc2)}
 .acteur .role strong{color:var(--enc)}
 
+/* Les trois paliers d'alerte. On ne meurt pas sans avoir été prévenu. */
+.force .etat{font-size:10.5px;letter-spacing:.04em;margin-top:6px;font-style:italic}
+.force.fragile{border-color:#C08A2A}
+.force.fragile .etat{color:#9A6A1E}
+.force.danger{border-color:var(--rge);box-shadow:0 0 0 2px rgba(176,58,30,.28),0 8px 18px rgba(0,0,0,.45)}
+.force.danger .etat{color:var(--rge);font-weight:bold}
+.force.critique{border-color:var(--rge);border-width:2px;
+  box-shadow:0 0 0 3px rgba(176,58,30,.4),0 8px 18px rgba(0,0,0,.45);
+  animation:battrerouge 1.1s ease-in-out infinite}
+.force.critique .etat{color:var(--rge);font-weight:bold}
+@keyframes battrerouge{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+
+.alarme{
+  background:linear-gradient(160deg,#B0442A,#7E2413); color:#FFEDE3;
+  border:1px solid #5A140A; border-radius:2px; padding:12px 18px; margin:0 0 16px;
+  font-size:15px; line-height:1.45; box-shadow:0 10px 26px rgba(0,0,0,.55);
+  animation:battement 1.6s ease-in-out infinite;
+}
+.alarme strong{color:#F3BE31}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1319,11 +1339,30 @@ function impacts(e){
 }
 function barresForces(){
   return `<div class="forces">${CLES.map(k=>{
-    const v=E.f[k], col=v>55?"var(--vert)":v>25?"var(--accent)":"var(--bs-orange)";
-    return `<div class="force ${v<=20?"danger":""}" title="${N.forces[k].nom} — ${N.forces[k].veut}">
+    const v=E.f[k];
+    const col = v>55?"var(--vert)" : v>35?"var(--accent)" : v>20?"#D08A2A" : "var(--rge)";
+    /* trois paliers, pour qu'on voie venir la rupture */
+    const etat = v<=10 ? "critique" : v<=20 ? "danger" : v<=35 ? "fragile" : "";
+    const mot  = v<=10 ? "au bord de la rupture" : v<=20 ? "ne tiendra pas longtemps"
+               : v<=35 ? "fragile" : "";
+    return `<div class="force ${etat}" title="${N.forces[k].nom} — ${N.forces[k].veut}">
       ${icone(k)}<div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
-      <div class="mini"><i style="width:${v}%;background:${col}"></i></div></div>`;
+      <div class="mini"><i style="width:${v}%;background:${col}"></i></div>
+      ${mot?`<div class="etat">${mot}</div>`:""}</div>`;
   }).join("")}</div>`;
+}
+
+/* Le bandeau d'alerte : il nomme le risque et dit ce qu'il en coûte. */
+function alerte(){
+  if(!E || !E.f) return "";
+  const bas = CLES.filter(k=>E.f[k]<=14).sort((a,b)=>E.f[a]-E.f[b]);
+  if(!bas.length) return "";
+  const noms = bas.map(k=>N.forces[k].nom.toLowerCase());
+  const liste = noms.map(n=>"les "+n).join(" et ");
+  return `<div class="alarme">
+    <strong>Attention.</strong> Vous allez perdre ${liste}.
+    Si ${noms.length>1?"l’une de ces forces tombe":"cette force tombe"} à zéro, la partie s’arrête
+    immédiatement — ${esc(N.forces[bas[0]].veut)}.</div>`;
 }
 
 /* ==================================================================
@@ -1405,6 +1444,7 @@ function rendre(){
     <span class="plaque">État des forces</span>
     ${barresForces()}
   </div>
+  ${alerte()}
   <div class="bureau"><div class="plateau">
     <div class="col col-g">
       ${E.consq?`<div class="consq dossier d-decision" ${D()}>
