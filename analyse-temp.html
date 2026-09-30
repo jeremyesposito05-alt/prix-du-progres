@@ -5,30 +5,30 @@
  const L=[];
  const F=[["menu.mp3","Menu principal"],["niveau-I.mp3","Manchester"],["niveau-II.mp3","Detroit"]];
  const ctx=new (window.AudioContext||window.webkitAudioContext)();
- const rms=(d,a,b)=>{ let s=0,n=0; for(let i=a;i<b&&i<d.length;i++){ s+=d[i]*d[i]; n++ } return n?Math.sqrt(s/n):0; };
- const dbfs=v=>v<=1e-6?-120:Math.round(20*Math.log10(v)*10)/10;
+ const rms=(d,a,b)=>{ let s=0,n=0; for(let i=Math.max(0,a);i<b&&i<d.length;i++){ s+=d[i]*d[i]; n++ } return n?Math.sqrt(s/n):0; };
+ const db=v=>v<=1e-7?-140:20*Math.log10(v);
  for(const [f,nom] of F){
   try{
    const r=await fetch("son/"+f); const ab=await r.arrayBuffer();
    const b=await ctx.decodeAudioData(ab);
    const d=b.getChannelData(0), sr=b.sampleRate, n=d.length;
-   const global=rms(d,0,n);
-   // silences : on cherche le premier et le dernier echantillon audible
-   const seuil=global*0.04;
-   let deb=0; while(deb<n && Math.abs(d[deb])<seuil) deb++;
-   let fin=n-1; while(fin>0 && Math.abs(d[fin])<seuil) fin--;
-   const ms=x=>Math.round(x/sr*1000);
-   // raccord : niveau des 200 ms de fin vs 200 ms de debut
-   const p=Math.round(sr*0.2);
-   const rDeb=rms(d,0,p), rFin=rms(d,n-p,n);
-   const ecart=Math.abs(dbfs(rDeb)-dbfs(rFin));
-   L.push(nom.padEnd(16)+" "+(Math.round(b.duration*10)/10)+" s   niveau moyen "+String(dbfs(global)).padStart(6)+" dBFS");
-   L.push("   silence au debut : "+String(ms(deb)).padStart(5)+" ms"
-     +"     silence a la fin : "+String(ms(n-1-fin)).padStart(5)+" ms");
-   L.push("   raccord  debut "+String(dbfs(rDeb)).padStart(6)+" dBFS   fin "+String(dbfs(rFin)).padStart(6)
-     +" dBFS   ecart "+ecart.toFixed(1)+" dB  "
-     + (ms(deb)>60||ms(n-1-fin)>60 ? "<- SILENCE AUDIBLE, la boucle claquera"
-        : ecart>6 ? "<- ecart de niveau, raccord perceptible" : "raccord correct"));
+   const moy=db(rms(d,0,n));
+   const fen=Math.round(sr*0.25);
+   // premier et dernier instant ou la matiere est a moins de 12 dB sous la moyenne
+   const seuil=moy-12;
+   let i=0; while(i+fen<n && db(rms(d,i,i+fen))<seuil) i+=fen;
+   const debut=i/sr;
+   let j=n-fen; while(j>0 && db(rms(d,j,j+fen))<seuil) j-=fen;
+   const fin=(j+fen)/sr;
+   L.push(nom.padEnd(16)+" duree "+b.duration.toFixed(2)+" s   niveau moyen "+moy.toFixed(1)+" dBFS");
+   L.push("   matiere pleine de "+debut.toFixed(2)+" s a "+fin.toFixed(2)+" s"
+     +"   (on perd "+(b.duration-fin).toFixed(2)+" s de fondu+silence a la fin)");
+   // niveau au point de reprise et au point de bouclage, pour juger le raccord
+   const a1=db(rms(d,Math.round(debut*sr),Math.round(debut*sr)+fen));
+   const a2=db(rms(d,Math.round(fin*sr)-fen,Math.round(fin*sr)));
+   L.push("   niveau au depart "+a1.toFixed(1)+" dBFS   au bouclage "+a2.toFixed(1)
+     +" dBFS   ecart "+Math.abs(a1-a2).toFixed(1)+" dB");
+   L.push("   >>> boucle: {debut:"+debut.toFixed(2)+", fin:"+fin.toFixed(2)+"}");
    L.push("");
   }catch(e){ L.push(nom+" : ERREUR "+e.message); }
  }
