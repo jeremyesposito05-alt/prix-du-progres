@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>analyse</title></head><body>
+<pre id="R">…</pre>
+<script>
+(async function(){
+ const L=[];
+ const F=[["menu.mp3","Menu principal"],["niveau-I.mp3","Manchester"],["niveau-II.mp3","Detroit"]];
+ const ctx=new (window.AudioContext||window.webkitAudioContext)();
+ const rms=(d,a,b)=>{ let s=0,n=0; for(let i=a;i<b&&i<d.length;i++){ s+=d[i]*d[i]; n++ } return n?Math.sqrt(s/n):0; };
+ const dbfs=v=>v<=1e-6?-120:Math.round(20*Math.log10(v)*10)/10;
+ for(const [f,nom] of F){
+  try{
+   const r=await fetch("son/"+f); const ab=await r.arrayBuffer();
+   const b=await ctx.decodeAudioData(ab);
+   const d=b.getChannelData(0), sr=b.sampleRate, n=d.length;
+   const global=rms(d,0,n);
+   // silences : on cherche le premier et le dernier echantillon audible
+   const seuil=global*0.04;
+   let deb=0; while(deb<n && Math.abs(d[deb])<seuil) deb++;
+   let fin=n-1; while(fin>0 && Math.abs(d[fin])<seuil) fin--;
+   const ms=x=>Math.round(x/sr*1000);
+   // raccord : niveau des 200 ms de fin vs 200 ms de debut
+   const p=Math.round(sr*0.2);
+   const rDeb=rms(d,0,p), rFin=rms(d,n-p,n);
+   const ecart=Math.abs(dbfs(rDeb)-dbfs(rFin));
+   L.push(nom.padEnd(16)+" "+(Math.round(b.duration*10)/10)+" s   niveau moyen "+String(dbfs(global)).padStart(6)+" dBFS");
+   L.push("   silence au debut : "+String(ms(deb)).padStart(5)+" ms"
+     +"     silence a la fin : "+String(ms(n-1-fin)).padStart(5)+" ms");
+   L.push("   raccord  debut "+String(dbfs(rDeb)).padStart(6)+" dBFS   fin "+String(dbfs(rFin)).padStart(6)
+     +" dBFS   ecart "+ecart.toFixed(1)+" dB  "
+     + (ms(deb)>60||ms(n-1-fin)>60 ? "<- SILENCE AUDIBLE, la boucle claquera"
+        : ecart>6 ? "<- ecart de niveau, raccord perceptible" : "raccord correct"));
+   L.push("");
+  }catch(e){ L.push(nom+" : ERREUR "+e.message); }
+ }
+ document.getElementById("R").textContent=L.join("\n");
+})();
+</script></body></html>
