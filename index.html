@@ -682,32 +682,34 @@ body[data-niveau="II"] .question{color:#D9E3ED}
 /* ==================================================================
    LE SON
 
-   Première version : tout était synthétisé, y compris l'ambiance de
-   fond. Résultat, un bourdon désagréable — quelques oscillateurs tenus
-   ne font pas une musique. Supprimé.
+   Trois boucles fournies, libres de droits, 80 kbit/s stéréo.
 
-   Ce qui reste et qui fonctionne : les sons **ponctuels**. Un coup
-   grave à l'arrivée d'un pli, le froissement d'une feuille qu'on pose,
-   le tic-tac d'une décision chronométrée, la cloche de fin. Courts,
-   utiles, jamais pénibles.
+   Mesuré à la décompression, elles ont toutes le même défaut : un
+   fondu descendant puis deux secondes de silence à la fin. Jouées en
+   boucle simple, on entendrait un trou toutes les deux ou trois
+   minutes. On ne les rejoue donc pas d'un bout à l'autre : on boucle
+   sur la matière pleine, mesurée fichier par fichier, avec un fondu
+   croisé de deux secondes et demie entre la fin et la reprise.
 
-   Ce qui est prêt à recevoir : des **boucles audio** déposées dans
-   son/. Elles jouent en fond, et la tension les transforme sans les
-   déformer — un filtre qui s'ouvre, le volume qui monte, et un
-   battement discret qui vient se poser par-dessus quand ça va mal.
-   Sans fichier, le jeu reste silencieux : aucun bourdon de repli.
+   Deux lecteurs alternent pour cela. Les niveaux relevés au point de
+   reprise et au point de bouclage ne diffèrent que de 0,5 à 1,5 dB :
+   le raccord est inaudible.
 
-      son/menu.mp3        l'écran d'accueil
-      son/niveau-I.mp3    Manchester
-      son/niveau-II.mp3   Detroit
-
-   Les navigateurs interdisent de démarrer un son sans geste de
-   l'utilisateur : tout se met en route au premier clic.
+   Par-dessus, la tension du jeu ouvre un filtre, monte le volume et
+   accélère de 5 % au plus ; et au-delà d'un seuil seulement, un
+   battement de machine vient se poser sur la musique.
    ================================================================== */
+const BOUCLES = {
+  menu:{ f:"son/menu.mp3",      debut:2.00, fin:167.6 },
+  I:   { f:"son/niveau-I.mp3",  debut:0.00, fin:142.2 },
+  II:  { f:"son/niveau-II.mp3", debut:0.75, fin:136.8 },
+};
+const CROISE = 2.5;   // secondes de fondu entre les deux lecteurs
+
 const SON = {
   ctx:null, pret:false, actif:true, amb:null,
   maitre:null, bruit:null, tension:0, tic:null,
-  audio:null, source:null, filtre:null, gainMus:null,
+  lecteurs:[], actifL:0, filtre:null, gainMus:null, veille:null, volume:.55,
   horloge:null, prochain:0, battue:0,
 
   dispo(){ return typeof (window.AudioContext||window.webkitAudioContext)==="function"; },
@@ -724,21 +726,61 @@ const SON = {
       this.bruit = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
       const d = this.bruit.getChannelData(0);
       for(let i=0;i<n;i++) d[i] = Math.random()*2-1;
+      /* la chaîne commune aux deux lecteurs : mélange, filtre, volume */
+      this.filtre = this.ctx.createBiquadFilter();
+      this.filtre.type="lowpass"; this.filtre.frequency.value=1600;
+      this.gainMus = this.ctx.createGain(); this.gainMus.gain.value=1;
+      this.filtre.connect(this.gainMus); this.gainMus.connect(this.maitre);
       this.pret = true;
     }catch(e){ this.pret=false; }
+  },
+
+  /* Deux lecteurs, créés une seule fois : createMediaElementSource ne
+     peut être appelé qu'une fois par élément audio. */
+  lecteur(i){
+    if(this.lecteurs[i]) return this.lecteurs[i];
+    const a = new Audio();
+    a.preload="auto"; a.crossOrigin="anonymous"; a.volume=1;
+    const L = {a, g:null, ok:false};
+    if(this.ctx){
+      try{
+        const src = this.ctx.createMediaElementSource(a);
+        L.g = this.ctx.createGain(); L.g.gain.value = 0;
+        src.connect(L.g); L.g.connect(this.filtre);
+        L.ok = true;
+      }catch(e){ L.g=null; a.volume=0; }
+    } else { a.volume=0; }
+    this.lecteurs[i]=L;
+    return L;
+  },
+
+  vol(L, v, t){
+    if(L.g) this.glisser(L.g.gain, v, t);
+    else {
+      /* repli sans Web Audio : on anime le volume de l'élément */
+      const dep=L.a.volume, pas=(v-dep)/Math.max(1,t*20);
+      clearInterval(L.anim);
+      L.anim = setInterval(()=>{
+        let x = L.a.volume + pas;
+        if((pas>0 && x>=v) || (pas<0 && x<=v)){ x=v; clearInterval(L.anim); }
+        try{ L.a.volume = Math.max(0,Math.min(1,x)) }catch(e){}
+      }, 50);
+    }
   },
 
   reveiller(){
     this.init();
     if(this.ctx && this.ctx.state==="suspended") this.ctx.resume().catch(()=>{});
-    if(this.audio && this.actif) this.audio.play().catch(()=>{});
+    const L=this.lecteurs[this.actifL];
+    if(L && this.actif && L.a.src) L.a.play().catch(()=>{});
   },
 
   couper(v){
     this.actif = v;
     try{ localStorage.setItem("pdp_son", v?"1":"0") }catch(e){}
     if(this.maitre) this.glisser(this.maitre.gain, v?.85:0, .3);
-    if(this.audio){ if(v) this.audio.play().catch(()=>{}); else this.audio.pause(); }
+    this.lecteurs.forEach(L=>{ if(!L) return;
+      if(v){ if(L.a.src) L.a.play().catch(()=>{}) } else L.a.pause(); });
     const b=document.getElementById("btson");
     if(b){ b.textContent = v?"♪":"♪̸"; b.title = v?"Couper le son":"Rétablir le son"; }
   },
@@ -751,84 +793,62 @@ const SON = {
     catch(e){ param.value = val; }
   },
 
-  /* ---------- l'ambiance : une boucle, si elle existe ---------------- */
+  /* ---------- l'ambiance --------------------------------------------- */
   ambiance(quoi){
     this.init();
     if(this.amb===quoi) return;
     this.amb = quoi;
-    this.arreterMusique();
-    const src = quoi==="menu" ? "son/menu.mp3" : "son/niveau-"+quoi+".mp3";
-    this.charger(src);
+    const b = BOUCLES[quoi];
+    this.lecteurs.forEach(L=>{ if(L) this.vol(L, 0, .5); });
+    clearInterval(this.veille); this.veille=null;
+    if(!b || !this.pret){ setTimeout(()=>this.stopTous(), 700); return; }
+    this.actifL = 0;
+    this.demarrer(this.lecteur(0), b, true);
+    this.lecteur(1);                       // prêt pour le premier croisement
+    this.surveiller(b);
     this.lancerHorloge();
   },
 
-  charger(src){
-    let a;
-    try{ a = new Audio(src); }catch(e){ return; }
-    a.loop = true; a.volume = 0; a.preload = "auto";
-    /* Pas de fichier, pas de son : on ne remplace rien par un bourdon. */
-    a.addEventListener("error", ()=>{ if(this.audio===a){ this.audio=null; } });
-    a.addEventListener("canplay", ()=>{
-      if(this.audio!==a) return;
-      if(this.actif) a.play().catch(()=>{});
-      this.brancher(a);
-      this.fondu(a, .55, 1.8);
-    }, {once:true});
-    this.audio = a;
-  },
-
-  /* On fait passer la boucle par un filtre, pour que la tension puisse
-     la transformer. Si le navigateur refuse (fichier local, origine
-     différente), on joue sans filtre plutôt que de ne rien jouer. */
-  brancher(a){
-    if(!this.ctx) return;
+  demarrer(L, b, fondu){
     try{
-      this.source = this.ctx.createMediaElementSource(a);
-      this.filtre = this.ctx.createBiquadFilter();
-      this.filtre.type = "lowpass";
-      this.filtre.frequency.value = 1400;
-      this.gainMus = this.ctx.createGain();
-      this.gainMus.gain.value = 1;
-      this.source.connect(this.filtre);
-      this.filtre.connect(this.gainMus);
-      this.gainMus.connect(this.maitre);
-      a.volume = 1;              // le volume passe désormais par le gain
-      this.gainMus.gain.value = 0;
-      this.glisser(this.gainMus.gain, .55, 1.8);
-    }catch(e){ this.source=null; this.filtre=null; this.gainMus=null; }
+      if(L.a.getAttribute("src") !== b.f){ L.a.src = b.f; L.a.load(); }
+      L.a.currentTime = b.debut;
+    }catch(e){}
+    if(this.actif) L.a.play().catch(()=>{});
+    this.vol(L, fondu ? this.volume : this.volume, fondu ? 1.8 : CROISE);
   },
 
-  fondu(a, v, t){
-    if(this.gainMus) return;     // déjà géré par le gain Web Audio
-    const d = v/(t*20); let x = a.volume;
-    const id = setInterval(()=>{
-      x = Math.min(v, x+d); a.volume = x;
-      if(x>=v) clearInterval(id);
-    }, 50);
+  /* On ne laisse jamais le fichier aller jusqu'au bout : à l'approche du
+     point de bouclage, l'autre lecteur reprend au début en fondu. */
+  surveiller(b){
+    this.veille = setInterval(()=>{
+      if(!this.amb || !BOUCLES[this.amb]) return;
+      const L=this.lecteurs[this.actifL];
+      if(!L || L.a.paused) return;
+      if(L.a.currentTime >= b.fin - CROISE){
+        const autre = this.lecteur(this.actifL^1);
+        this.demarrer(autre, b, false);
+        this.vol(L, 0, CROISE);
+        const vieux = L;
+        setTimeout(()=>{ try{ vieux.a.pause() }catch(e){} }, (CROISE+.4)*1000);
+        this.actifL ^= 1;
+      }
+    }, 250);
   },
 
-  arreterMusique(){
-    const a = this.audio;
-    if(!a) return;
-    this.audio=null;
-    if(this.gainMus) this.glisser(this.gainMus.gain, 0, .4);
-    try{ setTimeout(()=>{ try{ a.pause() }catch(e){} }, 500); }catch(e){}
-    this.source=null; this.filtre=null; this.gainMus=null;
+  stopTous(){
+    this.lecteurs.forEach(L=>{ if(L){ try{ L.a.pause() }catch(e){} } });
   },
 
-  /* ---------- le battement, seulement quand ça va mal ---------------- */
-  /* Ce n'est plus une ambiance mais un signal : il n'apparaît qu'au-delà
-     d'un certain seuil, et il se pose sur la musique sans la masquer. */
+  /* ---------- le battement, au-delà du seuil seulement ---------------- */
   lancerHorloge(){
     if(this.horloge) return;
     this.horloge = setInterval(()=>{
       if(!this.ctx || !this.amb || this.amb==="menu") return;
-      if(this.tension < .45) { this.prochain = this.ctx.currentTime + .2; return; }
-      const bpm = 54 + this.tension*54;
-      const pas = 60/bpm;
+      if(this.tension < .45){ this.prochain = this.ctx.currentTime + .2; return; }
+      const pas = 60/(54 + this.tension*54);
       while(this.prochain < this.ctx.currentTime + .12){
-        this.battre(this.prochain);
-        this.prochain += pas;
+        this.battre(this.prochain); this.prochain += pas;
       }
       if(this.prochain < this.ctx.currentTime) this.prochain = this.ctx.currentTime + .05;
     }, 25);
@@ -836,49 +856,44 @@ const SON = {
 
   battre(t){
     this.battue++;
-    const force = (this.tension-.45)/.55;          // 0 au seuil, 1 au pire
-    if(this.amb==="I") this.vapeur(t, this.battue%2===0, force);
-    else               this.chaine(t, this.battue%4===0, force);
+    const k=(this.tension-.45)/.55;
+    if(this.amb==="I") this.vapeur(t, this.battue%2===0, k);
+    else               this.chaine(t, this.battue%4===0, k);
   },
 
   vapeur(t, fort, k){
-    const c=this.ctx;
-    const o=c.createOscillator(), g=c.createGain();
+    const c=this.ctx, o=c.createOscillator(), g=c.createGain();
     o.type="sine"; o.frequency.setValueAtTime(fort?62:52, t);
     o.frequency.exponentialRampToValueAtTime(fort?30:26, t+.16);
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime((fort?.20:.12)*k, t+.012);
+    g.gain.linearRampToValueAtTime((fort?.17:.10)*k, t+.012);
     g.gain.exponentialRampToValueAtTime(.001, t+.22);
     o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.26);
   },
 
   chaine(t, fort, k){
-    const c=this.ctx;
-    const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    const c=this.ctx, s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
     s.buffer=this.bruit; s.loop=true;
-    f.type="bandpass"; f.frequency.value = fort?2600:3400; f.Q.value=9;
+    f.type="bandpass"; f.frequency.value=fort?2600:3400; f.Q.value=9;
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime((fort?.07:.04)*k, t+.004);
+    g.gain.linearRampToValueAtTime((fort?.06:.035)*k, t+.004);
     g.gain.exponentialRampToValueAtTime(.001, t+(fort?.10:.05));
     s.connect(f); f.connect(g); g.connect(this.maitre); s.start(t); s.stop(t+.14);
   },
 
-  /* ---------- la tension -------------------------------------------- */
-  /* Ce qui inquiète, c'est la force la plus basse — pas la moyenne :
-     une ville peut prospérer et s'effondrer par un seul côté. */
+  /* ---------- la tension ---------------------------------------------- */
   majTension(){
     if(!this.pret) return;
     if(typeof E==="undefined" || !E || !E.f) return;
     const bas = Math.min(E.f.i, E.f.o, E.f.m, E.f.p);
     const t = Math.max(0, Math.min(1, (62-bas)/52));
     this.tension = t;
-    /* la boucle s'éclaircit et monte à mesure que la situation se tend */
-    if(this.filtre)  this.glisser(this.filtre.frequency, 900 + t*5600, 2.2);
-    if(this.gainMus) this.glisser(this.gainMus.gain, .5 + t*.22, 2.2);
-    if(this.audio)   { try{ this.audio.playbackRate = 1 + t*.05 }catch(e){} }
+    if(this.filtre)  this.glisser(this.filtre.frequency, 1100 + t*6000, 2.2);
+    if(this.gainMus) this.glisser(this.gainMus.gain, 1 + t*.35, 2.2);
+    this.lecteurs.forEach(L=>{ if(L){ try{ L.a.playbackRate = 1 + t*.05 }catch(e){} } });
   },
 
-  /* ---------- les effets ponctuels ----------------------------------- */
+  /* ---------- les effets ponctuels ------------------------------------- */
   coup(){
     if(!this.pret) return;
     const c=this.ctx, t=c.currentTime+.02;
@@ -889,11 +904,9 @@ const SON = {
     g.gain.linearRampToValueAtTime(.38, t+.02);
     g.gain.exponentialRampToValueAtTime(.001, t+1.1);
     o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+1.2);
-    /* la musique s'efface un instant pour laisser passer le coup */
     if(this.gainMus){
-      const v=this.gainMus.gain.value;
-      this.glisser(this.gainMus.gain, v*.35, .2);
-      setTimeout(()=>this.majTension(), 1000);
+      this.glisser(this.gainMus.gain, .35, .2);
+      setTimeout(()=>this.majTension(), 1100);
     }
   },
 
@@ -904,7 +917,7 @@ const SON = {
     s.buffer=this.bruit; s.loop=true;
     f.type="bandpass"; f.frequency.value=4200; f.Q.value=1.4;
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(.045, t+.03);
+    g.gain.linearRampToValueAtTime(.04, t+.03);
     g.gain.exponentialRampToValueAtTime(.001, t+.19);
     s.connect(f); f.connect(g); g.connect(this.maitre); s.start(t); s.stop(t+.22);
   },
@@ -917,7 +930,7 @@ const SON = {
     this.tic = setInterval(()=>{
       const c=this.ctx, t=c.currentTime+.01;
       const o=c.createOscillator(), g=c.createGain();
-      o.type="square"; o.frequency.value = (n++%2) ? 1900 : 1500;
+      o.type="square"; o.frequency.value=(n++%2)?1900:1500;
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(.06, t+.004);
       g.gain.exponentialRampToValueAtTime(.001, t+.05);
@@ -938,13 +951,15 @@ const SON = {
       g.gain.exponentialRampToValueAtTime(.001, t+i*.09+2.6);
       o.connect(g); g.connect(this.maitre); o.start(t+i*.09); o.stop(t+i*.09+2.8);
     });
-    this.arreterMusique(); this.amb=null;
+    /* la musique baisse mais ne s'arrête pas : on lit encore le verdict */
+    if(this.gainMus) this.glisser(this.gainMus.gain, .45, 1.5);
   },
 };
 
 try{ SON.actif = localStorage.getItem("pdp_son") !== "0"; }catch(e){}
 ["pointerdown","keydown"].forEach(ev=>
   document.addEventListener(ev, ()=>SON.reveiller(), {once:true}));
+
 
 
 /* ==================================================================
