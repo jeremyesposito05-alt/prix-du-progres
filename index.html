@@ -1673,14 +1673,13 @@ function ecrire(titre, expose, replique){
   if(window.SANS_CHRONO || app.classList.contains("presse")){
     t.textContent=titre; if(x) x.textContent=E.ecrit.ex; r.textContent=replique; return;
   }
-  t.textContent=""; if(x) x.textContent=""; r.textContent="";
-  /* Le titre se pose, l'exposé défile vite, la réplique se dit.
-     Un clic n'importe où termine l'ensemble : voir finirEcriture(). */
-  E.machines=[ taper(t, titre, 20, ()=>{
-    if(!x || !E.ecrit.ex) { E.machines.push(taper(r, replique, 12)); return; }
-    E.machines.push(taper(x, E.ecrit.ex, 7, ()=>{
-      E.machines.push(taper(r, replique, 12));
-    }));
+  t.textContent=""; r.textContent="";
+  /* L'exposé se pose d'un coup : à 382 caractères, l'écrire lettre à
+     lettre coûtait près d'une minute par partie sans rien ajouter.
+     Seuls le titre puis la réplique se tapent, et vite. */
+  if(x) x.textContent = E.ecrit.ex;
+  E.machines=[ taper(t, titre, 16, ()=>{
+    E.machines.push(taper(r, replique, 8));
   }) ];
 }
 
