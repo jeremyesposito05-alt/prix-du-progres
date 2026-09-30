@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le prix du progrès</title>
+<style>
+/* ===================================================================
+   LE PRIX DU PROGRÈS — Collège Alpin Beau Soleil — Unité 1, G10
+   La marque tient le cadre (blason, SangBleu, barre navy),
+   l'époque tient le plateau (brique, suie, ivoire, cuivre).
+   Une situation, deux réponses, quatre forces qui vous jugent.
+   =================================================================== */
+:root{
+  --bs-navy:#1A2047; --bs-wgrey:#9C9895; --bs-orange:#CA5007; --bs-gold:#F3BE31;
+  --serif:"SangBleu OG Sans","SangBleu Sans",Georgia,serif;
+  --sans:Calibri,"Segoe UI",system-ui,sans-serif;
+  --fond:#241C16; --fond2:#30251C; --papier:#EFE5D4; --accent:#C8872B;
+  --trait:#5A4736; --vert:#8FBF7A; --rouge:#D97A5A;
+}
+/* Detroit : acier, bleu de travail, crème. Le cadre de marque ne bouge pas. */
+body[data-niveau="II"]{
+  --fond:#1B2026; --fond2:#262E36; --papier:#E9E5DD; --accent:#8FB4D9;
+  --trait:#3D4954;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fond);color:var(--papier);min-height:100vh;display:flex;flex-direction:column;
+  font-family:var(--sans);font-size:16px;line-height:1.5}
+
+header{background:var(--bs-navy);color:#fff;display:flex;align-items:center;gap:13px;
+  padding:9px 18px;border-bottom:3px solid var(--accent)}
+header svg.blason{width:24px;height:24px;flex:0 0 auto}
+header .titre{font-family:var(--serif);font-size:18px;letter-spacing:.06em}
+header .ecole{font-size:11.5px;color:#B9BCCB;margin-left:auto;letter-spacing:.08em}
+
+main{max-width:900px;width:100%;margin:0 auto;padding:18px 18px 40px;flex:1;display:flex;flex-direction:column;justify-content:center}
+h1{font-family:var(--serif);font-weight:normal;font-size:clamp(30px,5vw,50px);margin:.15em 0}
+h2{font-family:var(--serif);font-weight:normal;font-size:20px;color:var(--accent);margin:1.4em 0 .5em}
+.sous{color:var(--bs-wgrey);margin:0 0 1.3em}
+.centre{text-align:center}
+button{font-family:var(--sans);font-size:15px;cursor:pointer;border-radius:3px;
+  border:1px solid var(--accent);background:transparent;color:var(--papier);padding:11px 22px}
+button:hover{background:var(--accent);color:#241C16}
+button.plein{background:var(--accent);color:#241C16}
+button:disabled{opacity:.3;cursor:not-allowed;background:transparent;color:var(--papier)}
+
+/* ---------- les quatre forces, toujours visibles ---------- */
+.forces{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.force{background:var(--fond2);border:1px solid var(--trait);border-radius:4px;padding:10px 8px;text-align:center}
+.force svg{width:29px;height:29px;fill:var(--accent);display:block;margin:0 auto 5px}
+.force .nom b{color:var(--papier);font-weight:normal;font-size:13px}
+.force .nom{font-size:11.5px;letter-spacing:.05em;color:#C3B39A;text-transform:uppercase}
+.force .mini{height:6px;background:#1A130F;border-radius:3px;margin-top:7px;overflow:hidden}
+.force .mini i{display:block;height:100%;transition:width .5s,background .5s}
+.force.danger{border-color:var(--bs-orange);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(202,80,7,.5)}50%{box-shadow:0 0 0 6px rgba(202,80,7,0)}}
+
+/* ---------- la situation ---------- */
+.situ{background:var(--fond2);border:1px solid var(--trait);border-left:4px solid var(--accent);
+  border-radius:4px;padding:22px 24px;margin-bottom:16px}
+.situ .t{font-family:var(--serif);font-size:clamp(21px,3vw,27px);line-height:1.25;margin-bottom:8px}
+.situ .d{color:#CDBCA2;font-size:16px;font-style:italic}
+.situ .parle{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+
+/* ---------- les deux réponses ---------- */
+.rep{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:stretch}
+.rep.deux{grid-template-columns:repeat(2,1fr)}
+@media(max-width:860px){.rep{grid-template-columns:1fr}}
+@media(max-width:700px){.forces{grid-template-columns:repeat(2,1fr)}}
+.choix{background:var(--fond2);border:1px solid var(--trait);border-radius:4px;padding:16px;
+  display:flex;flex-direction:column;gap:12px;cursor:pointer;text-align:left;color:var(--papier);
+  transition:border-color .15s,transform .12s}
+.choix:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--fond2)}
+.choix .q{font-family:var(--serif);font-size:17px;line-height:1.3}
+.choix .impacts{display:flex;flex-direction:column;gap:4px;align-items:flex-start;margin-top:auto}
+.imp{display:inline-flex;align-items:center;gap:5px;width:100%}
+.imp svg{width:18px;height:18px;flex:0 0 auto}
+.imp .lb{font-size:12px;color:#B7A68C;letter-spacing:.02em}
+.imp.up .lb,.imp.dn .lb{color:inherit;opacity:.85}
+.imp .fl{font-size:13px;letter-spacing:-1px;margin-left:auto}
+.up{fill:var(--vert);color:var(--vert)} .dn{fill:var(--rouge);color:var(--rouge)}
+
+/* ---------- pied de plateau ---------- */
+.pied{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:20px;
+  border-top:1px solid var(--trait);padding-top:12px;font-size:13.5px;color:#A6947C}
+.pied b{font-weight:normal;color:var(--accent);font-variant-numeric:tabular-nums}
+.cond{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
+.cond span{font-size:11px;padding:2px 8px;border-radius:11px;border:1px solid var(--trait);color:#7E6D59}
+.cond span.ok{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- conséquence ---------- */
+.niveaux{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0 6px}
+@media(max-width:820px){.niveaux{grid-template-columns:1fr}}
+.niv{background:var(--fond2);border:1px solid var(--trait);border-radius:4px;padding:16px;
+  text-align:left;color:var(--papier);cursor:pointer;display:flex;flex-direction:column;gap:7px}
+.niv:hover{border-color:var(--accent);transform:translateY(-2px)}
+.niv .ord{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.niv .lieu{font-family:var(--serif);font-size:21px;line-height:1.2}
+.niv .per{font-size:13px;color:#9C9895}
+.niv .rec{font-size:12px;color:#8E7C66;margin-top:auto;padding-top:6px}
+.niv[disabled]{opacity:.42;cursor:default;transform:none;border-style:dashed}
+/* Un événement ne ressemble à rien d'autre : il entre en force. */
+.ev{background:#2A1410;border:1px solid var(--bs-orange);border-left:5px solid var(--bs-orange);
+  border-radius:4px;padding:20px 22px;animation:irruption .42s ease-out}
+body[data-niveau="II"] .ev{background:#2B1A18}
+@keyframes irruption{
+  0%{opacity:0;transform:scale(.97) translateY(-8px)}
+  55%{opacity:1;transform:scale(1.008) translateY(0)}
+  100%{transform:scale(1)}
+}
+.ev .evd{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--bs-gold)}
+.ev .evt{font-family:var(--serif);font-size:clamp(23px,3.4vw,31px);line-height:1.2;margin:6px 0 10px}
+.ev .evx{margin:0 0 14px;font-size:16.5px;max-width:74ch}
+.ev .evs{font-size:13.5px;color:#C4A98F;border-top:1px solid #5A3A2E;padding-top:11px;max-width:74ch}
+.ev .evs strong{color:var(--bs-gold);font-weight:normal}
+.ev .evi{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px}
+.ev .evi .imp{width:auto}
+.ev .evi .fl{margin-left:4px}
+button.urg{background:var(--bs-orange);border-color:var(--bs-orange);color:#fff;animation:battement 1.1s infinite}
+@keyframes battement{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+
+.chrono{height:7px;background:#1A130F;border-radius:4px;overflow:hidden;margin-bottom:7px}
+.chrono .jauge{height:100%;width:100%;background:var(--bs-orange)}
+.compte{margin:0 0 14px;font-size:13px;color:var(--bs-orange);letter-spacing:.04em}
+.compte b{font-size:16px}
+.situ.urgent{border-left-color:var(--bs-orange)}
+.situ.urgent .ct{color:var(--bs-orange);opacity:1}
+.situ .pc{margin-top:13px;padding-top:11px;border-top:1px solid var(--trait);
+  font-size:13.5px;line-height:1.55;color:#B2A188;max-width:80ch}
+body[data-niveau="II"] .situ .pc{color:#9FB0C0}
+.situ .pc span{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);opacity:.8;margin-bottom:4px}
+.ct{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:#8E7C66;margin-bottom:7px}
+.situ .ct{color:var(--accent);opacity:.72}
+.consq{background:#1C1511;border-left:3px solid var(--accent);padding:12px 16px;margin:14px 0;
+  border-radius:0 3px 3px 0;font-size:14.5px;color:#CDBCA2}
+
+/* ---------- fin ---------- */
+.gros{font-family:var(--serif);font-size:clamp(28px,5vw,44px);color:var(--accent);margin:.15em 0 .3em}
+.temoin{background:var(--fond2);border:1px solid var(--trait);border-radius:4px;padding:18px;margin:12px 0}
+.temoin .qui{font-family:var(--serif);font-size:17px;color:var(--accent);margin-bottom:6px}
+.temoin .cit{font-style:italic;color:#DDCEB6;border-left:2px solid var(--trait);padding-left:13px;margin:9px 0}
+.temoin .src{font-size:12px;color:var(--bs-wgrey)}
+.bilan{background:#1C1511;border:1px solid var(--accent);border-radius:4px;padding:20px;margin:18px 0}
+.bilan ul{margin:.5em 0;padding-left:1.2em} .bilan li{margin:.4em 0}
+.role{background:#1C1511;border:1px solid var(--trait);border-radius:4px;padding:18px 20px;margin:18px 0}
+.role .r{font-family:var(--serif);font-size:19px;color:var(--accent);margin-bottom:6px}
+footer{color:#6E5F4E;font-size:11.5px;text-align:center;padding:26px 18px 8px}
+
+/* ===================================================================
+   MISE EN SCÈNE — le bureau du maître de la ville
+   Une fenêtre d'atelier donne sur la ville ; sur la table, des dossiers.
+   Tout est dessiné en CSS/SVG : le jeu reste beau sans aucune image.
+   Si img/vue-I.jpg (ou vue-II.jpg) existe, elle remplace le décor peint.
+   =================================================================== */
+:root{
+  --ciel-h:#F2E3C4; --ciel-b:#C9B79A; --soleil:#FFF6DC;
+  --brique:#6B5645; --lointain:#9A8B79; --fumee:#8E8170;
+  --bois:#2A2018; --bois-h:#3A2C20;
+}
+body[data-niveau="II"]{
+  --ciel-h:#CBD6E0; --ciel-b:#8E9BA8; --soleil:#EDF3F8;
+  --brique:#4A555F; --lointain:#6E7B86; --fumee:#79838D;
+  --bois:#1D232A; --bois-h:#2A323B;
+}
+
+#scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#scene > div{position:absolute;inset:0}
+#scene .ciel{
+  background:
+    radial-gradient(circle at 46% 26%, var(--soleil) 0 4%, transparent 32%),
+    linear-gradient(to bottom, var(--ciel-h) 0%, var(--ciel-h) 34%, var(--ciel-b) 100%)}
+#scene .vue{background-size:cover;background-position:center;opacity:0;transition:opacity .9s}
+#scene.aimg .vue{opacity:1}
+#scene.aimg .ciel,#scene.aimg .ville,#scene.aimg .fumees{opacity:0}
+
+/* la ville au loin : une bande de toits et une forêt de cheminées */
+#scene .ville{top:auto;bottom:0;height:58%}
+#scene .ville svg{position:absolute;left:0;bottom:0;width:100%;height:100%}
+#scene .fumees{top:4%;bottom:auto;height:68%;filter:blur(9px);opacity:.5;transition:opacity 1.4s}
+#scene .fumees span{position:absolute;bottom:0;width:16%;height:100%;
+  background:radial-gradient(ellipse at 50% 100%, var(--fumee) 0, transparent 64%);
+  transform-origin:50% 100%;animation:monter 15s ease-in-out infinite}
+@keyframes monter{
+  0%{transform:translateY(18%) scaleX(.7);opacity:.14}
+  50%{transform:translateY(-6%) scaleX(1.08);opacity:.46}
+  100%{transform:translateY(18%) scaleX(.7);opacity:.14}
+}
+
+/* la vitre s'encrasse à mesure que la ville enfle : personne ne l'a décidé */
+#scene .vitre{transition:opacity 1.6s;
+  background:
+    linear-gradient(118deg, rgba(255,255,255,.2) 0 15%, transparent 16% 33%,
+                    rgba(255,255,255,.1) 34% 40%, transparent 41%),
+    linear-gradient(to bottom, rgba(40,32,24,.08), rgba(26,20,15,.34));
+  opacity:var(--suie,.2)}
+
+/* deux jambages et une traverse : une fenêtre d'atelier, pas un quadrillage */
+#scene .montants{
+  background:
+    linear-gradient(to right, transparent 0 11%, var(--bois) 11% 11.9%, transparent 11.9%),
+    linear-gradient(to right, transparent 0 88%, var(--bois) 88% 88.9%, transparent 88.9%),
+    linear-gradient(to bottom, transparent 0 41%, var(--bois) 41% 42%, transparent 42%);
+  opacity:.82}
+#scene .cadre{border:14px solid var(--bois);
+  box-shadow:inset 0 0 44px rgba(20,14,10,.2), inset 0 0 0 3px var(--bois-h)}
+
+/* Le voile n'assombrit que la colonne de lecture : sur les côtés, la ville
+   reste visible. C'est ce qui fait la fenêtre plutôt que le filtre. */
+#scene .voile{
+  background:
+    linear-gradient(to right, rgba(20,15,11,.04) 0, rgba(20,15,11,.78) 21%,
+                    rgba(20,15,11,.85) 50%, rgba(20,15,11,.78) 79%, rgba(20,15,11,.04) 100%),
+    linear-gradient(to bottom, rgba(26,20,15,0) 0, rgba(20,15,11,.30) 62%, rgba(20,15,11,.46) 100%)}
+body[data-niveau="II"] #scene .voile{
+  background:
+    linear-gradient(to right, rgba(14,18,23,.04) 0, rgba(14,18,23,.78) 21%,
+                    rgba(14,18,23,.85) 50%, rgba(14,18,23,.78) 79%, rgba(14,18,23,.04) 100%),
+    linear-gradient(to bottom, rgba(16,20,25,0) 0, rgba(12,16,20,.32) 62%, rgba(12,16,20,.48) 100%)}
+
+header,main,footer{position:relative;z-index:1}
+
+/* ---------- LES DOSSIERS SUR LA TABLE ---------- */
+/* Une règle : un statut de texte = un support. On distingue d'un coup
+   d'œil ce qu'un personnage affirme de ce qu'un rapport établit. */
+.dossier{position:relative;margin-top:24px;
+  box-shadow:0 10px 26px rgba(0,0,0,.5);
+  opacity:0;animation:poser .42s cubic-bezier(.2,.8,.3,1) forwards;animation-delay:var(--d,0s)}
+@keyframes poser{
+  0%{opacity:0;transform:translateY(-13px) rotate(-.45deg)}
+  100%{opacity:1;transform:none}
+}
+/* un clic pose tout le reste d'un coup : on ne punit jamais qui lit vite */
+#app.presse .dossier,#app.presse .forces{animation-delay:0s;animation-duration:.01s}
+.dossier .onglet{position:absolute;top:0;left:20px;transform:translateY(-100%);
+  background:var(--ong,var(--accent));color:#1C1511;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;padding:4px 13px 3px;border-radius:3px 3px 0 0;white-space:nowrap}
+.dossier::after{content:"";position:absolute;right:-3px;top:9px;bottom:9px;width:3px;
+  background:var(--ong,var(--accent));opacity:.45;border-radius:0 3px 3px 0}
+
+.d-situation{--ong:var(--accent)}
+.d-decision{--ong:#8FBF7A;border-left-color:#8FBF7A}
+.d-enquete{--ong:#7E8D9C;background:#211A14;border:1px solid var(--trait);
+  border-radius:3px;padding:16px 20px}
+body[data-niveau="II"] .d-enquete{background:#1A2027}
+.d-lettre{--ong:#C9A227;background:#241D14;border:1px solid var(--trait);
+  border-radius:3px;padding:20px 22px}
+body[data-niveau="II"] .d-lettre{background:#1E2229}
+
+/* le rapport d'enquête : fermé par défaut, on choisit de l'ouvrir */
+.d-enquete summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
+  font-size:14px;color:#B7A68C}
+.d-enquete summary::-webkit-details-marker{display:none}
+.d-enquete .pli{font-size:10.5px;color:var(--ong);border:1px solid var(--ong);border-radius:2px;
+  padding:3px 9px;letter-spacing:.1em;text-transform:uppercase;margin-left:auto;white-space:nowrap}
+.d-enquete .pli::before{content:"Ouvrir"}
+.d-enquete[open] .pli::before{content:"Fermer"}
+.d-enquete .pli::after{content:" ▼"}
+.d-enquete[open] .pli::after{content:" ▲"}
+.d-enquete[open]{--ong:var(--accent)}
+.d-enquete .corps{font-size:14.5px;line-height:1.62;color:#B2A188;max-width:80ch;
+  margin-top:14px;padding-top:13px;border-top:1px solid var(--trait)}
+body[data-niveau="II"] .d-enquete .corps{color:#9FB0C0}
+
+/* la lettre : un autre papier, une autre main */
+.d-lettre .corps{font-style:italic;font-size:15.5px;line-height:1.7;color:#DDCEB6;max-width:70ch}
+.d-lettre .sign{font-family:var(--serif);font-size:14.5px;color:var(--ong);margin-top:13px;text-align:right}
+.d-lettre .prov{font-size:11.5px;color:var(--bs-wgrey);margin-top:11px;
+  border-top:1px solid var(--trait);padding-top:9px}
+
+.consq.dossier{margin-bottom:0}
+.forces{opacity:0;animation:poser .4s ease-out forwards}
+
+@media(prefers-reduced-motion:reduce){
+  .dossier,.forces{animation:none;opacity:1}
+  #scene .fumees span{animation:none}
+}
+
+</style>
+<style>
+/* ===================================================================
+   SURCOUCHE « DOCUMENTS SUR LE BUREAU »
+
+   La scène du fond — la fenêtre, la ville, les fumées, la vitre qui
+   s'encrasse — n'est pas touchée : elle reste derrière, à sa place.
+   Ce qui change est le premier plan. L'interface cesse d'être des
+   panneaux sombres pour devenir ce qu'elle est dans la fiction :
+   des papiers posés sur un sous-main, qu'on vous apporte et que vous
+   signez.
+
+   Gain pédagogique autant qu'esthétique : un rapport se lit en encre
+   sombre sur papier clair. Au vidéoprojecteur, l'écart est net.
+
+   Variables préfixées pour ne rien écraser de la feuille précédente.
+   =================================================================== */
+:root{
+  --pap:#F0E6D2; --pap2:#E2D5BB; --enc:#2B2118; --enc2:#6B5741;
+  --fil:#B9A583; --lai:#B8894A; --vrt:#3E7A3A; --rge:#B03A1E;
+  --omb:0 16px 34px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.42);
+}
+body[data-niveau="II"]{
+  --pap:#EFEDE7; --pap2:#DCD9D0; --enc:#23292F; --enc2:#5A6570;
+  --fil:#A8AEB4; --lai:#8FA3B5; --vrt:#2F6B46; --rge:#B2382C;
+}
+
+/* le papier, une fois pour toutes */
+.situ, .choix, .force, .niv, .role, .bilan, .temoin, .consq, .ev{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 30%),
+    repeating-linear-gradient(94deg, rgba(160,140,110,.045) 0 2px, transparent 2px 5px),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%) !important;
+  color:var(--enc) !important;
+  border:1px solid var(--fil);
+  border-radius:2px;
+  box-shadow:var(--omb);
+}
+
+/* ---------- les quatre forces : des jetons épinglés ---------------- */
+.force{padding:12px 9px 10px;position:relative;box-shadow:0 8px 18px rgba(0,0,0,.45)}
+.force::before{
+  content:""; position:absolute; top:-5px; left:50%; width:10px; height:10px;
+  transform:translateX(-50%); border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #FFE7B0, var(--lai) 55%, #6A4A22);
+  box-shadow:0 2px 4px rgba(0,0,0,.55);
+}
+.force svg{fill:var(--enc2)}
+.force .nom{color:var(--enc2)}
+.force .nom b{color:var(--enc)}
+.force .mini{background:rgba(80,62,42,.22);box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.force.danger{border-color:var(--rge)}
+
+/* ---------- la conséquence : une note glissée sous le sous-main ---- */
+.consq{border-left:4px solid var(--lai) !important;transform:rotate(-.25deg);
+  padding:13px 18px;margin:0 0 18px}
+.ct{color:var(--enc2);font-weight:bold}
+
+/* ---------- la carte : le rapport qu'on vous apporte ---------------- */
+.situ{padding:24px 28px 22px;transform:rotate(.18deg);position:relative;
+  border-left:1px solid var(--fil) !important}
+.situ::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(180deg,var(--lai),transparent);
+}
+.situ .t{color:var(--enc)}
+.situ .parle{color:var(--rge);font-weight:bold}
+.situ .d{color:#3A2E22;font-style:italic}
+body[data-niveau="II"] .situ .d{color:#333B43}
+.situ .pc{border-top:1px solid var(--fil);color:var(--enc2)}
+.situ .pc span{color:var(--rge)}
+
+/* ---------- les réponses : des billets à signer -------------------- */
+.choix{padding:16px 17px;color:var(--enc) !important;margin:0;
+  box-shadow:0 10px 22px rgba(0,0,0,.46)}
+.choix:nth-child(1){transform:rotate(-.7deg)}
+.choix:nth-child(2){transform:rotate(.45deg)}
+.choix:nth-child(3){transform:rotate(-.3deg)}
+.choix:hover{transform:rotate(0) translateY(-4px);border-color:var(--lai);
+  box-shadow:0 18px 34px rgba(0,0,0,.58)}
+.choix .q{color:var(--enc)}
+.imp svg{fill:var(--enc2)}
+.imp .lb{color:var(--enc2)}
+.imp.up{color:var(--vrt)} .imp.dn{color:var(--rge)}
+.imp.up .lb,.imp.dn .lb{color:inherit;opacity:.92}
+.imp.up svg{fill:var(--vrt)} .imp.dn svg{fill:var(--rge)}
+
+/* ---------- l'événement : un télégramme, cachet compris ------------ */
+.ev{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 20%),
+    repeating-linear-gradient(90deg, rgba(150,120,80,.05) 0 3px, transparent 3px 7px),
+    linear-gradient(150deg, #F7ECD0 0%, #E5D2AB 100%) !important;
+  color:#2A1F12 !important; border:1px solid #C2A470;
+  padding:24px 28px 22px; box-shadow:0 22px 48px rgba(0,0,0,.62);
+  transform:rotate(-.5deg); position:relative;
+}
+.ev::before{ /* le cachet de cire, jamais tout à fait rond */
+  content:""; position:absolute; right:30px; top:-15px; width:46px; height:46px;
+  border-radius:47% 53% 51% 49%/49% 47% 53% 51%;
+  background:radial-gradient(circle at 36% 28%, #D4553A, #8E2413 60%, #5A140A);
+  box-shadow:0 5px 12px rgba(0,0,0,.6), inset 0 -3px 8px rgba(0,0,0,.45);
+}
+.ev .evd{color:#8E2413;font-weight:bold;letter-spacing:.16em}
+.ev .evt{color:#2A1F12}
+.ev .evx{color:#2A1F12}
+.ev .evs{color:#6A5539;border-top:1px solid #C2A470}
+.ev .evs strong{color:#8E2413}
+button.plein.urg{background:linear-gradient(180deg,#B0442A,#7E2413);border-color:#5A140A;
+  color:#FFEDE3}
+
+/* ---------- le chronomètre : une mèche qui brûle ------------------- */
+.chrono{background:rgba(0,0,0,.45);box-shadow:inset 0 1px 3px rgba(0,0,0,.6);height:9px}
+.chrono .jauge{background:linear-gradient(90deg,#7E2413,#D4553A 70%,#F3BE31)}
+.situ.urgent{border-color:#B0442A}
+.situ.urgent::before{background:linear-gradient(180deg,#B0442A,transparent)}
+.situ.urgent .ct{color:#8E2413}
+
+/* ---------- le choix du niveau : trois dossiers -------------------- */
+.niv{padding:18px 18px 16px;color:var(--enc) !important;margin:0;
+  box-shadow:0 11px 26px rgba(0,0,0,.48)}
+.niv:nth-child(1){transform:rotate(-.8deg)}
+.niv:nth-child(2){transform:rotate(.5deg)}
+.niv:nth-child(3){transform:rotate(-.35deg)}
+.niv:hover{transform:rotate(0) translateY(-4px);border-color:var(--lai);
+  box-shadow:0 19px 36px rgba(0,0,0,.58)}
+.niv .ord{color:#8E2413;font-weight:bold}
+.niv .lieu{color:var(--enc)}
+.niv .per{color:var(--enc2)}
+.niv .rec{color:#7D6A4E}
+.niv[disabled]{opacity:.52;transform:rotate(-.35deg);border-style:dashed}
+.niv[disabled]:hover{transform:rotate(-.35deg)}
+
+/* ---------- le rôle, le bilan, les témoins -------------------------- */
+.role{border-left:4px solid var(--lai) !important;padding:18px 22px;transform:rotate(-.2deg)}
+.role .r{color:var(--enc)}
+.bilan{padding:18px 22px}
+.bilan h2{color:var(--enc)}
+.temoin{
+  background:linear-gradient(158deg,#F4EAD1,#E1D1AC) !important; color:#2A1F12 !important;
+  border:1px solid #C2A470; border-left:4px solid #8E2413;
+  padding:16px 20px; transform:rotate(.25deg);
+}
+.temoin .qui{color:#8E2413;font-weight:bold}
+.temoin .src{color:#6A5539}
+
+/* ---------- les boutons ordinaires --------------------------------- */
+button{background:var(--pap);color:var(--enc);border:1px solid var(--fil);
+  border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,.42);
+  transition:transform .16s,box-shadow .16s}
+button:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.52)}
+button.plein{background:linear-gradient(180deg,#8C6A38,#6B4E27);color:#FFF4DE;
+  border-color:#4E3719}
+body[data-niveau="II"] button.plein{background:linear-gradient(180deg,#3E5C79,#2B4257);
+  border-color:#1E2F3E;color:#EAF2F8}
+
+/* ---------- les dossiers à onglets ---------------------------------
+   Ajoutés le 30 septembre par ailleurs : une situation, une décision,
+   un rapport d'enquête dépliable, une lettre. Ils deviennent eux aussi
+   du papier — la languette d'onglet reste la seule touche de couleur,
+   comme sur une chemise cartonnée.                                    */
+.dossier{box-shadow:var(--omb)}
+.d-enquete, .d-lettre{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 30%),
+    repeating-linear-gradient(94deg, rgba(160,140,110,.045) 0 2px, transparent 2px 5px),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%) !important;
+  border:1px solid var(--fil) !important; color:var(--enc) !important;
+}
+.d-enquete{padding:16px 20px}
+.d-lettre{padding:20px 22px;border-left:4px solid #8E2413 !important}
+.dossier .onglet{
+  background:var(--pap2); color:var(--enc2);
+  border:1px solid var(--fil); border-bottom:none;
+  box-shadow:0 -3px 8px rgba(0,0,0,.28); font-weight:bold;
+}
+.d-situation .onglet{color:var(--rge)}
+.d-decision  .onglet{color:#2F6B2B}
+.d-enquete   .onglet{color:var(--enc2)}
+.d-lettre    .onglet{color:#8E2413}
+.dossier::after{background:var(--lai);opacity:.5}
+
+.d-enquete summary{color:var(--enc2)}
+.d-enquete .pli{color:var(--enc2);border:1px solid var(--fil);background:rgba(255,255,255,.4)}
+.d-enquete[open] .pli{color:var(--rge);border-color:var(--rge)}
+.d-enquete .corps{color:var(--enc2) !important;border-top:1px solid var(--fil)}
+.d-lettre .corps{color:#2A1F12 !important}
+.d-lettre .sign{color:#8E2413}
+.d-lettre .prov{color:var(--enc2);border-top:1px solid var(--fil)}
+</style>
+</head>
+<body>
+<!-- La fenêtre du bureau. Décor peint en CSS/SVG : aucune image requise. -->
+<div id="scene" aria-hidden="true">
+  <div class="ciel"></div>
+  <div class="vue"></div>
+  <div class="ville">
+    <svg viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <g fill="var(--lointain)" opacity=".55">
+        <rect x="0" y="238" width="1200" height="162"/>
+        <g id="loin"></g>
+      </g>
+      <g fill="var(--brique)" opacity=".9">
+        <rect x="0" y="292" width="1200" height="108"/>
+        <g id="pres"></g>
+      </g>
+    </svg>
+  </div>
+  <div class="fumees"></div>
+  <div class="vitre"></div>
+  <div class="montants"></div>
+  <div class="cadre"></div>
+  <div class="voile"></div>
+</div>
+
+
+<svg style="display:none">
+  <symbol id="ic-i" viewBox="0 0 24 24"><path d="M6 22V10l4.5-2.2V22zm6-12.2L16.5 7.6V22H12zM4 22h16v1.4H4zM9.2 5.4a1.7 1.7 0 1 1-3.4 0 1.7 1.7 0 0 1 3.4 0m3.6-2.1a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0"/></symbol>
+  <symbol id="ic-o" viewBox="0 0 24 24"><path d="M2.6 19.9 12.4 10l1.9 1.9L4.5 21.8zM11.6 4.4l8.4 4.2-3 3-8.4-4.2z"/></symbol>
+  <symbol id="ic-m" viewBox="0 0 24 24"><path d="M9.4 2.6h5.2l-1.3 3h-2.6zM12 6.4c4.7 0 7.8 3.9 7.8 7.9S16.7 21.4 12 21.4 4.2 18.3 4.2 14.3 7.3 6.4 12 6.4m0 3.1v1m0 6v1m2.2-6.1c-.6-.7-1.4-1-2.2-1-1.3 0-2.2.7-2.2 1.7s.9 1.4 2.2 1.7 2.2.7 2.2 1.7-.9 1.7-2.2 1.7c-.9 0-1.7-.4-2.2-1"/></symbol>
+  <symbol id="ic-p" viewBox="0 0 24 24"><path d="M2.6 7.4 7 12l5-7.4 5 7.4 4.4-4.6-2.2 12.2H4.8zM4.6 21.2h14.8v1.6H4.6z"/></symbol>
+  <symbol id="ic2-i" viewBox="0 0 24 24"><path d="M3 20.4h18V22H3zM4.8 13.2h3.4v5.6H4.8zm5.5-3.6h3.4v9.2h-3.4zm5.5-5h3.4v14.2h-3.4z"/></symbol>
+  <symbol id="ic2-o" viewBox="0 0 24 24"><path d="M14.9 2.6a5 5 0 0 0-1.3 5L4.2 17.1a2.1 2.1 0 0 0 3 3l9.4-9.4a5 5 0 0 0 5.8-6.5l-3 3-2.6-.7-.7-2.6zM6.3 17.3a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8"/></symbol>
+  <symbol id="ic2-m" viewBox="0 0 24 24"><path d="M2.8 16.2v-3l1.9-5A2.2 2.2 0 0 1 6.8 6.8h10.4a2.2 2.2 0 0 1 2.1 1.4l1.9 5v3h-1.9a2.1 2.1 0 0 1-4.2 0H9.1a2.1 2.1 0 0 1-4.2 0zM6.3 12.1h11.4l-1.3-3.6H7.6z"/></symbol>
+  <symbol id="ic2-p" viewBox="0 0 24 24"><path d="M2.8 9.6v4.8h2.4l7.6 4.4V5.2L5.2 9.6zM15.9 8.9a4.4 4.4 0 0 1 0 6.2l1.4 1.4a6.4 6.4 0 0 0 0-9zM18.4 6.4a7.9 7.9 0 0 1 0 11.2l1.4 1.4a9.9 9.9 0 0 0 0-14z"/></symbol>
+</svg>
+
+<header>
+  <svg class="blason" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="#fff" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg>
+  <span class="titre">LE PRIX DU PROGRÈS</span>
+  <span class="ecole">COLLÈGE ALPIN BEAU SOLEIL · G10</span>
+</header>
+
+<main id="app"></main>
+<footer>Unité 1 — Quand l’innovation change la société</footer>
+
+<script>
+"use strict";
+
+/* ==================================================================
+   LES QUATRE FORCES
+   ================================================================== */
+const FORCES_I = {
+  i:{nom:"Industriels", ic:"ic-i", veut:"des machines, du charbon, des bras"},
+  o:{nom:"Ouvriers",    ic:"ic-o", veut:"un salaire, un toit, des heures vivables"},
+  m:{nom:"Marchands",   ic:"ic-m", veut:"des canaux, des rails, des débouchés"},
+  p:{nom:"Parlement",   ic:"ic-p", veut:"l’ordre public et la salubrité"},
+};
+const CLES = ["i","o","m","p"];
+const CONDITIONS = ["Ressources","Savoirs techniques","Capitaux","Main-d’œuvre","Marchés","Transports","Organisation"];
+
+/* ==================================================================
+   LE JEU DE CARTES
+   Quelqu'un entre, vous parle, et attend votre réponse. Trois voies
+   à chaque fois : celle du demandeur, celle qui le refuse, et une
+   troisième qui ménage tout le monde — mais qui coûte toujours
+   quelque chose à quelqu'un. Il n'existe pas de réponse gratuite.
+
+   Les personnages sont des figures composites : ils n'ont pas existé
+   sous ces noms, mais chacun dit ce que disaient les gens de leur
+   condition. Les deux seuls témoignages authentiques du jeu sont
+   ceux de Johanna Schopenhauer et de Friedrich Engels, au verdict.
+   ================================================================== */
+const CARTES_I = [
+{t:"Le charbon manque à la filature.", qui:"Josiah Halliwell, filateur de Shudehill",
+ d:"« Ma machine est à l’arrêt trois jours sur sept, faute de charbon. Creusez un canal jusqu’au bassin houiller et je vous promets deux filatures de plus avant Noël. »",
+ f:"Une machine à vapeur brûle plusieurs tonnes de charbon par jour. Le bassin houiller le plus proche est à une trentaine de kilomètres, et une péniche transporte trente fois la charge d’une charrette.",
+ a:{q:"« Qu’on creuse le canal. »", e:{i:12,m:10,o:-6,p:-4}, g:["Ressources","Transports"],
+    c:"Les péniches arrivent chargées. L’énergie cesse d’être un obstacle — au prix de mois de terrassement, payés par la ville."},
+ b:{q:"« Le charbon viendra par la route. »", e:{i:-9,m:-6,p:3},
+    c:"Les charrettes coûtent cher et arrivent à moitié vides. Les fabricants murmurent."},
+ c:{q:"« Qu’on le creuse, aux frais des fabricants. »", e:{i:-1,m:1,o:-2,p:6}, g:["Ressources","Transports"],
+    c:"Le canal se fera, mais plus tard et sans entrain. Halliwell paie en grinçant des dents."}},
+
+{t:"Un mécanicien vous montre un plan.", qui:"Thomas Ainsworth, mécanicien",
+ d:"« Une seule machine à vapeur au sous-sol, et toutes les broches des quatre étages tournent ensemble. J’ai vu cela fonctionner à Cromford. Il vous faut du charbon, et de l’audace. »", req:["Ressources"],
+ f:"Avant la vapeur, une filature dépendait de la force d’une rivière : il fallait s’installer près de l’eau et s’arrêter quand elle gelait. La machine à vapeur libère l’usine de la géographie.",
+ a:{q:"« Installons la machine à vapeur. »", e:{i:14,m:5,o:-8}, g:["Savoirs techniques"],
+    c:"Une seule machine remplace des dizaines de bras. Ceux qui restent suivent désormais son rythme, pas le leur."},
+ b:{q:"« Continuons de filer à la main. »", e:{i:-9,o:6},
+    c:"On file à la main. La ville prend du retard sur Bolton et Oldham."},
+ c:{q:"« Installons-la sans renvoyer personne. »", e:{i:3,o:3,m:-9}, g:["Savoirs techniques"],
+    c:"La machine tourne et personne n’est renvoyé. Les comptes de la ville, eux, s’en ressentent."}},
+
+{t:"Quarante familles attendent à la grille.", qui:"Abel Crompton, contremaître",
+ d:"« Elles sont là depuis l’aube, avec leurs enfants, venues du Lancashire à pied. Elles accepteront n’importe quel salaire — c’est bien ce qui m’ennuie. Je les prends toutes ? »",
+ f:"Les campagnes anglaises se vident. Les enclosures ont privé beaucoup de paysans de l’usage des terres communes : ils arrivent en ville sans rien et acceptent n’importe quel salaire.",
+ a:{q:"« Embauchons-les toutes. »", e:{i:10,m:4,o:-10,p:-5}, pop:.20, g:["Main-d’œuvre"],
+    c:"Les filatures tournent jour et nuit. Les nouveaux venus s’entassent où ils peuvent, et tirent les salaires vers le bas."},
+ b:{q:"« Refusons les nouveaux arrivants. »", e:{i:-8,o:5,p:4},
+    c:"On refoule les arrivants. Les fabricants se plaignent de manquer de bras."},
+ c:{q:"« N’embauchons que ceux qu’on peut loger. »", e:{i:-2,o:-2,m:-5,p:3}, pop:.08, g:["Main-d’œuvre"],
+    c:"On trie à la grille. Ceux qu’on renvoie iront grossir Salford, juste de l’autre côté de la rivière."}},
+
+{t:"Un bâtisseur propose soixante cottages.", qui:"Amos Pilkington, bâtisseur",
+ d:"« Le terrain derrière la filature est libre. Je vous bâtis soixante maisons dos à dos avant l’hiver : une brique d’épaisseur, pas de cour, pas d’égout. Ou rien, et ils resteront dans les caves. »",
+ f:"Les maisons ouvrières dites « dos à dos » partagent trois de leurs quatre murs avec les voisines. Une seule façade, aucun courant d’air, une cour et des latrines pour plusieurs dizaines d’habitants.",
+ a:{q:"« Bâtissons vite, et au plus bas prix. »", e:{o:9,i:2,p:-6}, pop:.10,
+    c:"Des murs aussi minces que possible, mais un toit. La ville en attire davantage encore."},
+ b:{q:"« Ne bâtissons aucun logement. »", e:{o:-12,i:4,p:-3},
+    c:"On s’entasse dans les caves. Chaque nouvelle arrivée aggrave la précédente."},
+ c:{q:"« Bâtissons moins, mais avec cour et égout. »", e:{o:5,p:4,m:-9,i:-6}, pop:.05,
+    c:"Trente maisons au lieu de soixante, mais on y respire. Pilkington double son devis."}},
+
+{t:"Deux heures de plus par jour.", qui:"Josiah Halliwell, filateur",
+ d:"« Liverpool veut son fil pour mars et nous ne tiendrons pas. Deux heures de plus et la commande est sauvée. Mes ouvriers ont des bouches à nourrir : ils comprendront. »",
+ f:"Dans les années 1830, la journée ordinaire en filature va de douze à seize heures, six jours sur sept. L’éclairage au gaz a rendu le travail de nuit possible.",
+ a:{q:"« Passons à quatorze heures par jour. »", e:{i:13,m:6,o:-14,p:-6},
+    c:"Quatorze heures durant, on entre avant le jour et on sort après la nuit. Les accidents se multiplient en fin de journée."},
+ b:{q:"« Restons à douze heures. »", e:{i:-7,o:9,p:4},
+    c:"La commande partira en retard. Les ouvriers, eux, n’oublieront pas qui a tranché."}},
+
+{t:"Le Parlement a voté le Factory Act.", qui:"Sir Charles Beresford, envoyé de Londres", apres:1830,
+ d:"« La loi de 1833 est claire : aucun enfant de moins de neuf ans dans les filatures, neuf heures au plus pour les moins de treize. Londres enverra quatre inspecteurs pour tout le royaume. Quatre. Qu’en ferez-vous ? »",
+ f:"La loi de 1833 interdit d’employer des enfants de moins de neuf ans dans le textile et limite la journée des moins de treize ans. C’est la première à prévoir un contrôle — avec quatre inspecteurs pour tout le royaume.",
+ a:{q:"« Appliquons la loi : les enfants sortent. »", e:{p:12,o:10,i:-10,m:-4},
+    c:"Les plus jeunes sortent des ateliers. Certaines familles perdent d’un coup le tiers de leur revenu."},
+ b:{q:"« N’appliquons pas la loi. »", e:{i:9,m:4,o:-8,p:-12},
+    c:"Quatre inspecteurs pour tout le royaume : le risque est mince, et tout le monde le sait."},
+ c:{q:"« Ne l’appliquons qu’aux grandes filatures. »", e:{p:-2,i:2,o:-4,m:-1},
+    c:"Les grandes filatures se mettent en règle, les petits ateliers de cave continuent. La loi devient une affaire de taille."}},
+
+{t:"L’eau croupit devant les portes.", qui:"Dr William Rait, médecin des pauvres",
+ d:"« Cinq fièvres cette semaine, toutes dans la même rue. Il n’y a ni pavé ni égout : l’eau sale reste là où elle tombe. Ce ne sont pas les malades qu’il faut soigner, c’est la rue. »",
+ f:"Avant les années 1840, aucune ville industrielle anglaise n’a d’égouts dignes de ce nom. Les eaux usées stagnent dans des rues non pavées où jouent les enfants.",
+ a:{q:"« Creusons les égouts. »", e:{o:11,p:10,i:-6,m:-8},
+    c:"Le chantier est long et cher. Les fièvres reculent là où il passe."},
+ b:{q:"« Ne creusons rien : à chacun sa rue. »", e:{o:-9,p:-8,i:5,m:3},
+    c:"On laisse chaque propriétaire décider. Aucun ne décide rien."},
+ c:{q:"« Ne creusons que les rues principales. »", e:{o:3,p:3,m:-7},
+    c:"Le centre s’assainit. Les ruelles d’Ancoats, elles, restent ce qu’elles sont."}},
+
+{t:"Liverpool propose une voie ferrée.", qui:"Ezra Duckworth, négociant de Liverpool", apres:1820,
+ d:"« Une locomotive a fait le trajet en deux heures, là où mes charrettes mettent la journée. Ceux qui auront la ligne prendront le marché. Ceux qui ne l’auront pas le perdront. »",
+ f:"Liverpool est le port par lequel arrive le coton brut d’Amérique et par lequel repart le fil. La ligne ouverte en 1830 est la première au monde à relier deux grandes villes.",
+ a:{q:"« Ouvrons la ligne de chemin de fer. »", e:{m:14,i:9,o:-4,p:-3}, g:["Transports","Marchés"],
+    c:"Le coton brut arrive le matin, le fil repart le soir. La ville change d’échelle."},
+ b:{q:"« Refusons la ligne, gardons les canaux. »", e:{m:-10,i:-5,p:3},
+    c:"Les péniches sont lentes et gèlent en hiver. Duckworth commence à traiter avec Leeds."},
+ c:{q:"« Ouvrons-la, mais sous contrôle de la ville. »", e:{m:2,i:1,p:6,o:-2}, g:["Transports"],
+    c:"La ligne se fera aux conditions du conseil. Les actionnaires de Liverpool tempêtent, puis signent."}},
+
+{t:"Des acheteurs attendent à Hambourg.", qui:"Ezra Duckworth, négociant", req:["Transports"],
+ d:"« J’ai des commandes de Hambourg et de Rio qui dorment sur mon bureau. Si vos métiers ne doublent pas, j’achèterai le fil à Oldham. Cela ne me coûtera qu’une journée de voiture. »",
+ f:"Le coton de Manchester s’exporte dans le monde entier. C’est ce débouché qui rend la production de masse rentable : sans marché, des machines coûteuses ne servent à rien.",
+ a:{q:"« Doublons les métiers à tisser. »", e:{i:10,m:12,o:-11}, g:["Marchés"],
+    c:"On produit deux fois plus avec les mêmes murs. On y tient aussi deux fois moins longtemps."},
+ b:{q:"« Refusons : gardons nos cadences. »", e:{m:-11,i:-6,o:6},
+    c:"La commande part à Oldham. Duckworth s’en souviendra à la prochaine."},
+ c:{q:"« Doublons en embauchant, sans presser personne. »", e:{i:2,m:3,o:-6,p:-4}, pop:.12, g:["Marchés"],
+    c:"On produit plus parce qu’on est plus nombreux. La ville enfle d’autant."}},
+
+{t:"Un médecin demande une salle et deux lits.", qui:"Dr William Rait, médecin des pauvres",
+ d:"« Un seul praticien pour huit mille âmes. Je ne vous demande pas un hôpital : une salle, deux lits, et de quoi acheter de la quinine. »",
+ f:"Une enquête officielle de 1842 estime l’espérance de vie moyenne d’un ouvrier de Manchester à dix-sept ans, contre trente-huit dans un comté rural voisin. La mortalité des jeunes enfants pèse lourd dans ce chiffre.",
+ a:{q:"« Ouvrons le dispensaire. »", e:{o:10,p:7,m:-6,i:-3},
+    c:"Le dispensaire ne désemplit pas. On y découvre l’ampleur de ce qu’on ne voyait pas."},
+ b:{q:"« Refusons le dispensaire. »", e:{o:-7,p:-4,i:3},
+    c:"Rait continue seul, et le dit à qui veut l’entendre."},
+ c:{q:"« Ouvrons-le, aux frais des fabricants. »", e:{o:6,p:4,i:-11,m:-3},
+    c:"Les fabricants paient, et ne manquent pas de rappeler que c’est eux qui paient."}},
+
+{t:"On loue désormais les sous-sols.", qui:"Le révérend Ellis Hargreaves",
+ d:"« J’ai enterré quatre enfants cette semaine, tous venus de la même cave. On y loue le sol comme on loue une chambre, à des familles entières. Fermez ces logements. »",
+ f:"Au début des années 1840, on estime que quinze à vingt mille habitants de Manchester vivent dans des caves : une pièce en sous-sol, sans fenêtre ni évacuation, souvent humide. C’est le logement le moins cher de la ville.",
+ a:{q:"« On ferme les logements en cave. »", e:{p:9,o:-6,i:-4,m:-2},
+    c:"Les caves sont murées — et ceux qui y vivaient se retrouvent à la rue. Fermer un taudis ne crée pas un logement."},
+ b:{q:"« Laissons louer les caves. »", e:{o:-8,p:-6,i:4},
+    c:"Sous presque chaque maison, une famille de plus. Le loyer du sous-sol devient un commerce."},
+ c:{q:"« On les ferme à mesure qu’on reloge. »", e:{o:3,p:4,m:-10,i:-6},
+    c:"Lent, coûteux, et personne ne dort dehors. Le conseil s’endette."}},
+
+{t:"Une fileuse demande à vous parler.", qui:"Mary Kearsley, fileuse à Ancoats",
+ d:"« Mon garçon a onze ans. Il passe sous les métiers en marche pour rattacher les fils, parce qu’il est le seul assez petit. S’il en sort, nous ne mangeons plus. S’il y reste, il y restera pour de bon. C’est vous qui choisissez, pas moi. »",
+ f:"Les enfants sont employés comme « rattacheurs » : assez petits pour passer sous les métiers en marche et renouer les fils cassés sans qu’on arrête la machine.",
+ a:{q:"« Interdisons le travail des enfants. »", e:{p:11,o:3,i:-11,m:-4},
+    c:"Les enfants sortent. Leurs familles perdent un salaire sur trois, et le leur disent."},
+ b:{q:"« Laissons les enfants sous les machines. »", e:{i:8,o:-4,p:-10},
+    c:"Ils restent sous les machines. Certains n’en ressortiront pas entiers."}},
+
+{t:"Un contremaître veut chronométrer les gestes.", qui:"Abel Crompton, contremaître", req:["Savoirs techniques"],
+ d:"« Chacun à son poste, chaque geste compté, et je vous tire un tiers de fil en plus des mêmes machines. Ils n’aimeront pas. Ils s’y feront. »",
+ f:"Avant l’usine, l’artisan décidait de son rythme. La discipline d’atelier — horaires fixes, poste assigné, amendes — est une nouveauté que les ouvriers vivent comme une dépossession.",
+ a:{q:"« Organisons le travail en postes fixes. »", e:{i:12,m:6,o:-12}, g:["Organisation"],
+    c:"Le rendement grimpe. L’ouvrier cesse de conduire son travail : c’est le travail qui le conduit."},
+ b:{q:"« Refusons le chronométrage. »", e:{i:-8,o:7},
+    c:"On garde les habitudes de l’atelier. Les coûts restent ce qu’ils sont."},
+ c:{q:"« Organisons, avec une pause par demi-journée. »", e:{i:3,o:-5,m:1}, g:["Organisation"],
+    c:"La cadence s’installe, coupée de deux répits. On tient — un peu plus longtemps."}},
+
+{t:"Trois morts dans la même ruelle.", qui:"Dr William Rait, médecin des pauvres", apres:1830,
+ d:"« Les mêmes symptômes chez les trois. Si c’est le choléra, il suivra l’eau, et l’eau passe partout où il n’y a pas d’égout. Décidez aujourd’hui — pas la semaine prochaine. »",
+ f:"Le choléra atteint la Grande-Bretagne en 1831. On ignore encore qu’il se transmet par l’eau : on l’attribue aux mauvaises odeurs. Ce sont les quartiers sans égouts qui paient le plus lourd tribut.",
+ a:{q:"« Bouclons le quartier et nettoyons. »", e:{o:12,p:12,i:-12,m:-10},
+    c:"Le quartier est bouclé, les filatures à l’arrêt. L’épidémie s’éteint plus vite qu’ailleurs."},
+ b:{q:"« Ne fermons rien : produisons. »", e:{i:8,m:6,o:-15,p:-12},
+    c:"Les machines n’ont pas cessé de tourner. Le quartier a enterré ses morts sans vous."}},
+
+{t:"Le dernier terrain libre du centre.", qui:"Miss Agnes Thorne, dame d’œuvres",
+ d:"« Il y a dans cette ville des enfants de six ans qui n’ont jamais vu un arbre. Ce terrain est le dernier qui reste. Après celui-ci, il n’y en aura plus jamais. »",
+ f:"Manchester passe d’environ 25 000 habitants en 1772 à plus de 300 000 en 1851. La ville se construit sans plan d’ensemble : chaque terrain libre est bâti dès qu’il se vend.",
+ a:{q:"« Faisons un parc public. »", e:{o:10,p:8,m:-9,i:-6},
+    c:"Un parc au milieu des cheminées. On y vient le dimanche, en habits propres."},
+ b:{q:"« Vendons le terrain pour des entrepôts. »", e:{m:10,i:7,o:-8,p:-5},
+    c:"Les entrepôts sortent de terre en six mois. Le dernier arbre du centre tombe avec eux."},
+ c:{q:"« La moitié en parc, la moitié en entrepôts. »", e:{o:4,p:2,i:-1,m:-7},
+    c:"Un square et quatre hangars. Il faut dédommager le propriétaire, qui espérait tout vendre."}},
+
+{t:"Le pain a doublé depuis le printemps.", qui:"Mary Kearsley, fileuse à Ancoats",
+ d:"« Nous ne demandons pas la fortune. Nous demandons de quoi manger en travaillant. Sinon les métiers s’arrêteront d’eux-mêmes, et ce ne sera pas de notre fait. »",
+ f:"Le pain représente près de la moitié du budget d’une famille ouvrière. Quand son prix monte, c’est aussitôt la faim — et l’agitation.",
+ a:{q:"« Accordons la hausse des salaires. »", e:{o:13,i:-9,m:-6,p:3},
+    c:"Les salaires montent. Les fabricants jurent qu’ils ne tiendront pas l’année."},
+ b:{q:"« Refusons la hausse. »", e:{i:8,m:4,o:-13,p:-4},
+    c:"On refuse, et l’on compte sur la faim pour ramener chacun à son métier."}},
+
+{t:"Une pétition contre les droits sur le grain.", qui:"Josiah Halliwell, filateur", apres:1830,
+ d:"« Les Corn Laws tiennent le pain cher pour protéger les propriétaires terriens. Pain cher, salaires réclamés, coûts en hausse : ce sont eux qui vivent sur notre dos. Signez avec nous. »",
+ f:"Les Corn Laws taxent le grain importé pour protéger les propriétaires terriens. Les industriels y voient la cause du pain cher, donc des salaires qu’on leur réclame. La Ligue contre les Corn Laws naît à Manchester en 1838.",
+ a:{q:"« Signons la pétition contre les Corn Laws. »", e:{i:10,m:9,o:5,p:-11},
+    c:"Manchester devient le cœur de la Ligue. Londres le remarque, et n’apprécie pas."},
+ b:{q:"« Ne prenons pas parti. »", e:{i:-5,m:-4,p:4},
+    c:"On ne se fâche avec personne, et l’on n’obtient rien."},
+ c:{q:"« Soutenons-les, mais en secret. »", e:{i:1,m:1,p:-5},
+    c:"On finance discrètement la Ligue. Tout le monde le sait, personne ne le dit."}},
+
+{t:"Le monde entier défile au Crystal Palace.", qui:"Le secrétaire du conseil de ville", apres:1840,
+ d:"« Londres expose tout ce que ce pays sait faire, et six millions de visiteurs viendront voir. On nous demande nos cotonnades — et certains voudront voir d’où elles sortent. »",
+ f:"L’Exposition universelle de 1851 rassemble à Londres les produits du monde entier sous une halle de verre et de fer. Six millions de visiteurs y défilent en cinq mois.",
+ a:{q:"« Repeignons les façades avant la visite. »", e:{m:8,i:6,p:5,o:-7},
+    c:"Les visiteurs voient une ville prospère et ordonnée. Ancoats est à dix minutes, et personne n’y va."},
+ b:{q:"« Ne cachons rien aux visiteurs. »", e:{o:11,p:-8,i:-7,m:-5},
+    c:"On montre les caves avec les cheminées. Les journaux de Londres s’en emparent."},
+ c:{q:"« Exposons le fil, sans visite d’usine. »", e:{m:2,i:1,p:-1,o:-3},
+    c:"Le fil de Manchester triomphe à l’exposition. Les filatures restent fermées aux curieux."}},
+
+{t:"Le feu a pris aux cardes cette nuit.", qui:"Abel Crompton, contremaître",
+ d:"« Trois étages effondrés, quarante familles sans travail ce matin. Le propriétaire dit qu’il ne rebâtira pas sans aide de la ville. »",
+ f:"Les filatures brûlent souvent : coton, huile, poussière en suspension et lampes à flamme nue. Les escaliers sont étroits et les issues peu nombreuses.",
+ a:{q:"« Aidons le propriétaire à reconstruire. »", e:{i:10,o:7,m:-9,p:-4},
+    c:"Les murs se relèvent en quatre mois. On n’a pas discuté des issues de secours."},
+ b:{q:"« N’aidons pas : qu’il paie seul. »", e:{i:-9,o:-7,p:5,m:3},
+    c:"Il ne rebâtira pas. Quarante familles cherchent ailleurs."},
+ c:{q:"« Prêtons l’argent, remboursable. »", e:{i:3,o:2,m:-7},
+    c:"Le prêt est signé devant notaire. Il faudra bien qu’il rembourse un jour."}},
+
+{t:"Un prédicateur décrit ce qu’il voit.", qui:"Le révérend Ellis Hargreaves",
+ d:"« Du haut de ma chaire je dis ce que je vois : des caves, des fièvres, des enfants sous les machines. On m’écoute. Et l’on commence à répéter mes mots dans la rue. »",
+ f:"Les Églises dissidentes sont très implantées dans les villes industrielles. Leurs pasteurs comptent parmi les premiers à décrire publiquement les conditions de vie des ouvriers.",
+ a:{q:"« Ouvrons une enquête sur les quartiers. »", e:{p:9,o:8,i:-9,m:-4},
+    c:"L’enquête établit noir sur blanc ce que chacun savait. Il devient difficile de ne rien faire."},
+ b:{q:"« Faisons taire le prédicateur. »", e:{i:7,m:4,p:-8,o:-9},
+    c:"On étouffe le sermon. Les mots, eux, continuent de circuler."},
+ c:{q:"« Nommons-le au conseil de salubrité. »", e:{p:5,o:3,i:-5,m:-4},
+    c:"Le révérend a désormais un siège, un registre, et l’obligation de nuancer."}},
+];
+
+/* ==================================================================
+   ÉTAT
+   ================================================================== */
+let E=null;
+const app=document.getElementById("app");
+const clamp=(x)=>Math.max(0,Math.min(100,x));
+const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ");
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const AN=t=>Math.round(N.a0+(N.a1-N.a0)*t/(N.tours-1));
+
+function nouvellePartie(mode,niv){
+  if(niv) N=NIVEAUX[niv];
+  document.body.dataset.niveau=N.id; peindreVille(); chercherVue();
+  if(E&&E.timer){ clearInterval(E.timer); }
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],evVus:[],derEv:-9,consq:null,fini:null,timer:null};
+  piocher(); rendre();
+}
+const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
+function piocher(){
+  const an=E.mode==="campagne"?AN(E.tour):9999;
+  let lot=N.cartes.filter(c=>!E.vues.includes(c.t)&&ok(c)&&(!c.apres||c.apres<=an));
+  if(!lot.length){ E.vues=[]; lot=N.cartes.filter(c=>ok(c)&&(!c.apres||c.apres<=an)); }
+  if(!lot.length) lot=N.cartes.filter(c=>!c.req);
+  E.carte=lot[Math.floor(Math.random()*lot.length)];
+}
+
+function choisir(quel){
+  const c=E.carte, r=c[quel];
+  CLES.forEach(k=>{ if(r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
+  (r.g||[]).forEach(g=>{ if(!E.acquis.includes(g)) E.acquis.push(g); });
+  E.vues.push(c.t);
+  E.consq=r.c;
+  E.tour++;
+
+  /* La croissance de la ville est elle-même une pression : plus les
+     industriels sont contents, plus la population enfle, et plus
+     l'entassement use les ouvriers. C'est le mécanisme d'Ancoats. */
+  const taux=1+.03+E.f.i/500+(r.pop||0);
+  const avant=E.pop; E.pop=Math.round(E.pop*taux);
+  /* L'entassement s'aggrave avec la TAILLE de la ville, pas seulement
+     avec son rythme : loger 400 000 personnes est plus dur que d'en
+     loger 40 000. Sans cela, il suffisait de ne jamais industrialiser
+     pour survivre indéfiniment — une ville éternelle et minuscule. */
+  const usure=(taux-1)*13*(1+E.pop/400000);
+  E.f.o=clamp(E.f.o-usure);
+  /* Et les marchands ne patientent pas devant une ville qui stagne. */
+  let impatience="";
+  if(E.f.i<40){ E.f.m=clamp(E.f.m-1.6); impatience=" "+N.impatience; }
+  E.entassement=N.croissance(avant,E.pop,usure)+impatience;
+
+  const mort=CLES.find(k=>E.f[k]<=0);
+  if(mort) return finir(mort);
+  if(E.mode==="campagne"&&E.tour>=N.tours) return finir("verdict");
+  const ev=evenementDu();
+  if(ev) return declencher(ev);
+  piocher(); rendre();
+}
+
+function finir(cause){
+  E.fini=cause;
+  if(E.mode==="infini"){
+    /* On se mesure à la POPULATION atteinte, jamais au nombre de tours :
+       sinon la meilleure tactique serait de ne rien industrialiser. */
+    const rec=record();
+    if(E.pop>rec) try{localStorage.setItem("pdp_pop_"+N.id,E.pop)}catch(e){}
+  }
+  rendreFin();
+}
+
+/* ==================================================================
+   RENDU
+   ================================================================== */
+const icone=(k,cls)=>`<svg class="${cls||""}"><use href="#${N.forces[k].ic}"/></svg>`;
+function fleches(v){
+  const n=Math.abs(v)<=6?1:Math.abs(v)<=12?2:3;
+  return (v>0?"▲":"▼").repeat(n);
+}
+function impacts(e){
+  return CLES.filter(k=>e[k]).map(k=>{
+    const cls=e[k]>0?"up":"dn";
+    return `<span class="imp ${cls}" title="${N.forces[k].nom} ${e[k]>0?"+":""}${e[k]}">
+      ${icone(k)}<span class="lb">${N.forces[k].nom}</span><span class="fl">${fleches(e[k])}</span></span>`;
+  }).join("");
+}
+function barresForces(){
+  return `<div class="forces">${CLES.map(k=>{
+    const v=E.f[k], col=v>55?"var(--vert)":v>25?"var(--accent)":"var(--bs-orange)";
+    return `<div class="force ${v<=20?"danger":""}" title="${N.forces[k].nom} — ${N.forces[k].veut}">
+      ${icone(k)}<div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
+      <div class="mini"><i style="width:${v}%;background:${col}"></i></div></div>`;
+  }).join("")}</div>`;
+}
+
+/* ==================================================================
+   LE DÉCOR — la fenêtre du bureau
+   La ville derrière la vitre n'est pas un ornement : elle est la jauge
+   que le joueur ne peut pas lire en chiffres. Elle grandit avec la
+   population, elle s'assombrit avec l'usure ouvrière — sans que
+   personne ne l'ait voté. C'est la leçon du jeu, rendue visible.
+   ================================================================== */
+const SC = {
+  el:null, loin:null, pres:null, fum:null, vitre:null, peinte:false,
+  /* positions fixes : la ville ne doit pas danser d'un tour à l'autre */
+  h(i){ return ((i*2654435761)%4294967296)/4294967296 }
+};
+
+function peindreVille(){
+  SC.el    = document.getElementById("scene");
+  if(!SC.el) return;
+  SC.loin  = document.getElementById("loin");
+  SC.pres  = document.getElementById("pres");
+  SC.fum   = SC.el.querySelector(".fumees");
+  SC.vitre = SC.el.querySelector(".vitre");
+  if(SC.peinte) return;
+
+  let a="",b="",f="";
+  /* rangée lointaine : toits et clochers, ce que la ville était déjà */
+  for(let i=0;i<34;i++){
+    const x=SC.h(i)*1180, w=14+SC.h(i+90)*30, h=16+SC.h(i+40)*34;
+    a+=`<rect x="${x.toFixed(0)}" y="${(238-h).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}"/>`;
+  }
+  /* rangée proche : les cheminées, une par index, révélées peu à peu */
+  for(let i=0;i<30;i++){
+    const x=18+SC.h(i+7)*1150, w=7+SC.h(i+61)*5, h=52+SC.h(i+23)*86;
+    b+=`<rect class="che" data-i="${i}" x="${x.toFixed(0)}" y="${(292-h).toFixed(0)}"
+         width="${w.toFixed(0)}" height="${h.toFixed(0)}" opacity="0"/>`;
+    if(i<9) f+=`<span style="left:${(SC.h(i+7)*88).toFixed(1)}%;animation-delay:${(i*1.6).toFixed(1)}s"></span>`;
+  }
+  SC.loin.innerHTML=a; SC.pres.innerHTML=b; SC.fum.innerHTML=f;
+  SC.peinte=true;
+}
+
+/* Une image existe-t-elle pour ce niveau ? Si oui elle remplace le décor
+   peint ; si non, rien ne se voit — le jeu reste beau sans elle. */
+function chercherVue(){
+  if(!SC.el) return;
+  SC.el.classList.remove("aimg");
+  const src="img/vue-"+N.id+".jpg", im=new Image();
+  im.onload=()=>{ SC.el.querySelector(".vue").style.backgroundImage=`url("${src}")`;
+                  SC.el.classList.add("aimg"); };
+  im.src=src;
+}
+
+function majVue(){
+  if(!SC.el||!E) return;
+  /* combien la ville a-t-elle enflé depuis le premier tour */
+  const croiss = Math.min(1, Math.log(E.pop/N.pop0+1)/Math.log(9));
+  /* la suie : l'usure ouvrière d'abord, la taille de la ville ensuite */
+  const suie = .16 + .34*(1-E.f.o/100) + .18*croiss;
+  SC.el.style.setProperty("--suie", suie.toFixed(3));
+  /* les fumées suivent l'activité des fabriques */
+  SC.fum.style.opacity = (.16 + .6*(E.f.i/100)).toFixed(3);
+  /* les cheminées sortent de terre à mesure que la ville grandit */
+  const n = Math.round(4 + croiss*26);
+  SC.pres.querySelectorAll(".che").forEach(r=>{
+    r.setAttribute("opacity", (+r.dataset.i < n) ? "0.92" : "0");
+  });
+}
+
+/* ==================================================================
+   RENDU — un statut de texte, un dossier
+   ================================================================== */
+function rendre(){
+  const c=E.carte;
+  let d=0; const D=()=>`style="--d:${(d+=.085).toFixed(3)}s"`;
+  const trois=["a","b","c"].filter(k=>c[k]);
+
+  app.innerHTML=`
+  ${barresForces()}
+  ${E.consq?`<div class="consq dossier d-decision" ${D()}>
+      <span class="onglet">Rapport de décision</span>
+      ${esc(E.consq)}<br><span style="color:#8E7C66">${E.entassement}</span></div>`:""}
+  <div class="situ dossier d-situation" ${D()}>
+    <span class="onglet">Affaire du jour</span>
+    <div class="ct">Une nouvelle affaire vous arrive</div>
+    <div class="t">${esc(c.t)}</div>
+    <div class="parle">${esc(c.qui)}</div>
+    <div class="d">${esc(c.d)}</div></div>
+  ${c.f?`<details class="dossier d-enquete" ${D()}>
+      <summary><span class="onglet">Rapport d’enquête</span>
+        Le bureau d’enquête a joint une note à ce dossier.
+        <span class="pli"></span></summary>
+      <div class="corps">${esc(c.f)}</div></details>`:""}
+  <div class="rep ${trois.length===2?"deux":""}" ${D()}>
+    ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
+      <span class="q">${esc(c[k].q)}</span><span class="impacts">${impacts(c[k].e)}</span></button>`).join("")}
+  </div>
+  <div class="pied">
+    ${E.mode==="campagne"?`<span>Année <b>${AN(E.tour)}</b></span><span>Décision <b>${E.tour+1}</b> sur ${N.tours}</span>`
+                         :`<span>Mode survie — décision <b>${E.tour+1}</b></span>`}
+    <span>${N.unite} <b>${fmt(E.pop)}</b></span>
+    <span class="cond">${CONDITIONS.map(x=>`<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
+  </div>`;
+  app.classList.remove("presse");
+  majVue();
+}
+
+/* Un clic n'importe où sur la table pose le reste des dossiers d'un coup. */
+document.addEventListener("click",e=>{
+  if(e.target.closest("button, summary, a")) return;
+  app.classList.add("presse");
+});
+/* On compte les rapports d'enquête réellement ouverts : le rapport final
+   dira au professeur qui a enquêté et qui a tranché à l'aveugle. */
+document.addEventListener("toggle",e=>{
+  const t=e.target;
+  if(t.classList&&t.classList.contains("d-enquete")&&t.open&&E){
+    if(!E.lus) E.lus=[];
+    const k=(E.carte&&E.carte.t)||"";
+    if(k&&!E.lus.includes(k)) E.lus.push(k);
+  }
+},true);
+
+
+/* ==================================================================
+   LES ÉVÉNEMENTS — ils tombent, on ne les choisit pas
+   ================================================================== */
+const SECONDES_URGENCE = 20;
+
+function evenementDu(){
+  const reste = N.ev.filter(v=>!E.evVus.includes(v.t));
+  if(!reste.length) return null;
+  /* Jamais deux coups du sort coup sur coup : il faut pouvoir respirer,
+     et redresser les jauges, entre deux. */
+  if(E.tour - E.derEv < 3) return null;
+  if(E.mode==="campagne"){
+    /* À sa date réelle : Peterloo en 1819, le krach en 1929. */
+    const an = AN(E.tour);
+    return reste.find(v=>v.an<=an) || null;
+  }
+  /* En survie il n'y a plus de calendrier, donc le hasard. */
+  return Math.random()<.22 ? reste[Math.floor(Math.random()*reste.length)] : null;
+}
+
+function declencher(ev){
+  E.evVus.push(ev.t);
+  E.derEv = E.tour;
+  E.evEnCours = ev;
+  CLES.forEach(k=>{ if(ev.e[k]) E.f[k]=clamp(E.f[k]+ev.e[k]); });
+  if(ev.pop) E.pop = Math.round(E.pop*(1+ev.pop));
+  rendreEvenement(ev);
+}
+
+function rendreEvenement(ev){
+  app.innerHTML=`
+  ${barresForces()}
+  <div class="ev">
+    <div class="evd">${esc(ev.date)}</div>
+    <div class="evt">${esc(ev.t)}</div>
+    <p class="evx">${esc(ev.x)}</p>
+    <div class="evs"><strong>Fait authentique.</strong> ${esc(ev.src)}</div>
+    <div class="evi">${impacts(ev.e)}</div>
+  </div>
+  <p class="centre" style="margin:20px 0 0">
+    ${ev.urgence ? `<button class="plein urg" onclick="rendreUrgence()">Il faut décider maintenant</button>`
+                 : `<button class="plein" onclick="suiteEvenement()">Continuer</button>`}
+  </p>`;
+}
+
+function rendreUrgence(){
+  const ev=E.evEnCours;
+  if(!ev || !ev.urgence) return suiteEvenement();
+  const u=ev.urgence;
+  app.innerHTML=`
+  ${barresForces()}
+  <div class="chrono"><div class="jauge" id="jt"></div></div>
+  <p class="compte">Il vous reste <b id="cpt">${SECONDES_URGENCE}</b> secondes</p>
+  <div class="situ urgent">
+    <div class="ct">Décision urgente — ${esc(ev.date)}</div>
+    <div class="t">${esc(ev.t)}</div>
+    <div class="d">${esc(u.q)}</div>
+  </div>
+  <div class="rep ${u.choix.length===2?"deux":""}">
+    ${u.choix.map((c,i)=>`<button class="choix" onclick="urgenceChoix(${i})">
+      <span class="q">${esc(c.q)}</span><span class="impacts">${impacts(c.e)}</span></button>`).join("")}
+  </div>`;
+  const jt=document.getElementById("jt");
+  if(jt){ jt.style.transition=`width ${SECONDES_URGENCE}s linear`; requestAnimationFrame(()=>{ jt.style.width="0%" }); }
+  if(window.SANS_CHRONO) return;
+  E.reste=SECONDES_URGENCE;
+  E.timer=setInterval(()=>{
+    E.reste--;
+    const c=document.getElementById("cpt");
+    if(c) c.textContent=Math.max(0,E.reste);
+    if(E.reste<=0) urgenceChoix(-1);
+  },1000);
+}
+
+function urgenceChoix(i){
+  if(E.timer){ clearInterval(E.timer); E.timer=null; }
+  if(!E.evEnCours || !E.evEnCours.urgence) return suiteEvenement();
+  const u=E.evEnCours.urgence;
+  const r = i<0 ? u.defaut : u.choix[i];
+  CLES.forEach(k=>{ if(r.e && r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
+  E.consq = r.c;
+  E.entassement = i<0 ? "Le temps a décidé à votre place." : "";
+  suiteEvenement();
+}
+
+function suiteEvenement(){
+  const mort=CLES.find(k=>E.f[k]<=0);
+  if(mort) return finir(mort);
+  if(E.mode==="campagne" && E.tour>=N.tours) return finir("verdict");
+  piocher(); rendre();
+}
+
+/* ---------- fins ---------- */
+const FINS_I={
+ o:{t:"Les machines brisées",
+    x:"Les ouvriers vous ont lâché. Ateliers désertés, métiers brisés, émeutes du pain : la ville ne trouve plus personne pour faire tourner ses filatures. Manchester a connu Peterloo en 1819 et le chartisme dans les années 1840. <strong>Une industrie ne se maintient pas sans ceux qui la font tourner.</strong>"},
+ i:{t:"Les cheminées froides",
+    x:"Les industriels vous ont lâché. Les fabricants ferment ou remontent leurs machines à Bolton, où on les laisse travailler. Sans usines, la ville redevient ce qu’elle était : un bourg de marché. <strong>Une révolution industrielle n’est pas acquise une fois pour toutes.</strong>"},
+ m:{t:"Le crédit coupé",
+    x:"Les marchands vous ont lâché. Plus un shilling de Liverpool, plus un débouché pour le fil. Les entrepôts se vident et les banques placent leur argent ailleurs. <strong>Sans capitaux ni marchés, les machines ne sont que du métal.</strong>"},
+ p:{t:"La ville sous tutelle",
+    x:"Le Parlement vous a lâché. Une commission d’enquête arrive de Londres : caves insalubres, épidémies, travail des enfants. Votre gestion s’arrête là. <strong>L’État finit toujours par regarder ce que l’industrie laisse derrière elle.</strong>"},
+};
+const SCHOP={qui:"Johanna Schopenhauer, voyageuse allemande",
+ cit:"Une machine à vapeur, placée au sous-sol, faisait fonctionner presque toutes les roues et les broches disposées sur plusieurs étages. Tout semblait se faire facilement grâce aux machines, qui nous parurent un miracle de l’industrie.",
+ src:"Traduction pédagogique adaptée d’un témoignage publié en 1831."};
+const ENGELS={qui:"Friedrich Engels, à Ancoats",
+ cit:"Les murs des cottages où ils vivent sont aussi minces que possible ; sous presque chaque maison, on trouve des logements en cave. De nombreuses rues ne sont ni pavées ni pourvues d’égouts. L’ouvrier est contraint d’habiter ces logements parce qu’il ne peut pas en payer d’autres.",
+ src:"La Situation de la classe laborieuse en Angleterre, 1845."};
+const temoin=o=>`<div class="temoin"><div class="qui">${o.qui}</div><div class="cit">« ${o.cit} »</div><div class="src">${o.src}</div></div>`;
+
+function record(){ try{ return +(localStorage.getItem("pdp_pop_"+N.id)||0) }catch(e){ return 0 } }
+
+function rendreFin(){
+  const f=E.f, rec=record();
+  let titre,texte,tem="";
+  if(N.fins[E.fini]){ titre=N.fins[E.fini].t; texte=N.fins[E.fini].x; }
+  else { const v=N.verdict(f); titre=v.t; texte=v.x; tem=v.tem.map(temoin).join(""); }
+  app.innerHTML=`
+  ${barresForces()}
+  <p class="sous" style="margin:18px 0 0">${E.mode==="campagne"?`${N.lieu}, ${AN(Math.min(E.tour,N.tours-1))}`:"Mode survie"} — partie terminée</p>
+  <div class="gros">${titre}</div>
+  <p style="max-width:68ch;font-size:16.5px">${texte}</p>
+  ${tem}
+  <div class="pied" style="margin-bottom:8px">
+    <span>Décisions prises <b>${E.tour}</b></span>
+    <span>${N.unite} finale <b>${fmt(E.pop)}</b></span>
+    <span>Conditions réunies <b>${E.acquis.length} / ${CONDITIONS.length}</b></span>
+    ${E.mode==="infini"?`<span>Record <b>${fmt(rec)} ${N.unite2}</b></span>`:""}
+  </div>
+  <div class="bilan"><h2 style="margin-top:0">Ce que vous venez d’apprendre</h2><ul>
+    ${N.lecons.map(x=>`<li>${x}</li>`).join("")}
+  </ul></div>
+  <p class="centre"><button class="plein" onclick="nouvellePartie('${E.mode}',N.id)">Rejouer</button>
+  <button onclick="accueil()">Menu</button></p>`;
+}
+
+
+function VERDICT_I(f){
+  const prod=(f.i+f.m)/2, humain=(f.o+f.p)/2;
+  if(prod>=58&&humain>=52) return {t:"Une ville que l’on peut défendre",
+    x:"Vous avez industrialisé sans briser ceux qui y travaillaient. C’est rare. Vos deux visiteurs n’ont pas vu la même ville, et ils ont tous les deux raison : <strong>c’est exactement cela, nuancer l’idée de progrès.</strong>",
+    tem:[SCHOP,ENGELS]};
+  if(prod>=55) return {t:"Une puissance bâtie sur des caves",
+    x:"Vos filatures tournent, votre population a explosé, vos marchands se sont enrichis. Et voici ce qu’un visiteur allemand a vu de vos quartiers ouvriers. Le progrès technique a bien eu lieu — <strong>il n’a pas profité à tout le monde</strong>.",
+    tem:[ENGELS]};
+  if(prod<45) return {t:"La ville qui n’a pas basculé",
+    x:"Les conditions ne se sont jamais toutes réunies. Sans énergie, sans capitaux, sans bras ni débouchés, les machines restent des curiosités. <strong>Une révolution industrielle n’est pas une invention : c’est un système.</strong>",
+    tem:[]};
+  return {t:"Un équilibre fragile",
+    x:"Ni grande puissance, ni désastre. Vous avez gouverné prudemment — l’histoire de Manchester, elle, ne l’a pas été.",
+    tem:[SCHOP]};
+}
+/* ==================================================================
+   NIVEAU II — DETROIT, 1908-1932
+   Le joueur dirige l'usine. Même moteur, autres forces : ce ne sont
+   plus des habitants qui s'entassent mais des voitures qui sortent,
+   et ce n'est plus le logement qui manque, c'est le temps.
+
+   Le fait qui porte tout le niveau : en 1913, chez Ford, il fallait
+   embaucher près de quatre fois l'effectif pour le maintenir. La
+   chaîne marchait si bien que personne ne voulait y rester.
+   ================================================================== */
+const FORCES_II = {
+  i:{nom:"Actionnaires", ic:"ic2-i", veut:"du rendement, des dividendes, une usine qui ne s’arrête jamais"},
+  o:{nom:"Ouvriers",     ic:"ic2-o", veut:"une cadence tenable, un salaire, le droit de s’organiser"},
+  m:{nom:"Clients",      ic:"ic2-m", veut:"une voiture fiable, bon marché, qu’on ait envie d’acheter"},
+  p:{nom:"Opinion",      ic:"ic2-p", veut:"des comptes, de la décence — et bientôt des lois"},
+};
+
+const CARTES_II = [
+{t:"Un ingénieur a dessiné un convoyeur.", qui:"Walter Kessler, ingénieur de production",
+ d:"« Au lieu que l’homme aille au châssis, c’est le châssis qui vient à l’homme. Chacun fait un geste, toujours le même, et ne bouge plus de sa place. Je vous promets de diviser le temps de montage par huit. »",
+ f:"L’idée vient des abattoirs de Chicago, où les carcasses circulaient sur un rail devant des ouvriers immobiles. Appliquée à l’automobile en 1913, elle inverse le principe : c’est la pièce qui se déplace, plus l’homme.",
+ a:{q:"« Installons la chaîne mobile. »", e:{i:14,m:8,o:-12}, g:["Organisation","Savoirs techniques"],
+    c:"Douze heures trente pour un châssis, puis une heure trente-trois. Le geste est simple. La journée, elle, ne l’est plus."},
+ b:{q:"« Gardons le montage à poste fixe. »", e:{i:-10,m:-7,o:5},
+    c:"L’équipe tourne autour du châssis comme avant. Le concurrent d’en face, lui, a lu les mêmes plans."},
+ c:{q:"« Installons la chaîne, mais ralentie. »", e:{i:2,m:1,o:-5,p:2}, g:["Organisation"],
+    c:"Le convoyeur avance moins vite qu’il ne pourrait. Les actionnaires calculent ce que coûte chaque minute perdue."}},
+
+{t:"Trois cent soixante-dix pour cent.", qui:"Frank Doyle, actionnaire", req:["Organisation"],
+ d:"« Voici le chiffre que votre chaîne produit vraiment : pour garder cent hommes à leur poste, il faut en embaucher trois cent soixante-dix dans l’année. Ils partent au bout de quelques jours. Former, reformer, reformer encore — cela nous ruine. »",
+ f:"Le taux de rotation mesure le renouvellement du personnel. À 370 %, il faut embaucher près de quatre personnes dans l’année pour chaque poste à tenir. Former chaque nouveau venu coûte cher.",
+ a:{q:"« Doublons le salaire : cinq dollars par jour. »", e:{o:16,m:6,i:-11,p:8},
+    c:"Le salaire double d’un coup. Dix mille hommes font la queue devant l’usine le lendemain matin, et l’on cesse de partir."},
+ b:{q:"« Ne changeons rien : embauchons chaque matin. »", e:{i:6,o:-13,p:-7},
+    c:"On embauche à la porte chaque matin. Personne n’apprend jamais bien son geste."},
+ c:{q:"« Une prime, aux anciens seulement. »", e:{o:4,i:-6,m:1,p:-3},
+    c:"Ceux qui restent y gagnent, les nouveaux n’y ont pas droit. L’atelier se divise en deux."}},
+
+{t:"Qui mérite les cinq dollars ?", qui:"Dr Emmett Crowe, du département sociologique", apres:1914,
+ d:"« Le salaire double n’est pas un dû, c’est une récompense. Laissez mes inspecteurs visiter les foyers : ils vérifieront qu’on n’y boit pas, qu’on y épargne, que la famille est tenue. Ceux qui vivent mal ne toucheront que la moitié. »",
+ f:"Ford crée en 1914 un « département sociologique » : des enquêteurs visitent les foyers ouvriers pour vérifier la sobriété, l’épargne et la tenue du ménage. Seuls les jugés méritants touchent le salaire complet.",
+ a:{q:"« Inspectons la vie privée des ouvriers. »", e:{i:7,p:4,o:-11},
+    c:"On entre chez les ouvriers pour compter les bouteilles et lire les livrets d’épargne. Le salaire s’achète en obéissance."},
+ b:{q:"« Cinq dollars pour tous, sans inspection. »", e:{o:12,p:5,i:-8},
+    c:"Ce qu’ils font de leur soirée ne vous regarde pas. Certains actionnaires trouvent l’argent mal employé."}},
+
+{t:"Le client demande une autre couleur.", qui:"Elias Bright, concessionnaire à Chicago",
+ d:"« On me réclame du bleu, du vert, une carrosserie fermée pour l’hiver. Je réponds ce qu’on me dit de répondre : noir. Combien de temps croyez-vous que cela tiendra ? »",
+ f:"Une seule peinture séchait assez vite pour suivre la cadence de la chaîne : un noir au bitume. Une contrainte technique était devenue une règle commerciale.",
+ a:{q:"« Une seule couleur : le noir. »", e:{i:9,m:-8,o:2}, g:["Organisation"],
+    c:"Une seule teinte sèche assez vite pour la chaîne. Le prix baisse encore. Le choix, lui, a disparu."},
+ b:{q:"« Proposons plusieurs couleurs. »", e:{m:12,i:-9,o:-3},
+    c:"Il faut ralentir la chaîne pour laisser sécher. Chaque voiture coûte plus cher à produire."},
+ c:{q:"« Proposons deux teintes, pas plus. »", e:{m:3,i:-8},
+    c:"Un compromis que personne ne réclamait : trop peu pour séduire, assez pour compliquer l’atelier."}},
+
+{t:"Une usine qui fabriquerait tout.", qui:"Frank Doyle, actionnaire", req:["Savoirs techniques"],
+ d:"« Le minerai entre d’un côté, la voiture sort de l’autre. Nos fonderies, notre verre, notre caoutchouc, nos bateaux. Plus un fournisseur pour nous tenir à la gorge. Il faut construire au bord de la rivière, et il faut beaucoup d’argent. »",
+ f:"On appelle intégration verticale le fait de posséder toutes les étapes, de la mine à la vente. River Rouge, construite à partir de 1917, aura ses hauts fourneaux, sa verrerie, sa centrale électrique et son port.",
+ a:{q:"« Bâtissons River Rouge : tout sous un toit. »", e:{i:13,m:6,o:-7,p:-5}, g:["Ressources","Capitaux"],
+    c:"La plus grande usine du monde. Rien n’y dépend de personne — et personne n’y échappe à rien."},
+ b:{q:"« Continuons d’acheter nos pièces dehors. »", e:{i:-7,m:-4,p:3},
+    c:"On reste dépendant de vingt fournisseurs, qui connaissent maintenant la valeur de leur signature."},
+ c:{q:"« Rachetons seulement nos fonderies. »", e:{i:3,o:-4,m:-2}, g:["Ressources"],
+    c:"La fonderie est à nous, le reste s’achète. Une demi-indépendance, à demi-prix."}},
+
+{t:"L’ouvrière de la ligne 4 demande à parler.", qui:"Anna Kowalczyk, ouvrière à Highland Park",
+ d:"« Je pose la même vis, quatre cents fois par jour, depuis deux ans. Je ne sais toujours pas à quoi sert la pièce d’à côté. Le soir je ne parle plus. Vous m’avez donné cinq dollars — vous ne m’avez pas rendu mon métier. »",
+ f:"Le travail à la chaîne décompose la fabrication en gestes élémentaires de quelques secondes. L’ouvrier n’a plus besoin d’un savoir-faire — et ne voit jamais l’objet fini.",
+ a:{q:"« Ne changeons rien à son poste. »", e:{i:8,o:-12,p:-6},
+    c:"Le geste reste ce qu’il est. Elle retourne à sa vis, et vous savez désormais ce qu’elle en pense."},
+ b:{q:"« Faisons tourner les ouvriers de poste en poste. »", e:{o:11,p:5,i:-9,m:-3},
+    c:"Chacun change de poste dans la semaine. Le rendement baisse ; les arrêts de travail aussi."},
+ c:{q:"« Montrons-leur au moins la voiture finie. »", e:{o:3,p:1,i:-5},
+    c:"On emmène les équipes voir sortir l’automobile qu’elles montent. C’est peu. Ce n’est pas rien."}},
+
+{t:"General Motors change de modèle chaque année.", qui:"Elias Bright, concessionnaire", apres:1920,
+ d:"« Chez eux, la voiture de l’an prochain ne ressemble pas à celle de cette année — et ils la vendent à crédit, en douze versements. Mes clients viennent regarder la nôtre et repartent chez eux. »",
+ f:"À la tête de General Motors, Alfred Sloan invente le modèle renouvelé chaque année et la gamme : une voiture pour chaque bourse et chaque âge de la vie. Sa maison vend aussi à crédit dès 1919.",
+ a:{q:"« Changeons de modèle chaque année. »", e:{m:13,i:-10,o:-4}, g:["Marchés"],
+    c:"Il faut refaire les outillages, réapprendre les gestes, tout recommencer. Le client, lui, revient."},
+ b:{q:"« Gardons le même modèle. »", e:{i:7,m:-14,o:3},
+    c:"On produit toujours la même, de mieux en mieux, de moins en moins cher. Et de moins en moins souvent achetée."},
+ c:{q:"« Gardons le châssis, changeons la carrosserie. »", e:{m:4,i:-8,o:-3}, g:["Marchés"],
+    c:"On habille l’ancienne en neuve. Les concessionnaires respirent ; les ingénieurs de la concurrence sourient."}},
+
+{t:"Faut-il vendre à crédit ?", qui:"Frank Doyle, actionnaire", apres:1920,
+ d:"« L’ouvrier gagne cinq dollars et la voiture en coûte quatre cents. À crédit, il l’achète demain au lieu d’économiser trois ans. Nos concurrents ont monté leur propre banque pour cela. »",
+ f:"Le crédit à la consommation se répand par l’automobile dans les années 1920. Il permet d’acheter avec un revenu qu’on n’a pas encore, et fait entrer durablement les ménages dans l’endettement.",
+ a:{q:"« Vendons à crédit, en douze versements. »", e:{m:14,i:6,p:-8,o:2}, g:["Capitaux","Marchés"],
+    c:"On vend d’un coup à des gens qui n’avaient pas l’argent. On leur vend aussi des années de dettes."},
+ b:{q:"« Refusons le crédit. »", e:{p:7,i:-5,m:-11},
+    c:"Le principe est sauf. Le marché, lui, passe chez le voisin qui n’en a pas."},
+ c:{q:"« Un crédit court, réservé à nos ouvriers. »", e:{m:4,o:2,i:-2,p:-7}, g:["Marchés"],
+    c:"Les ouvriers de la maison achètent la voiture qu’ils montent. On a inventé le client captif."}},
+
+{t:"Cinq jours de travail au lieu de six.", qui:"Harriet Vance, journaliste", apres:1922,
+ d:"« Vous répétez partout qu’un ouvrier bien payé achète des voitures. Poussez donc le raisonnement : un ouvrier qui a son samedi a le temps de s’en servir. Oserez-vous ? »",
+ f:"L’argument est qu’un ouvrier bien payé et disponible devient le client de ce qu’il fabrique. C’est le cœur de ce qu’on appellera le fordisme : produire en masse suppose de consommer en masse.",
+ a:{q:"« Passons à cinq jours de travail. »", e:{o:14,p:11,m:5,i:-13},
+    c:"Le monde entier en parle. Les autres patrons de Detroit vous détestent pour longtemps."},
+ b:{q:"« Gardons la semaine de six jours. »", e:{i:6,o:-9,p:-7},
+    c:"On travaille le samedi. La presse rappelle vos propres discours sur le pouvoir d’achat."},
+ c:{q:"« Cinq jours, mais l’été seulement. »", e:{o:3,p:1,i:-7},
+    c:"La mesure s’arrête en septembre. Personne ne sait si c’est un droit ou une faveur."}},
+
+{t:"Un organisateur distribue des tracts à la grille.", qui:"Sam Rusin, organisateur syndical",
+ d:"« Nous ne demandons pas votre usine. Nous demandons de discuter la cadence avec quelqu’un qui ait le droit de dire non. Vous pouvez nous recevoir aujourd’hui, ou nous retrouver dehors dans dix ans. »",
+ f:"Les syndicats ne sont pas reconnus dans l’automobile américaine avant la fin des années 1930. Les grandes firmes entretiennent des services de sécurité privés chargés de surveiller les ateliers.",
+ a:{q:"« Recevons les syndicalistes. »", e:{o:13,p:9,i:-12,m:-3},
+    c:"On s’assoit à la même table. Les actionnaires parlent d’abdication ; les usines voisines, de contagion."},
+ b:{q:"« Chassons-les par le service d’ordre. »", e:{i:8,o:-14,p:-11},
+    c:"On disperse, on fiche, on licencie les meneurs. L’atelier se tait — et n’oublie pas."}},
+
+{t:"Le chronomètre descend à l’atelier.", qui:"Walter Kessler, ingénieur", req:["Organisation"],
+ d:"« Nous avons mesuré chaque geste au dixième de seconde. En supprimant les mouvements inutiles, je gagne onze secondes par voiture. Multipliez par la production de l’année. »",
+ f:"Frederick Taylor a théorisé l’organisation scientifique du travail : décomposer chaque tâche, chronométrer chaque geste, supprimer les mouvements inutiles. Le savoir passe de l’ouvrier au bureau des méthodes.",
+ a:{q:"« Appliquons les temps chronométrés. »", e:{i:12,m:5,o:-13},
+    c:"Onze secondes gagnées mille fois par jour. C’est l’ouvrier qui les paie, une par une."},
+ b:{q:"« Renonçons au chronométrage. »", e:{o:9,p:4,i:-9,m:-3},
+    c:"On garde les temps anciens. Le prix de revient ne baisse plus."},
+ c:{q:"« Chronométrons, et partageons le gain. »", e:{i:3,o:-1,m:1,p:1},
+    c:"Une part du temps gagné revient en salaire. Les comptables surveillent la part de très près."}},
+
+{t:"Un homme se présente avec une jambe en moins.", qui:"Dr Emmett Crowe, du département sociologique",
+ d:"« Nous avons classé les postes : sept mille d’entre eux peuvent être tenus assis, cent soixante-dix par un homme sans jambes, une dizaine par un aveugle. Le geste est si simple qu’il n’exige presque plus de corps. Faut-il les embaucher ? »",
+ f:"Parce que les postes sont décomposés en gestes simples, l’entreprise recense ceux qui peuvent être tenus assis, par un homme amputé ou par un aveugle. Ford en employa plusieurs milliers.",
+ a:{q:"« Embauchons les ouvriers handicapés. »", e:{o:8,p:12,m:4,i:-5},
+    c:"Des centaines d’hommes que personne ne voulait entrent à l’usine. Le travail décomposé aura eu cela pour lui."},
+ b:{q:"« Refusons de les embaucher. »", e:{i:5,o:-7,p:-12},
+    c:"On les renvoie à la grille. La presse a les chiffres de vos propres ingénieurs."},
+ c:{q:"« Embauchons-en quelques-uns, pour l’image. »", e:{p:1,i:-3,o:-1},
+    c:"On en embauche vingt et l’on photographie chacun d’eux. Le reste attend toujours."}},
+
+{t:"Les machines réclament du courant.", qui:"Walter Kessler, ingénieur",
+ d:"« Une seule machine à vapeur et ses courroies au plafond : quand elle casse, l’usine entière s’arrête. Un moteur électrique par machine, et chaque poste devient indépendant. Il faut refaire toute l’installation. »",
+ f:"Dans une usine à vapeur, une seule machine entraîne tout l’atelier par des courroies au plafond. Le moteur électrique individuel libère chaque poste et permet de ranger les machines dans l’ordre du travail.",
+ a:{q:"« Électrifions toute l’usine. »", e:{i:11,m:4,o:3,p:2}, g:["Ressources","Savoirs techniques"],
+    c:"Chaque machine tourne pour elle-même. On peut enfin disposer les postes dans l’ordre du travail, et non sous les courroies."},
+ b:{q:"« Gardons la machine à vapeur. »", e:{i:-9,o:-3,m:-4},
+    c:"Les courroies continuent de claquer au plafond. Une rupture, et deux mille hommes attendent."},
+ c:{q:"« N’électrifions que les ateliers neufs. »", e:{i:2,m:-1,o:-2}, g:["Savoirs techniques"],
+    c:"L’usine vit à deux époques à la fois, et les contremaîtres passent leur journée entre les deux."}},
+
+{t:"La pièce ne s’ajuste plus.", qui:"Walter Kessler, ingénieur",
+ d:"« Trois fournisseurs, trois tolérances. Nos ajusteurs passent leurs journées à limer des pièces qui devraient entrer seules. Imposons la même cote à tout le monde, au centième. »",
+ f:"La pièce interchangeable suppose que toutes les copies soient identiques au centième près. C’est elle qui permet de monter sans ajuster, et de réparer sans atelier — mais elle supprime le métier d’ajusteur.",
+ a:{q:"« Imposons une cote unique à tous. »", e:{i:12,m:6,o:-4}, g:["Savoirs techniques","Organisation"],
+    c:"Toute pièce entre dans toute voiture. L’ajusteur qualifié devient un homme qui pose."},
+ b:{q:"« Gardons nos ajusteurs et leurs limes. »", e:{o:7,i:-11,m:-6},
+    c:"On lime, on ajuste, on rattrape. Chaque voiture est un peu différente, et coûte un peu plus."},
+ c:{q:"« Une cote unique sur le moteur seulement. »", e:{i:3,m:1,o:-4}, g:["Savoirs techniques"],
+    c:"Le moteur est interchangeable, la carrosserie non. On a réglé la moitié du problème."}},
+
+{t:"Le marché s’est arrêté d’un coup.", qui:"Frank Doyle, actionnaire", apres:1928,
+ d:"« Octobre. Les commandes ne tombent plus, elles s’annulent. Nous avons les stocks, les usines, les hommes — et personne en face. Il faut décider vite, et ce sera brutal dans tous les cas. »",
+ f:"La crise de 1929 frappe l’automobile plus que tout : on repousse l’achat d’une voiture bien avant celui du pain. La production américaine chute des trois quarts en quatre ans.",
+ a:{q:"« Fermons les lignes et licencions. »", e:{i:9,o:-16,p:-12,m:-5},
+    c:"Des milliers d’hommes dehors en une semaine, dans une ville qui n’existe que par vous."},
+ b:{q:"« Gardons tout le monde, au ralenti. »", e:{o:14,p:10,i:-15,m:-4},
+    c:"On paie des ouvriers à produire des voitures que personne n’achète. Les réserves fondent à vue d’œil."}},
+
+{t:"Ils marchent vers l’usine.", qui:"Harriet Vance, journaliste", apres:1930,
+ d:"« Ils sont plusieurs milliers sur la route de Dearborn, sans armes, et ils demandent du travail et de quoi manger. Vos gardes sont postés à la grille. Que doivent-ils faire quand la tête du cortège arrivera ? »",
+ f:"Au creux de la Dépression, Detroit compte près d’un chômeur sur trois. Des marches de la faim s’organisent dans tout le pays pour réclamer du travail et des secours.",
+ a:{q:"« Bloquons la grille par la force. »", e:{i:4,o:-17,p:-16},
+    c:"On tire. Quatre morts sur la route, et des photographies qui feront le tour du pays pour un siècle."},
+ b:{q:"« Ouvrons et recevons une délégation. »", e:{o:13,p:14,i:-12,m:-3},
+    c:"Six hommes entrent, parlent une heure, repartent avec peu. Mais personne n’est mort ce jour-là."}},
+
+{t:"La publicité coûte un million.", qui:"Elias Bright, concessionnaire",
+ d:"« Nos concurrents achètent des pages entières et font rêver. Nous, nous publions des tarifs. La voiture la moins chère du monde ne se vend pas toute seule quand le voisin en propose une plus belle au même prix. »",
+ f:"La publicité de masse se développe avec la presse illustrée dans les années 1920. Elle ne vend plus seulement un produit mais une image de soi — et l’automobile en devient le terrain privilégié.",
+ a:{q:"« Achetons des pages de publicité. »", e:{m:11,i:-7,p:-3}, g:["Marchés"],
+    c:"On vend désormais une idée avec la voiture. Elle coûte plus cher que la tôle."},
+ b:{q:"« Ne publions que nos tarifs. »", e:{i:6,m:-9},
+    c:"On continue d’imprimer des chiffres. Les chiffres n’ont jamais fait envie à personne."},
+ c:{q:"« De la publicité, mais sur la fiabilité. »", e:{m:3,i:-5,p:1}, g:["Marchés"],
+    c:"On vante ce que la voiture est vraiment. C’est honnête, et un peu terne."}},
+
+{t:"Deux hommes attendent à l’embauche.", qui:"Sam Rusin, organisateur syndical",
+ d:"« Celui-ci vient de Géorgie, il est noir, et aucune usine de cette ville ne le prendra. Vous, vous embauchez. Je veux savoir si vous le mettrez à la fonderie, comme tous les autres, ou sur une ligne comme n’importe qui. »",
+ f:"Des centaines de milliers d’Afro-Américains quittent alors le Sud ségrégué pour les usines du Nord : c’est la Grande Migration. Dans la plupart des firmes, on les cantonne aux postes les plus pénibles, à la fonderie.",
+ a:{q:"« Embauchons-le sur la ligne, comme les autres. »", e:{o:9,p:13,i:-6,m:-2},
+    c:"Detroit compte peu d’usines qui le font. On vient de loin pour y travailler — et l’atelier gronde quelques semaines."},
+ b:{q:"« Envoyons-le à la fonderie, comme d’usage. »", e:{i:4,o:-6,p:-11},
+    c:"Les postes les plus durs et les plus chauds, toujours les mêmes hommes. L’usage n’est pas une raison."}},
+
+{t:"Faut-il arrêter la voiture qui vous a faits ?", qui:"Frank Doyle, actionnaire", apres:1924, req:["Marchés"],
+ d:"« Quinze millions d’exemplaires. C’est la voiture la plus vendue de l’histoire, et elle ne se vend plus. La remplacer, c’est arrêter les chaînes six mois et refaire chaque outil de la maison. »",
+ f:"La Ford T fut produite à plus de quinze millions d’exemplaires entre 1908 et 1927. Son prix tomba de 850 dollars à moins de 300, grâce à la seule production de masse.",
+ a:{q:"« Arrêtons tout et changeons de modèle. »", e:{m:13,i:-12,o:-9,p:2}, g:["Marchés"],
+    c:"Six mois d’usine muette, soixante mille hommes sans salaire — puis une file d’attente devant les concessions."},
+ b:{q:"« Produisons la même jusqu’au bout. »", e:{i:8,m:-13,o:4},
+    c:"On la produit encore deux ans, de moins en moins. Le stock dort dans les entrepôts."},
+ c:{q:"« Préparons la suivante sans rien arrêter. »", e:{m:4,i:-9,o:-5}, g:["Marchés"],
+    c:"Deux usines, deux modèles, deux fois les frais. Mais pas un jour de chaîne arrêtée."}},
+
+{t:"Un contremaître interdit de parler.", qui:"Anna Kowalczyk, ouvrière",
+ d:"« Il est interdit de s’asseoir, de siffler, de parler à son voisin. On nous surveille jusque dans la façon de tenir la tête. Vous appelez cela de la discipline. Nous, nous avons un autre mot. »",
+ f:"Le règlement d’atelier interdisait de s’asseoir, de siffler, de parler à son voisin. Les ouvriers avaient mis au point une façon de parler sans remuer les lèvres, qu’ils appelaient entre eux le « murmure de Ford ».",
+ a:{q:"« Maintenons l’interdiction de parler. »", e:{i:7,o:-11,p:-5},
+    c:"Le règlement tient. On apprend à parler sans remuer les lèvres — les ouvriers appellent cela le fordisme."},
+ b:{q:"« Levons l’interdiction de parler. »", e:{o:10,p:4,i:-8,m:-2},
+    c:"Le bruit revient dans l’atelier. Les contremaîtres jurent que le rendement va tomber. Il ne tombe pas."},
+ c:{q:"« N’imposons le silence qu’aux postes dangereux. »", e:{o:2,i:-4,p:1},
+    c:"La règle devient discutable poste par poste, donc discutée partout."}},
+];
+
+/* ---- les fins du niveau II ------------------------------------- */
+const FINS_II = {
+ o:{t:"L’usine s’est arrêtée d’elle-même",
+    x:"Les ouvriers vous ont lâché. Grèves, sabotages, postes désertés : la chaîne ne tient que si chaque maillon est occupé, et vous avez fini par n’avoir plus personne à y mettre. <strong>Le travail décomposé rend chaque homme remplaçable — et l’usine entière dépendante de tous à la fois.</strong>"},
+ i:{t:"Les actionnaires ont repris la main",
+    x:"Le conseil vous a démis. Les dividendes n’arrivaient plus, l’argent est parti financer une autre marque. <strong>Une usine n’appartient pas à celui qui la dirige.</strong>"},
+ m:{t:"Les concessions ont fermé",
+    x:"Les clients vous ont lâché. On a préféré la voiture d’en face, plus neuve, vendue à crédit et changée chaque année. Les stocks dorment dans les entrepôts. <strong>Produire moins cher ne sert à rien si personne ne veut plus de ce que vous produisez.</strong>"},
+ p:{t:"La commission d’enquête est arrivée",
+    x:"L’opinion vous a lâché. Journaux, élus, tribunaux : ce qui se passait derrière vos grilles est devenu une affaire publique. <strong>Une entreprise assez grande finit toujours par relever de la politique.</strong>"},
+};
+
+const FORD={qui:"Henry Ford, sur le travail à la chaîne",
+ cit:"L’homme moyen cherche un travail où il n’ait pas à se dépenser, et par-dessus tout un travail où il n’ait pas à penser. Pour la plupart des esprits, la tâche qui se répète est un soulagement.",
+ src:"D’après Ma vie et mon œuvre, 1922 — traduction pédagogique adaptée."};
+const GRAMSCI={qui:"Antonio Gramsci, en prison",
+ cit:"On cherche à obtenir de l’ouvrier des gestes qui ne demandent plus aucune participation de son intelligence. Mais l’homme, même réduit au geste, continue de penser — et c’est en pensant qu’il devient non conformiste.",
+ src:"D’après Américanisme et fordisme, 1934 — traduction pédagogique adaptée."};
+
+function VERDICT_II(f){
+  const prod=(f.i+f.m)/2, humain=(f.o+f.p)/2;
+  if(prod>=62&&humain>=58) return {t:"Une usine que l’on peut défendre",
+    x:"Vous avez produit en masse sans broyer ceux qui produisaient. C’est rare, et ce n’est pas ce qu’a fait l’histoire. Vos deux témoins ne décrivent pas la même usine, et ils ont tous les deux raison : <strong>c’est exactement cela, nuancer l’idée de progrès.</strong>",
+    tem:[FORD,GRAMSCI]};
+  if(prod>=55) return {t:"Quinze millions de voitures, et des hommes usés",
+    x:"Les chiffres sont écrasants : jamais on n’avait produit autant, ni si bon marché. Reste ce qu’un observateur en a écrit depuis sa cellule. <strong>Le gain de productivité est réel — la question est de savoir qui l’a payé.</strong>",
+    tem:[GRAMSCI]};
+  if(prod<45) return {t:"L’atelier qui n’est pas devenu une usine",
+    x:"Sans organisation nouvelle, sans capitaux, sans marché de masse, la voiture reste ce qu’elle était en 1900 : un objet de luxe monté à la main. <strong>La deuxième révolution industrielle n’est pas une invention, c’est une méthode.</strong>",
+    tem:[]};
+  return {t:"Une maison qui a hésité",
+    x:"Ni Highland Park, ni la faillite. Vous avez avancé prudemment, alors que l’époque, elle, ne l’a pas fait — et que vos concurrents non plus.",
+    tem:[FORD]};
+}
+
+/* ==================================================================
+   LES ÉVÉNEMENTS
+   Ils ne se choisissent pas : ils tombent. Tous sont authentiques,
+   datés, et le jeu dit lequel — c'est ce qui les sépare des cartes,
+   où les personnages sont des figures composites.
+
+   En campagne ils arrivent à leur date réelle : Peterloo en 1819,
+   le krach en 1929. En survie ils sont tirés au sort, parce qu'il
+   n'y a plus de calendrier.
+
+   Certains laissent une décision à prendre dans l'urgence. Le temps
+   qui s'écoule fait partie de la leçon : ne pas trancher est aussi
+   une façon de trancher.
+   ================================================================== */
+
+const EV_I = [
+{an:1799, date:"1799-1800", t:"Le Parlement interdit les coalitions",
+ x:"Les Combination Acts rendent illégal, pour des ouvriers, de s’associer afin de réclamer un meilleur salaire ou moins d’heures. Se réunir devient un délit.",
+ src:"Lois votées en 1799 et 1800, abrogées seulement en 1824.",
+ e:{i:5,p:3,o:-6}},
+
+{an:1819, date:"16 août 1819", t:"Peterloo",
+ x:"Soixante mille personnes se rassemblent à St Peter’s Field, ici même, pour réclamer le droit de vote. La cavalerie charge la foule sabre au clair. Dix-huit morts, des centaines de blessés.",
+ src:"Le massacre de Peterloo, Manchester, 16 août 1819. Le nom parodie Waterloo, quatre ans plus tôt.",
+ e:{o:-4,p:-8,i:-2},
+ urgence:{q:"Les mêmes appellent à se réunir de nouveau la semaine prochaine. Les magistrats attendent votre avis avant la nuit.",
+  choix:[
+   {q:"« Qu’on les laisse se réunir. »", e:{o:11,p:-8,i:-6},
+    c:"Le rassemblement a lieu sans un blessé. Londres note votre nom, et pas en bien."},
+   {q:"« Qu’on interdise le rassemblement. »", e:{p:9,o:-12,i:4},
+    c:"On interdit, on disperse, on arrête. Le calme revient — celui qu’on obtient par la peur."}],
+  defaut:{e:{o:-6,p:-6}, c:"Vous n’avez rien répondu. Les magistrats ont décidé seuls, et mal : on a chargé de nouveau."}}},
+
+{an:1826, date:"avril 1826", t:"Les briseurs de métiers",
+ x:"Des tisserands à bras, ruinés par les métiers mécaniques, parcourent le Lancashire et brisent les machines atelier par atelier. Des centaines de métiers détruits en trois jours.",
+ src:"Power loom riots, Lancashire, avril 1826. Les tisserands à la main ne pouvaient plus vivre de leur métier.",
+ e:{i:-7,m:-4,o:2},
+ urgence:{q:"Une vingtaine d’émeutiers sont sous les verrous. La peine prévue va de la déportation à la corde. On vous demande ce qu’il faut requérir.",
+  choix:[
+   {q:"« La rigueur : qu’on fasse un exemple. »", e:{i:8,p:6,o:-13},
+    c:"On déporte. Les ateliers sont tranquilles, et personne dans les faubourgs ne l’oubliera."},
+   {q:"« La clémence : ils ont perdu leur métier. »", e:{o:12,i:-7,p:-5},
+    c:"Les peines sont légères. Les fabricants parlent d’encouragement au désordre."}],
+  defaut:{e:{o:-7,i:-3}, c:"Faute d’instruction, l’affaire a traîné en prison. Deux hommes y sont morts avant d’être jugés."}}},
+
+{an:1830, date:"15 septembre 1830", t:"La ligne de Liverpool est inaugurée",
+ x:"Le premier chemin de fer entre deux grandes villes s’ouvre en fanfare. Le jour même, le député William Huskisson descend sur la voie et se fait écraser par la Rocket. Il meurt le soir.",
+ src:"Ouverture du Liverpool & Manchester Railway et mort de William Huskisson, 15 septembre 1830 — le premier accident ferroviaire mortel connu.",
+ e:{m:6,i:4,p:-3}},
+
+{an:1837, date:"1837-1842", t:"La crise s’installe",
+ x:"Les banques américaines s’effondrent, les commandes s’arrêtent, les filatures tournent trois jours par semaine. On appellera ces années-là les Hungry Forties.",
+ src:"Panique de 1837 et dépression qui suit, jusqu’en 1842-43.",
+ e:{m:-7,i:-5,o:-4}},
+
+{an:1842, date:"août 1842", t:"La grève des bouchons",
+ x:"Les grévistes vont d’usine en usine retirer le bouchon des chaudières. Sans vapeur, rien ne tourne. En quelques jours, la moitié du Lancashire est à l’arrêt.",
+ src:"Plug Plot Riots, août 1842 — la première grève générale de l’histoire industrielle britannique.",
+ e:{i:-8,m:-6,o:3},
+ urgence:{q:"Les chaudières sont froides depuis six jours. Le préfet propose la troupe ; les meneurs proposent de discuter. Il faut répondre ce soir.",
+  choix:[
+   {q:"« Faisons intervenir la troupe. »", e:{i:10,p:4,o:-15},
+    c:"Les usines rouvrent sous escorte militaire. On a gagné la semaine et perdu la confiance."},
+   {q:"« Recevons les meneurs. »", e:{o:12,p:-6,i:-8},
+    c:"On négocie le retour poste par poste. Les fabricants du comté vous accusent de capituler."}],
+  defaut:{e:{i:-9,o:-5}, c:"Personne n’a tranché. L’arrêt a duré trois semaines de plus, et tout le monde y a perdu."}}},
+
+{an:1846, date:"1845-1849", t:"La famine chasse l’Irlande",
+ x:"Le mildiou détruit la pomme de terre, seule nourriture de millions d’Irlandais. Ils fuient par Liverpool, et beaucoup s’arrêtent ici. La ville n’a rien prévu.",
+ src:"Grande Famine irlandaise. En 1851, plus d’un habitant de Manchester sur huit était né en Irlande.",
+ e:{o:-7,i:4,p:-3}, pop:.30,
+ urgence:{q:"Des milliers de familles dorment dans les cours d’Ancoats. Le conseil vous demande une décision avant l’hiver.",
+  choix:[
+   {q:"« Ouvrons des abris et des soupes populaires. »", e:{o:11,p:9,m:-10,i:-6},
+    c:"On ouvre des baraquements. Ils sont pleins le premier soir, et cela coûte une fortune."},
+   {q:"« Ce n’est pas à la ville de les nourrir. »", e:{i:6,m:4,o:-13,p:-9},
+    c:"On les laisse où ils sont. Le typhus part des mêmes cours six semaines plus tard."}],
+  defaut:{e:{o:-9,p:-7}, c:"L’hiver est arrivé avant votre réponse. On a compté les morts au printemps."}}},
+
+{an:1848, date:"février 1848", t:"L’Europe s’embrase",
+ x:"Paris chasse son roi, Vienne et Berlin se soulèvent. À Londres paraît un opuscule signé de deux Allemands, dont l’un a passé deux ans à observer vos filatures. Les chartistes reprennent espoir.",
+ src:"Printemps des peuples, 1848. Le Manifeste du parti communiste paraît à Londres en février ; Engels séjournait à Manchester depuis 1842.",
+ e:{o:4,p:-5,i:-3}},
+];
+
+const EV_II = [
+{an:1911, date:"25 mars 1911", t:"L’incendie de la Triangle Shirtwaist",
+ x:"À New York, un atelier de confection brûle au huitième étage. Les portes de secours avaient été verrouillées pour empêcher les ouvrières de sortir fumer. Cent quarante-six morts, la plupart des jeunes femmes.",
+ src:"Incendie de la Triangle Shirtwaist Factory, New York, 25 mars 1911 — à l’origine des premières lois américaines de sécurité au travail.",
+ e:{p:-4,o:-3},
+ urgence:{q:"Un contremaître vous signale que trois de vos issues sont condamnées par des caisses, et qu’on ferme une porte à clé pendant les postes de nuit. La presse est déjà dehors.",
+  choix:[
+   {q:"« Ouvrons tout, ce soir, et faisons-le savoir. »", e:{p:13,o:10,i:-7,m:-4},
+    c:"On déblaie devant les journalistes. Les actionnaires trouvent l’aveu coûteux — les ouvriers, lui, s’en souviennent."},
+   {q:"« Réglons cela discrètement, plus tard. »", e:{i:5,p:-11,o:-8},
+    c:"On déplace les caisses après le départ des reporters. Il faudra espérer qu’il n’arrive rien d’ici là."}],
+  defaut:{e:{p:-9,o:-7}, c:"Vous n’avez rien dit. Un journal a publié la photographie de la porte fermée à clé."}}},
+
+{an:1914, date:"janvier 1914", t:"Dix mille hommes devant la grille",
+ x:"L’annonce des cinq dollars par jour a fait le tour du pays en une nuit. Ils arrivent de tout le Michigan et d’au-delà, par milliers, et campent devant Highland Park en plein hiver.",
+ src:"Janvier 1914, après l’annonce du five-dollar day. La foule fut finalement dispersée à la lance à incendie, par un froid glacial.",
+ e:{m:4,p:-4,o:-3},
+ urgence:{q:"La foule ne se disperse pas et bloque l’entrée de l’équipe du matin. La police propose les lances à incendie. Il gèle.",
+  choix:[
+   {q:"« Ouvrons un bureau d’embauche et prenons les noms. »", e:{o:9,p:11,i:-8,m:-3},
+    c:"On enregistre trois mille noms dans la journée. On n’en embauchera pas le dixième, mais personne n’a été arrosé."},
+   {q:"« Les lances à incendie, qu’on dégage l’entrée. »", e:{i:6,o:-12,p:-14},
+    c:"On disperse des hommes trempés par moins neuf degrés. La photographie fera le tour des journaux."}],
+  defaut:{e:{o:-8,p:-8,i:-4}, c:"Pendant qu’on attendait vos ordres, la police a chargé d’elle-même. Le résultat est le même, sans la décision."}}},
+
+{an:1918, date:"automne 1918", t:"La grippe traverse les ateliers",
+ x:"Elle frappe d’abord les hommes de vingt à quarante ans — exactement ceux qui tiennent la chaîne. Les postes se vident sans prévenir, parfois trois sur une même ligne dans la journée.",
+ src:"Pandémie de grippe de 1918-1919, qui tua davantage que la guerre qui s’achevait.",
+ e:{o:-7,m:-4,i:-3}},
+
+{an:1919, date:"février 1919", t:"Dodge contre Ford",
+ x:"Deux actionnaires minoritaires attaquent la direction en justice : elle réinvestit tout dans l’usine au lieu de verser des dividendes. La Cour suprême du Michigan leur donne raison. Une entreprise, dit-elle, est dirigée d’abord pour le profit de ceux qui la possèdent.",
+ src:"Dodge v. Ford Motor Co., Cour suprême du Michigan, 1919 — l’un des arrêts les plus cités du droit des sociétés.",
+ e:{i:7,o:-5,p:-3},
+ urgence:{q:"La cour ordonne le versement. Vous pouvez payer, ou racheter les minoritaires pour n’avoir plus jamais à en discuter. Les banques attendent votre réponse.",
+  choix:[
+   {q:"« Rachetons toutes les parts des minoritaires. »", e:{i:9,m:-9,o:3},
+    c:"Cent cinq millions de dollars empruntés. Plus personne ne vous demandera de comptes — et la dette, elle, vous en demandera."},
+   {q:"« Versons le dividende et passons à autre chose. »", e:{i:6,o:-7,m:4},
+    c:"L’argent part aux actionnaires au lieu d’aller à l’usine. C’est exactement ce que la cour voulait."}],
+  defaut:{e:{i:-10,p:-5}, c:"Le délai est passé sans réponse. La cour a tranché pour vous, au prix fort."}}},
+
+{an:1921, date:"hiver 1920-1921", t:"Les commandes s’effondrent",
+ x:"La guerre finie, le pays entre en récession. Les stocks s’entassent, les concessionnaires ne prennent plus rien. Il faut fermer les usines deux mois ou trouver de l’argent ailleurs.",
+ src:"Récession de 1920-1921. Ford ferma ses usines et força ses concessionnaires à payer d’avance les voitures qu’il leur expédiait.",
+ e:{m:-7,o:-5,i:2},
+ urgence:{q:"Une solution existe : expédier d’office aux concessionnaires les voitures invendues, et exiger le paiement à réception. Ils encaisseront le choc à votre place.",
+  choix:[
+   {q:"« Expédions, et qu’ils paient à réception. »", e:{i:11,m:-14,o:5},
+    c:"La trésorerie est sauvée en trois semaines. Une partie des concessionnaires ne s’en relèvera pas."},
+   {q:"« Fermons deux mois et encaissons nous-mêmes. »", e:{m:7,o:-12,i:-8},
+    c:"Les grilles se ferment, les salaires s’arrêtent. On a protégé le réseau, pas les ouvriers."}],
+  defaut:{e:{m:-8,i:-8}, c:"Rien n’a été décidé à temps. On a fermé quand même, mais après avoir brûlé les réserves."}}},
+
+{an:1927, date:"mai 1927", t:"Les chaînes s’arrêtent six mois",
+ x:"Le modèle qui a fait la maison ne se vend plus. Le remplacer suppose de refaire chaque outil de chaque atelier. Pendant ce temps, soixante mille ouvriers n’ont plus de salaire.",
+ src:"Arrêt de la production de la Ford T en mai 1927 ; la Model A n’arriva qu’en décembre.",
+ e:{o:-8,m:-4,i:-4}},
+
+{an:1929, date:"24 octobre 1929", t:"Jeudi noir",
+ x:"Wall Street s’effondre en une séance. En quelques semaines, l’épargne de millions de clients a disparu. Personne n’achète plus une automobile avec de l’argent qu’il n’a pas.",
+ src:"Krach boursier du 24 octobre 1929, point de départ de la Grande Dépression.",
+ e:{m:-10,i:-6,o:-3}},
+
+{an:1931, date:"1931-1932", t:"Un ouvrier sur trois est dehors",
+ x:"La ville qui produisait les automobiles du monde entier ne produit plus grand-chose. Les files d’attente pour la soupe s’allongent devant les mêmes grilles où l’on se pressait pour être embauché.",
+ src:"Detroit au creux de la Dépression : près d’un tiers de la main-d’œuvre sans emploi.",
+ e:{o:-7,m:-6,p:-4},
+ urgence:{q:"On vous propose d’ouvrir les cuisines de l’usine aux anciens ouvriers. Cela coûtera, et cela reviendra à reconnaître publiquement l’étendue du désastre.",
+  choix:[
+   {q:"« Ouvrons les cuisines à nos anciens. »", e:{o:12,p:12,i:-11,m:-5},
+    c:"Des milliers de repas par jour. Les actionnaires parlent de charité avec l’argent des autres."},
+   {q:"« Ce n’est pas à l’usine de nourrir la ville. »", e:{i:7,o:-13,p:-12},
+    c:"On garde les portes closes. La ville s’en souviendra le jour où les chômeurs marcheront sur Dearborn."}],
+  defaut:{e:{o:-9,p:-9}, c:"Pendant qu’on délibérait, l’hiver est passé. La question ne s’est plus posée dans les mêmes termes."}}},
+];
+
+/* ==================================================================
+   LES NIVEAUX
+   Le moteur est commun. Un niveau n'est qu'un jeu de données :
+   ses forces, ses cartes, ses années, sa palette, ses témoins, et
+   l'unité dans laquelle se mesure sa croissance.
+   ================================================================== */
+const NIVEAUX = {
+ I:{ id:"I", titre:"Le prix du progrès", lieu:"Manchester", pays:"Angleterre",
+     sous:"Manchester, 1780 — 1851", ord:"1re révolution industrielle",
+     role:"Vous décidez pour Manchester.",
+     qui:"Vous n’êtes ni le patron, ni l’ouvrier, ni le député. Vous êtes celui qui tranche — et <strong>chacune de vos décisions fait un gagnant et un perdant.</strong>",
+     but:"Votre but : mener la ville jusqu’en 1851 sans qu’aucune force ne vous lâche — puis découvrir quelle Manchester vous avez bâtie.",
+     note:"<strong>Pourquoi 1851 ?</strong> Cette année-là, Londres expose sous le Crystal Palace tout ce que l’industrie britannique sait faire, et le recensement établit que le pays compte désormais plus de citadins que de ruraux — une première dans l’histoire. C’est le moment où la société née en 1780 peut enfin se regarder en face.",
+     avant:"Plus les industriels sont contents, plus la ville grossit. Et plus elle grossit, <strong>plus les ouvriers s’épuisent tout seuls</strong>, sans que vous ayez rien décidé : les logements ne suivent jamais le rythme des usines.",
+     forces:FORCES_I, cartes:CARTES_I, fins:FINS_I, verdict:VERDICT_I, ev:EV_I,
+     tours:18, a0:1780, a1:1851, pop0:36267, unite:"Population", unite2:"habitants",
+ croissance:(a,b,u)=>`La population passe de ${fmt(a)} à ${fmt(b)} habitants. Les logements ne suivent pas : les ouvriers perdent ${u.toFixed(1)} points.`,
+ impatience:"Les marchands, eux, commencent à regarder vers Leeds.",
+     lecons:[
+      "Une invention ne devient une révolution industrielle que si <strong>plusieurs conditions se combinent</strong> : ressources, savoirs, capitaux, main-d’œuvre, marchés, transports, organisation du travail.",
+      "Chaque décision a <strong>fait un gagnant et un perdant</strong>. Aucune ne contentait les quatre forces à la fois : c’est ce que veut dire « le progrès ne profite pas également à tous ».",
+      "La croissance de la population n’est pas seulement une conséquence de l’industrialisation, <strong>elle en est aussi le coût</strong> : les logements ne suivent jamais le rythme des usines.",
+     ]},
+ II:{ id:"II", titre:"Le prix du progrès", lieu:"Detroit", pays:"États-Unis",
+     sous:"Detroit, 1908 — 1932", ord:"2e révolution industrielle",
+     role:"Vous dirigez l’usine.",
+     qui:"Vous n’êtes ni l’ingénieur, ni l’ouvrier de la chaîne, ni l’actionnaire. Vous êtes celui qui tranche — et <strong>chaque gain de productivité se prend quelque part.</strong>",
+     but:"Votre but : mener l’usine jusqu’en 1932 sans qu’aucune force ne vous lâche — puis découvrir quelle entreprise vous avez bâtie.",
+     note:"<strong>Pourquoi 1932 ?</strong> Le 7 mars, plusieurs milliers de chômeurs marchent sur les usines de Dearborn pour demander du travail. La police tire. La chaîne qui avait fait la prospérité de la ville venait de produire du chômage de masse : c’est là que la deuxième révolution industrielle se regarde en face.",
+     avant:"Plus les actionnaires sont contents, plus la production monte. Et plus elle monte, <strong>plus la cadence use les ouvriers d’elle-même</strong>, sans que vous ayez rien décidé : la chaîne ne ralentit jamais toute seule.",
+     forces:FORCES_II, cartes:CARTES_II, fins:FINS_II, verdict:VERDICT_II, ev:EV_II,
+     tours:18, a0:1908, a1:1932, pop0:10600, unite:"Production", unite2:"voitures par an",
+ croissance:(a,b,u)=>`La production passe de ${fmt(a)} à ${fmt(b)} voitures par an. La chaîne suit le rythme, les hommes moins : les ouvriers perdent ${u.toFixed(1)} points.`,
+ impatience:"Les clients, eux, commencent à regarder chez General Motors.",
+     lecons:[
+      "La deuxième révolution industrielle n’invente pas l’automobile : elle invente <strong>la façon de la fabriquer</strong>. Chaîne mobile, pièces interchangeables, gestes chronométrés, électricité.",
+      "Le travail décomposé rend l’ouvrier <strong>remplaçable et étranger à ce qu’il produit</strong>. Chez Ford, il fallait en 1913 embaucher près de quatre fois l’effectif pour le maintenir.",
+      "Payer davantage pouvait servir la production : <strong>l’ouvrier bien payé devient le client</strong>. Mais le même salaire a servi à exiger un mode de vie, puis à refuser un syndicat.",
+     ]},
+};
+let N = NIVEAUX.I;
+
+/* ---------- accueil ---------- */
+function accueil(){
+  document.body.dataset.niveau="I"; N=NIVEAUX.I; peindreVille(); chercherVue();
+  const carte=(id,dispo)=>{ const n=NIVEAUX[id]; if(!dispo)
+    return `<button class="niv" disabled><span class="ord">3e révolution industrielle</span>
+      <span class="lieu">La révolution numérique</span>
+      <span class="per">1970 — aujourd’hui</span>
+      <span class="rec">En préparation.</span></button>`;
+    let r=0; try{ r=+(localStorage.getItem("pdp_pop_"+id)||0) }catch(e){}
+    return `<button class="niv" onclick="menuNiveau('${id}')">
+      <span class="ord">${n.ord}</span>
+      <span class="lieu">${n.lieu}</span>
+      <span class="per">${n.sous.replace(n.lieu+", ","")}</span>
+      <span class="rec">${r?`Record : ${fmt(r)} ${n.unite2}`:"Jamais joué"}</span></button>`; };
+  app.innerHTML=`
+  <h1>Le prix du progrès</h1>
+  <p class="sous">Trois révolutions industrielles, une même question : qui paie le progrès ?</p>
+  <div class="niveaux">${carte("I",1)}${carte("II",1)}${carte("III",0)}</div>
+  <div class="bilan"><h2 style="margin-top:0">La règle, quelle que soit l’époque</h2>
+    <p style="margin:.3em 0">Quatre forces vous jugent. Chaque décision en contente une et en fâche une autre.
+    <strong>Si l’une d’elles tombe à zéro, la partie s’arrête.</strong> Il n’existe aucune réponse qui plaise à tout le monde —
+    c’est le sujet même du cours.</p></div>`;
+}
+
+function menuNiveau(id){
+  N=NIVEAUX[id]; document.body.dataset.niveau=id; peindreVille(); chercherVue();
+  const rec=record();
+  app.innerHTML=`
+  <h1>${N.lieu}</h1>
+  <p class="sous">${N.sous}</p>
+  <div class="role">
+    <div class="r">${N.role}</div>
+    <p style="margin:.3em 0">${N.qui}</p>
+    <p style="margin:.6em 0 0"><strong>Si l’une des quatre forces tombe à zéro, la partie s’arrête.</strong> ${N.but}</p>
+    <p style="margin:.7em 0 0;font-size:14.5px;color:#A6947C">${N.note}</p>
+    <p style="margin:.7em 0 0;font-size:13px;color:#8E7C66">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
+  </div>
+  <div class="forces">${CLES.map(k=>`<div class="force">
+     ${icone(k)}<div class="nom">${N.forces[k].nom}</div>
+     <div style="font-size:12px;color:#A6947C;margin-top:5px">${N.forces[k].veut}</div></div>`).join("")}</div>
+  <p class="centre" style="margin:24px 0 8px">
+    <button class="plein" onclick="nouvellePartie('campagne',N.id)">Campagne · ${N.tours} décisions jusqu’en ${N.a1}</button>
+    <button onclick="nouvellePartie('infini',N.id)">Survie${rec?` · record ${fmt(rec)} ${N.unite2}`:""}</button>
+    <button onclick="accueil()">Changer de niveau</button>
+  </p>
+  <div class="bilan"><h2 style="margin-top:0">Une chose à savoir avant de commencer</h2>
+    <p style="margin:.3em 0">${N.avant} C’est ce qui rendra la fin de partie difficile.</p></div>`;
+}
+accueil();
+</script>
+</body>
+</html>
