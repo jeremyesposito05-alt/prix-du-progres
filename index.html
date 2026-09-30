@@ -669,6 +669,55 @@ body[data-niveau="II"] .situ .ex{color:#3D474F}
   .qzr button:not(.pris):not(.bonne){display:none}
 }
 
+/* ---------- l'écran de titre ---------------------------------------
+   La charte de l'école tient cette page : marine, or, SangBleu. Le
+   décor du niveau I reste visible derrière, mais très assombri.       */
+body.surtitre #scene{filter:saturate(.55) brightness(.75)}
+body.surtitre footer{opacity:0}
+.titre-ecran{
+  text-align:center; padding:7vh 24px 5vh; position:relative; max-width:860px; margin:0 auto;
+  background:
+    linear-gradient(180deg, rgba(26,32,71,.96) 0%, rgba(20,56,127,.86) 48%, rgba(20,24,54,.97) 100%),
+    var(--illu, none);
+  background-size:cover; background-position:center;
+  border:1px solid rgba(243,190,49,.35); border-radius:3px;
+  box-shadow:0 26px 60px rgba(0,0,0,.65), inset 0 0 90px rgba(0,0,0,.45);
+  animation:paraitre .7s ease-out;
+}
+@keyframes paraitre{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.titre-ecran .blason-grand{width:74px;height:74px;color:#fff;opacity:.95;margin-bottom:10px}
+.titre-ecran h1{
+  font-family:var(--serif); font-weight:normal; color:#fff;
+  font-size:clamp(34px,7vw,74px); line-height:1.05; margin:.05em 0 .12em;
+  letter-spacing:.01em; text-shadow:0 3px 26px rgba(0,0,0,.75);
+}
+.titre-ecran .filet{
+  width:132px; height:2px; margin:14px auto 20px;
+  background:linear-gradient(90deg, transparent, var(--bs-gold), transparent);
+}
+.titre-ecran .accroche{
+  font-size:clamp(15px,2.1vw,20px); line-height:1.6; color:#DCE2F0;
+  margin:0 0 30px; text-shadow:0 2px 12px rgba(0,0,0,.6);
+}
+.titre-ecran .demarrer{
+  font-family:var(--serif); font-size:clamp(19px,2.6vw,25px); letter-spacing:.06em;
+  padding:15px 54px; margin:0; border-radius:2px; color:#1A2047;
+  background:linear-gradient(180deg,#F7D46A,var(--bs-gold));
+  border:1px solid #C39A1E;
+  box-shadow:0 12px 30px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.55);
+}
+.titre-ecran .demarrer:hover{
+  transform:translateY(-3px);
+  box-shadow:0 18px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.titre-ecran .mention{
+  margin:34px 0 0; font-size:12px; letter-spacing:.09em; text-transform:uppercase;
+  color:#9FA9C4;
+}
+/* l'illustration, si elle existe */
+body[data-niveau="I"] .titre-ecran{--illu:url("img/accueil.jpg")}
+@media(max-width:700px){ .titre-ecran{padding:5vh 16px 4vh} }
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2750,6 +2799,30 @@ function telechargerTrace(){
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
 
+/* ==================================================================
+   L'ÉCRAN DE TITRE
+   ================================================================== */
+function titre(){
+  document.body.dataset.niveau="I";
+  document.body.classList.add("surtitre");
+  N = NIVEAUX.I;
+  app.innerHTML=`
+  <div class="titre-ecran">
+    <svg class="blason-grand" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="currentColor" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg>
+    <h1>Le prix du progrès</h1>
+    <div class="filet"></div>
+    <p class="accroche">Trois révolutions industrielles.<br>Une même question : qui paie le progrès ?</p>
+    <button class="demarrer" onclick="demarrer()">Démarrer</button>
+    <p class="mention">Collège Alpin Beau Soleil · Unité 1 — Quand l’innovation change la société</p>
+  </div>`;
+}
+
+function demarrer(){
+  document.body.classList.remove("surtitre");
+  try{ SON.reveiller(); }catch(e){}
+  accueil();
+}
+
 /* ---------- accueil ---------- */
 function accueil(){
   document.body.dataset.niveau="I"; N=NIVEAUX.I; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
@@ -2799,7 +2872,7 @@ function menuNiveau(id){
   <div class="bilan"><h2 style="margin-top:0">Une chose à savoir avant de commencer</h2>
     <p style="margin:.3em 0">${N.avant} C’est ce qui rendra la fin de partie difficile.</p></div>`;
 }
-accueil();
+titre();
 </script>
 </body>
 </html>
