@@ -548,6 +548,11 @@ body[data-niveau="II"] .situ .ex{color:#3D474F}
 .situ .d{margin-top:2px}
 @media(max-width:1000px){.situ .ex{min-height:0}}
 
+#btson{margin-left:14px;background:transparent;border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-size:15px;line-height:1;padding:5px 10px;border-radius:2px;
+  box-shadow:none;opacity:.7}
+#btson:hover{opacity:1;transform:none;background:rgba(255,255,255,.1)}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -652,6 +657,7 @@ body[data-niveau="II"] .question{color:#D9E3ED}
   <svg class="blason" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="#fff" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg>
   <span class="titre">LE PRIX DU PROGRÈS</span>
   <span class="ecole">COLLÈGE ALPIN BEAU SOLEIL · G10</span>
+  <button id="btson" onclick="SON.couper(!SON.actif)" title="Couper le son">♪</button>
 </header>
 
 <main id="app"></main>
@@ -659,6 +665,281 @@ body[data-niveau="II"] .question{color:#D9E3ED}
 
 <script>
 "use strict";
+/* ==================================================================
+   LE SON — fabriqué par le navigateur, aucun fichier
+
+   Rien n'est téléchargé : tout est synthétisé. Cela tient en quelques
+   kilooctets, ne pose aucune question de droits, et surtout la tension
+   devient un réglage continu au lieu d'un interrupteur entre deux
+   morceaux.
+
+   Ce qu'on entend, c'est le rythme de la machine. À Manchester le
+   battement d'une vapeur et le souffle d'une soufflerie ; à Detroit le
+   cliquetis de la chaîne et le bourdon du courant. Plus les jauges
+   tombent, plus le pouls s'emballe : c'est le sujet même du jeu.
+
+   Les navigateurs interdisent de démarrer un son sans geste de
+   l'utilisateur. Tout se met donc en route au premier clic.
+   ================================================================== */
+const SON = {
+  ctx:null, pret:false, actif:true, amb:null,
+  maitre:null, voix:[], bruit:null,
+  horloge:null, prochain:0, tension:0, tictac:false, battue:0,
+
+  dispo(){ return typeof (window.AudioContext||window.webkitAudioContext)==="function"; },
+
+  init(){
+    if(this.ctx || !this.dispo()) return;
+    try{
+      const AC = window.AudioContext||window.webkitAudioContext;
+      this.ctx = new AC();
+      this.maitre = this.ctx.createGain();
+      this.maitre.gain.value = this.actif ? .85 : 0;
+      this.maitre.connect(this.ctx.destination);
+      /* un buffer de bruit blanc, réutilisé pour tout ce qui souffle,
+         claque ou froisse : moins coûteux que d'en recréer à chaque fois */
+      const n = this.ctx.sampleRate*2;
+      this.bruit = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
+      const d = this.bruit.getChannelData(0);
+      for(let i=0;i<n;i++) d[i] = Math.random()*2-1;
+      this.pret = true;
+    }catch(e){ this.pret=false; }
+  },
+
+  /* Le premier clic réveille le contexte : c'est la règle des navigateurs. */
+  reveiller(){
+    this.init();
+    if(this.ctx && this.ctx.state==="suspended") this.ctx.resume().catch(()=>{});
+  },
+
+  couper(v){
+    this.actif = v;
+    try{ localStorage.setItem("pdp_son", v?"1":"0") }catch(e){}
+    if(this.maitre) this.glisser(this.maitre.gain, v?.85:0, .3);
+    const b=document.getElementById("btson");
+    if(b){ b.textContent = v?"♪":"♪̸"; b.title = v?"Couper le son":"Rétablir le son"; }
+  },
+
+  glisser(param, val, t){
+    if(!this.ctx) return;
+    const n=this.ctx.currentTime;
+    try{ param.cancelScheduledValues(n); param.setValueAtTime(param.value,n);
+         param.linearRampToValueAtTime(val, n+t); }
+    catch(e){ param.value = val; }
+  },
+
+  /* ---------- les ambiances ---------------------------------------- */
+  ambiance(quoi){
+    this.init();
+    if(!this.pret || this.amb===quoi) return;
+    this.amb = quoi;
+    this.taire();
+    if(quoi==="menu")      this.nappe([55, 82.4, 110], 320, .11);
+    else if(quoi==="I")    { this.nappe([49, 73.4, 98, 116.5], 380, .10); this.soufflerie(.05); }
+    else if(quoi==="II")   { this.nappe([41.2, 61.7, 82.4], 300, .09); this.courant(); }
+    this.lancerHorloge();
+  },
+
+  /* une nappe tenue : quelques ondes graves derrière un filtre fermé */
+  nappe(freqs, coupure, gain){
+    const c=this.ctx, g=c.createGain(), f=c.createBiquadFilter();
+    f.type="lowpass"; f.frequency.value=coupure; f.Q.value=.6;
+    g.gain.value=0; f.connect(g); g.connect(this.maitre);
+    this.glisser(g.gain, gain, 2.2);
+    freqs.forEach((hz,i)=>{
+      const o=c.createOscillator();
+      o.type = i%2 ? "triangle" : "sine";
+      o.frequency.value=hz;
+      o.detune.value = (i-1)*4;          // un léger frottement, pas d'accord parfait
+      o.connect(f); o.start();
+      this.voix.push({o, g, f});
+    });
+    this.filtre=f; this.nappeG=g;
+  },
+
+  /* le souffle d'une soufflerie : du bruit derrière un passe-bande */
+  soufflerie(gain){
+    const c=this.ctx, s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.bruit; s.loop=true;
+    f.type="bandpass"; f.frequency.value=420; f.Q.value=.8;
+    g.gain.value=0;
+    s.connect(f); f.connect(g); g.connect(this.maitre); s.start();
+    this.glisser(g.gain, gain, 3);
+    this.souffleG=g; this.souffleF=f;
+    this.voix.push({o:s, g, f});
+  },
+
+  /* Detroit : le bourdon du courant, cinquante fois par seconde */
+  courant(){
+    const c=this.ctx, o=c.createOscillator(), g=c.createGain(), f=c.createBiquadFilter();
+    o.type="sawtooth"; o.frequency.value=50;
+    f.type="lowpass"; f.frequency.value=180;
+    g.gain.value=0;
+    o.connect(f); f.connect(g); g.connect(this.maitre); o.start();
+    this.glisser(g.gain, .045, 2.5);
+    this.souffleG=g; this.souffleF=f;
+    this.voix.push({o, g, f});
+  },
+
+  taire(){
+    this.voix.forEach(v=>{
+      try{ this.glisser(v.g.gain, 0, .35); }catch(e){}
+      try{ setTimeout(()=>{ try{ v.o.stop() }catch(e){} }, 500); }catch(e){}
+    });
+    this.voix=[]; this.filtre=null; this.nappeG=null; this.souffleG=null;
+  },
+
+  /* ---------- le pouls ---------------------------------------------- */
+  /* Un ordonnanceur : on place les coups un peu en avance sur l'horloge
+     audio, sinon le rythme tremble dès que la page travaille. */
+  lancerHorloge(){
+    if(this.horloge) return;
+    this.prochain = this.ctx.currentTime + .1;
+    this.horloge = setInterval(()=>{
+      if(!this.ctx || !this.amb || this.amb==="menu") return;
+      const bpm = 50 + this.tension*58;
+      const pas = 60/bpm;
+      while(this.prochain < this.ctx.currentTime + .12){
+        this.battre(this.prochain);
+        this.prochain += pas;
+      }
+      if(this.prochain < this.ctx.currentTime) this.prochain = this.ctx.currentTime + .05;
+    }, 25);
+  },
+
+  battre(t){
+    this.battue++;
+    if(this.amb==="I") this.vapeur(t, this.battue%2===0);
+    else               this.chaine(t, this.battue%4===0);
+  },
+
+  /* le « tchouf » d'une machine à vapeur : un coup sourd, puis l'échappement */
+  vapeur(t, fort){
+    const c=this.ctx;
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(fort?62:52, t);
+    o.frequency.exponentialRampToValueAtTime(fort?30:26, t+.16);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime((fort?.30:.19)*(.55+this.tension*.7), t+.012);
+    g.gain.exponentialRampToValueAtTime(.001, t+.22);
+    o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.26);
+    if(fort){
+      const s=c.createBufferSource(), f=c.createBiquadFilter(), sg=c.createGain();
+      s.buffer=this.bruit; s.loop=true;
+      f.type="highpass"; f.frequency.value=1800;
+      sg.gain.setValueAtTime(0, t+.03);
+      sg.gain.linearRampToValueAtTime(.045*(.4+this.tension), t+.06);
+      sg.gain.exponentialRampToValueAtTime(.001, t+.3);
+      s.connect(f); f.connect(sg); sg.connect(this.maitre); s.start(t+.03); s.stop(t+.34);
+    }
+  },
+
+  /* Detroit : le cliquetis sec d'une chaîne qui avance */
+  chaine(t, fort){
+    const c=this.ctx;
+    const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.bruit; s.loop=true;
+    f.type="bandpass"; f.frequency.value = fort?2600:3400; f.Q.value=9;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime((fort?.09:.05)*(.5+this.tension*.8), t+.004);
+    g.gain.exponentialRampToValueAtTime(.001, t+(fort?.10:.05));
+    s.connect(f); f.connect(g); g.connect(this.maitre); s.start(t); s.stop(t+.14);
+    if(fort){
+      const o=c.createOscillator(), og=c.createGain();
+      o.type="square"; o.frequency.setValueAtTime(140, t);
+      og.gain.setValueAtTime(0, t);
+      og.gain.linearRampToValueAtTime(.05*(.5+this.tension), t+.006);
+      og.gain.exponentialRampToValueAtTime(.001, t+.12);
+      o.connect(og); og.connect(this.maitre); o.start(t); o.stop(t+.14);
+    }
+  },
+
+  /* ---------- la tension -------------------------------------------- */
+  /* Ce qui inquiète, c'est la force la plus basse — pas la moyenne.
+     Une ville peut prospérer et s'effondrer par un seul côté. */
+  majTension(){
+    if(!this.pret) return;
+    /* E est déclaré avec « let » : il n’existe pas sur window. */
+    if(typeof E==="undefined" || !E || !E.f) return;
+    const bas = Math.min(E.f.i, E.f.o, E.f.m, E.f.p);
+    const t = Math.max(0, Math.min(1, (62-bas)/52));
+    this.tension = t;
+    if(this.filtre)  this.glisser(this.filtre.frequency, 300 + t*620, 1.4);
+    if(this.souffleG) this.glisser(this.souffleG.gain, .04 + t*.075, 1.4);
+    if(this.souffleF) this.glisser(this.souffleF.frequency, this.amb==="II" ? 180+t*120 : 420+t*520, 1.4);
+    if(this.nappeG)  this.glisser(this.nappeG.gain, .09 + t*.05, 1.4);
+    this.voix.forEach((v,i)=>{ if(v.o.detune) this.glisser(v.o.detune, (i-1)*4 - t*13, 1.4); });
+  },
+
+  /* ---------- les effets ponctuels ----------------------------------- */
+  /* un pli qui arrive : un coup grave, et le reste se tait un instant */
+  coup(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.02;
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(96, t);
+    o.frequency.exponentialRampToValueAtTime(34, t+.7);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.4, t+.02);
+    g.gain.exponentialRampToValueAtTime(.001, t+1.1);
+    o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+1.2);
+    if(this.nappeG){ this.glisser(this.nappeG.gain, .03, .25);
+      setTimeout(()=>this.majTension(), 900); }
+  },
+
+  /* la feuille qu'on pose */
+  papier(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.01;
+    const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.bruit; s.loop=true;
+    f.type="bandpass"; f.frequency.value=4200; f.Q.value=1.4;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.05, t+.03);
+    g.gain.exponentialRampToValueAtTime(.001, t+.19);
+    s.connect(f); f.connect(g); g.connect(this.maitre); s.start(t); s.stop(t+.22);
+  },
+
+  /* le chronomètre d'une décision urgente */
+  horlogeUrgence(marche){
+    if(!this.pret) return;
+    if(!marche){ if(this.tic){ clearInterval(this.tic); this.tic=null; } return; }
+    if(this.tic) return;
+    let n=0;
+    this.tic = setInterval(()=>{
+      const c=this.ctx, t=c.currentTime+.01;
+      const o=c.createOscillator(), g=c.createGain();
+      o.type="square"; o.frequency.value = (n++%2) ? 1900 : 1500;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(.07, t+.004);
+      g.gain.exponentialRampToValueAtTime(.001, t+.05);
+      o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.07);
+    }, 500);
+  },
+
+  /* la fin de partie : une cloche, ou le silence */
+  fin(cause){
+    if(!this.pret) return;
+    this.horlogeUrgence(false);
+    const c=this.ctx, t=c.currentTime+.05;
+    const freqs = cause==="verdict" ? [196, 261.6, 329.6] : [110, 146.8, 155.6];
+    freqs.forEach((hz,i)=>{
+      const o=c.createOscillator(), g=c.createGain();
+      o.type="sine"; o.frequency.value=hz;
+      g.gain.setValueAtTime(0, t+i*.09);
+      g.gain.linearRampToValueAtTime(.16, t+i*.09+.03);
+      g.gain.exponentialRampToValueAtTime(.001, t+i*.09+2.6);
+      o.connect(g); g.connect(this.maitre); o.start(t+i*.09); o.stop(t+i*.09+2.8);
+    });
+    this.taire(); this.amb=null;
+  },
+};
+
+try{ SON.actif = localStorage.getItem("pdp_son") !== "0"; }catch(e){}
+/* Le premier geste de l'utilisateur, quel qu'il soit, met le son en route. */
+["pointerdown","keydown"].forEach(ev=>
+  document.addEventListener(ev, ()=>SON.reveiller(), {once:true}));
+
 
 /* ==================================================================
    LES QUATRE FORCES
@@ -911,6 +1192,7 @@ const AN=t=>Math.round(N.a0+(N.a1-N.a0)*t/(N.tours-1));
 function nouvellePartie(mode,niv){
   if(niv) N=NIVEAUX[niv];
   document.body.dataset.niveau=N.id; peindreVille(); chercherVue();
+  try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
   E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],evVus:[],derEv:-9,consq:null,fini:null,timer:null};
@@ -958,6 +1240,7 @@ function choisir(quel){
 }
 
 function finir(cause){
+  try{ SON.fin(cause) }catch(e){}
   E.fini=cause;
   if(E.mode==="infini"){
     /* On se mesure à la POPULATION atteinte, jamais au nombre de tours :
@@ -1108,6 +1391,7 @@ function rendre(){
   </div>`;
   app.classList.remove("presse");
   ecrire(c.t, c.ex, c.d);
+  try{ SON.majTension(); SON.papier() }catch(e){}
   majVue();
 }
 
@@ -1150,6 +1434,7 @@ function evenementDu(){
 }
 
 function declencher(ev){
+  try{ SON.coup() }catch(e){}
   E.evVus.push(ev.t);
   E.derEv = E.tour;
   E.evEnCours = ev;
@@ -1194,6 +1479,7 @@ function rendreUrgence(){
   const jt=document.getElementById("jt");
   if(jt){ jt.style.transition=`width ${SECONDES_URGENCE}s linear`; requestAnimationFrame(()=>{ jt.style.width="0%" }); }
   if(window.SANS_CHRONO) return;
+  try{ SON.horlogeUrgence(true) }catch(e){}
   E.reste=SECONDES_URGENCE;
   E.timer=setInterval(()=>{
     E.reste--;
@@ -1204,6 +1490,7 @@ function rendreUrgence(){
 }
 
 function urgenceChoix(i){
+  try{ SON.horlogeUrgence(false) }catch(e){}
   if(E.timer){ clearInterval(E.timer); E.timer=null; }
   if(!E.evEnCours || !E.evEnCours.urgence) return suiteEvenement();
   const u=E.evEnCours.urgence;
@@ -1832,7 +2119,7 @@ let N = NIVEAUX.I;
 
 /* ---------- accueil ---------- */
 function accueil(){
-  document.body.dataset.niveau="I"; N=NIVEAUX.I; peindreVille(); chercherVue();
+  document.body.dataset.niveau="I"; N=NIVEAUX.I; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
   const carte=(id,dispo)=>{ const n=NIVEAUX[id]; if(!dispo)
     return `<button class="niv" disabled><span class="ord">3e révolution industrielle</span>
       <span class="lieu">La révolution numérique</span>
@@ -1855,7 +2142,7 @@ function accueil(){
 }
 
 function menuNiveau(id){
-  N=NIVEAUX[id]; document.body.dataset.niveau=id; peindreVille(); chercherVue();
+  N=NIVEAUX[id]; document.body.dataset.niveau=id; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
   const rec=record();
   app.innerHTML=`
   <h1>${N.lieu}</h1>
