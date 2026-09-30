@@ -605,6 +605,22 @@ body[data-niveau="II"] .situ .ex{color:#3D474F}
 }
 .alarme strong{color:#F3BE31}
 
+/* L'origine d'une conséquence : lisible avant le récit, jamais après. */
+.ev.graine .origine{
+  background:rgba(122,106,70,.14); border-left:3px solid #7A6A46; border-radius:2px;
+  padding:10px 14px; margin:2px 0 14px; font-size:14.5px; line-height:1.5; color:#4A3B2C;
+}
+.ev.graine .origine em{font-style:normal;font-weight:bold;color:#2B2118}
+.ev.graine .origine span{display:block;margin-top:5px;font-size:12.5px;color:#7A6A46;font-style:italic}
+.ev.graine.bonne{border-left-color:#3E7A3A !important}
+.ev.graine.bonne .evd{color:#2F6B2B}
+.ev.graine.bonne .origine{border-left-color:#3E7A3A;background:rgba(62,122,58,.12)}
+.ev.graine.mauvaise{border-left-color:#8E2413 !important}
+.ev.graine.mauvaise .evd{color:#8E2413}
+.ev.graine.mauvaise .origine{border-left-color:#8E2413;background:rgba(142,36,19,.09)}
+.plateau.un .question{margin-top:22px}
+.plateau.un .rep{margin-top:10px}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1088,7 +1104,12 @@ const CARTES_I = [
  f:"La loi de 1833 interdit le travail des enfants de moins de neuf ans dans le textile et limite à neuf heures la journée des moins de treize ans. Elle est la première à prévoir un contrôle — mais avec quatre inspecteurs pour tout le royaume, autant dire aucun. Elle marque pourtant un tournant : l’État admet que le **progrès** industriel a des effets qu’il faut encadrer. Les lois suivantes, en 1842 et 1847, iront plus loin.",
  a:{q:"« Appliquons la loi : les enfants sortent. »", e:{p:12,o:10,i:-10,m:-4},
     c:"Les plus jeunes sortent des ateliers. Certaines familles perdent d’un coup le tiers de leur revenu."},
- b:{q:"« N’appliquons pas la loi. »", e:{i:9,m:4,o:-8,p:-12}, suite:{dans:4, t:"Un inspecteur est venu de Londres", x:"Il a visité quatre filatures sans prévenir et relevé des enfants de sept ans aux machines. Son rapport part au Parlement. La ville est nommée dedans.", e:{p:-9,i:-4,o:3}},
+ b:{q:"« N’appliquons pas la loi. »", e:{i:9,m:4,o:-8,p:-12}, suite:{dans:4, t:"Un inspecteur est venu de Londres", x:"Il a visité quatre filatures sans prévenir et relevé des enfants de sept ans aux machines. Son rapport part au Parlement. La ville est nommée dedans.", e:{p:-9,i:-4,o:3}, q:{texte:"Le rapport conclut à une amende et à une inspection annuelle. Un avocat de la ville propose de contester devant les tribunaux.",
+     choix:[
+      {q:"« Payons, et mettons-nous en règle. »", e:{p:10,o:7,i:-8,m:-3},
+       c:"L’amende est réglée sans bruit et les enfants sortent des ateliers. Les fabricants parlent de capitulation."},
+      {q:"« Contestons : la loi est mal rédigée. »", e:{i:7,p:-9,o:-6,m:2},
+       c:"La procédure durera des années, et pendant ce temps rien ne change. Londres retient le nom de la ville."}]}},
     c:"Quatre inspecteurs pour tout le royaume : le risque est mince, et tout le monde le sait."},
  c:{q:"« Ne l’appliquons qu’aux grandes filatures. »", e:{p:-2,i:2,o:-4,m:-1},
     c:"Les grandes filatures se mettent en règle, les petits ateliers de cave continuent. La loi devient une affaire de taille."}},
@@ -1097,9 +1118,19 @@ const CARTES_I = [
  d:"« Ce ne sont pas les malades qu’il faut soigner, c’est la rue. Tant que l’eau sale restera devant les portes, je reviendrai vous voir chaque hiver avec les mêmes chiffres. »",
  ex:"Dans les rues ouvrières, il n’y a ni pavés ni canalisations pour emporter les eaux sales : on les jette devant la porte, et elles y stagnent. Le médecin a relevé cinq cas de fièvre cette semaine, tous dans la même rue. Creuser des égouts coûterait deux années de budget et supposerait d’éventrer des quartiers entiers pendant des mois.",
  f:"Avant les années 1840, aucune ville industrielle anglaise n’a d’égouts dignes de ce nom : les eaux usées stagnent dans des rues non pavées où jouent les enfants. Une enquête officielle de 1842, le rapport Chadwick, établit que l’espérance de vie moyenne d’un ouvrier de Manchester est de dix-sept ans, contre trente-huit dans un comté rural voisin. C’est l’un des documents qui obligeront l’État à intervenir : le coût humain de l’**industrialisation** devient un problème public.",
- a:{q:"« Creusons les égouts. »", e:{o:11,p:10,i:-6,m:-8}, suite:{dans:4, t:"Les fièvres ont reculé", x:"Le médecin apporte ses chiffres : deux fois moins de fièvres dans les rues assainies que dans les autres. Londres a demandé copie du rapport — on cite désormais la ville en exemple.", e:{o:9,p:11,m:3}},
+ a:{q:"« Creusons les égouts. »", e:{o:11,p:10,i:-6,m:-8}, suite:{dans:4, t:"Les fièvres ont reculé", x:"Le médecin apporte ses chiffres : deux fois moins de fièvres dans les rues assainies que dans les autres. Londres a demandé copie du rapport — on cite désormais la ville en exemple.", e:{o:9,p:11,m:3}, q:{texte:"Londres propose de financer l’extension des égouts à toute la ville — à condition d’envoyer ses propres inspecteurs contrôler les travaux.",
+     choix:[
+      {q:"« Acceptons leur argent et leurs inspecteurs. »", e:{o:8,p:9,i:-7,m:-4},
+       c:"Les travaux s’étendent deux fois plus vite. Des fonctionnaires de Londres s’installent à demeure et regardent tout."},
+      {q:"« Nous continuerons seuls, à notre rythme. »", e:{i:5,m:4,o:-5,p:-6},
+       c:"La ville garde la main et l’addition. Les quartiers les plus pauvres attendront encore."}]}},
     c:"Le chantier est long et cher. Les fièvres reculent là où il passe."},
- b:{q:"« Ne creusons rien : à chacun sa rue. »", e:{o:-9,p:-8,i:5,m:3}, suite:{dans:3, t:"Le typhus part des rues sans égouts", x:"Les fièvres que le médecin annonçait sont là. Elles suivent exactement les rues où l’eau stagne — celles que vous aviez laissées en l’état. Cent quarante malades en trois semaines.", e:{o:-6,p:-6,i:-3}},
+ b:{q:"« Ne creusons rien : à chacun sa rue. »", e:{o:-9,p:-8,i:5,m:3}, suite:{dans:3, t:"Le typhus part des rues sans égouts", x:"Les fièvres que le médecin annonçait sont là. Elles suivent exactement les rues où l’eau stagne — celles que vous aviez laissées en l’état. Cent quarante malades en trois semaines.", e:{o:-6,p:-6,i:-3}, q:{texte:"Le médecin demande de fermer les trois rues les plus touchées, le temps de les nettoyer. Deux filatures y ont leurs ouvriers.",
+     choix:[
+      {q:"« Fermons ces rues et nettoyons-les. »", e:{o:9,p:8,i:-9,m:-5},
+       c:"Trois semaines de travaux et deux filatures au ralenti. L’épidémie s’arrête aux limites du quartier."},
+      {q:"« Les filatures ne peuvent pas s’arrêter. »", e:{i:6,m:3,o:-10,p:-8},
+       c:"On produit sans interruption. Le typhus, lui, ne s’arrête pas aux limites du quartier."}]}},
     c:"On laisse chaque propriétaire décider. Aucun ne décide rien."},
  c:{q:"« Ne creusons que les rues principales. »", e:{o:3,p:3,m:-7},
     c:"Le centre s’assainit. Les ruelles d’Ancoats, elles, restent ce qu’elles sont."}},
@@ -1279,7 +1310,7 @@ function choisir(quel){
   CLES.forEach(k=>{ if(r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
   (r.g||[]).forEach(g=>{ if(!E.acquis.includes(g)) E.acquis.push(g); });
   /* ce que cette décision fera germer plus tard */
-  if(r.suite) E.graines.push({tour:E.tour+r.suite.dans, s:r.suite, de:c.t});
+  if(r.suite) E.graines.push({tour:E.tour+r.suite.dans, s:r.suite, de:c.t, choix:r.q, semee:E.tour});
   E.vues.push(c.t);
   E.consq=r.c;
   E.tour++;
@@ -1698,26 +1729,49 @@ function germer(gr){
 }
 
 function rendreGraine(gr){
+  /* le sens se lit dans le bilan des effets : on ne l'écrit pas deux fois */
+  const bilan = CLES.reduce((s,k)=>s+(gr.s.e[k]||0), 0);
+  const bon = bilan >= 0;
+  const ecart = (gr.semee!=null) ? (E.tour-gr.semee) : gr.s.dans;
   app.innerHTML=`
   <div class="tableau">
     <span class="plaque">État des forces</span>
     ${barresForces()}
   </div>
   <div class="bureau"><div class="plateau un">
-    <div class="ev graine">
-      <div class="evd">Conséquence de votre décision</div>
+    <div class="ev graine ${bon?"bonne":"mauvaise"}">
+      <div class="evd">${bon?"Grâce à":"À cause de"} votre choix d’il y a ${ecart} tour${ecart>1?"s":""}</div>
+      <div class="origine">
+        Vous aviez répondu <em>${esc(gr.choix||"—")}</em>
+        à l’affaire « ${esc(gr.de).replace(/\s*\.$/,"")} ».
+        <span>Ce n’est donc pas votre dernière décision qui produit ceci.</span>
+      </div>
       <div class="evt">${esc(gr.s.t)}</div>
       <p class="evx">${gras(esc(gr.s.x))}</p>
-      <div class="evs"><strong>Vous vous souvenez ?</strong> Cela remonte à l’affaire
-        « ${esc(gr.de)} », il y a ${E.tour-gr.tour+gr.s.dans} décisions.</div>
       <div class="evi">${impacts(gr.s.e)}</div>
     </div>
-    <p class="centre" style="margin:22px 0 0">
+    ${gr.s.q ? `
+    <div class="question">${esc(gr.s.q.texte)}</div>
+    <div class="rep ${gr.s.q.choix.length===2?"deux":""}">
+      ${gr.s.q.choix.map((c,i)=>`<button class="choix" onclick="graineChoix(${i})">
+        <span class="q">${esc(c.q)}</span><span class="impacts">${impacts(c.e)}</span></button>`).join("")}
+    </div>`
+    : `<p class="centre" style="margin:22px 0 0">
       <button class="plein" onclick="suiteGraine()">Continuer</button>
-    </p>
+    </p>`}
   </div></div>`;
   try{ SON.majTension() }catch(e){}
   majVue();
+}
+
+/* Une conséquence peut appeler une décision de plus. */
+function graineChoix(i){
+  const gr=E.graineEnCours;
+  if(!gr || !gr.s.q) return suiteGraine();
+  const r=gr.s.q.choix[i];
+  CLES.forEach(k=>{ if(r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
+  E.consq=r.c; E.entassement="";
+  suiteGraine();
 }
 
 function suiteGraine(){
@@ -1826,7 +1880,12 @@ const CARTES_II = [
  d:"« Voilà ce que votre chaîne produit vraiment. Trois cent soixante-dix pour cent. Nous ne fabriquons plus des automobiles, nous formons des débutants à longueur d’année. »",
  ex:"Le travail à la chaîne est si répétitif que les ouvriers partent au bout de quelques jours. Le service du personnel a calculé le chiffre : pour garder cent hommes à leur poste pendant un an, il faut en embaucher trois cent soixante-dix. On passe donc son temps à former des gens qui s’en vont, et cela coûte plus cher que tout le reste.",
  f:"Le taux de rotation du personnel mesure combien de gens il faut embaucher pour garder un effectif stable. Chez Ford, il atteint 370 % en 1913 : le travail est si répétitif que personne ne reste. C’est le coût caché de la **division du travail** poussée à l’extrême — on gagne en **productivité** ce qu’on perd en fidélité. La réponse sera le salaire de cinq dollars par jour, en janvier 1914.",
- a:{q:"« Doublons le salaire : cinq dollars par jour. »", e:{o:16,m:6,i:-11,p:8}, suite:{dans:3, t:"On ne part plus", x:"Le renouvellement du personnel est tombé de trois cent soixante-dix à seize pour cent. Les hommes restent, apprennent leur poste, et le font mieux. La presse du pays entier en parle.", e:{i:8,o:10,m:6,p:5}},
+ a:{q:"« Doublons le salaire : cinq dollars par jour. »", e:{o:16,m:6,i:-11,p:8}, suite:{dans:3, t:"On ne part plus", x:"Le renouvellement du personnel est tombé de trois cent soixante-dix à seize pour cent. Les hommes restent, apprennent leur poste, et le font mieux. La presse du pays entier en parle.", e:{i:8,o:10,m:6,p:5}, q:{texte:"Les ateliers voisins réclament le même salaire, et les autres industriels de Detroit vous accusent de faire monter les prix dans toute la ville.",
+     choix:[
+      {q:"« Étendons les cinq dollars à toute l’usine. »", e:{o:11,m:5,i:-9,p:4},
+       c:"Le principe vaut pour tous. Les concurrents devront suivre, et ils ne vous le pardonneront pas."},
+      {q:"« Gardons-les aux seules lignes de montage. »", e:{i:6,o:-8,p:-3},
+       c:"Deux salaires cohabitent sous le même toit pour un travail voisin. L’atelier s’en aperçoit très vite."}]}},
     c:"Le salaire double d’un coup. Dix mille hommes font la queue devant l’usine le lendemain matin, et l’on cesse de partir."},
  b:{q:"« Ne changeons rien : embauchons chaque matin. »", e:{i:6,o:-13,p:-7}, suite:{dans:3, t:"Plus personne ne sait faire son geste", x:"Le contrôle rejette un châssis sur six. Avec des hommes qui restent quatre jours, on ne forme plus : on remplace. La qualité s’effondre au moment où la réputation comptait le plus.", e:{i:-7,m:-6,o:-3}},
     c:"On embauche à la porte chaque matin. Personne n’apprend jamais bien son geste."},
@@ -1881,7 +1940,12 @@ const CARTES_II = [
  f:"Alfred Sloan, à la tête de General Motors, oppose à la voiture unique de Ford une gamme complète et un modèle renouvelé chaque année, pour que l’ancien paraisse démodé. C’est l’invention de l’**obsolescence** commerciale, et le passage de la production de masse à la **consommation de masse** : il ne suffit plus de produire moins cher, il faut créer le désir d’acheter. Ford perdra sa première place en 1927 pour ne pas l’avoir vu.",
  a:{q:"« Changeons de modèle chaque année. »", e:{m:13,i:-10,o:-4}, g:["Marchés"],
     c:"Il faut refaire les outillages, réapprendre les gestes, tout recommencer. Le client, lui, revient."},
- b:{q:"« Gardons le même modèle. »", e:{i:7,m:-14,o:3}, suite:{dans:4, t:"Les entrepôts sont pleins", x:"Onze mille voitures invendues. Les concessionnaires refusent les livraisons et certains ont pris la représentation d’une autre marque. Le stock coûte plus cher chaque mois qu’il dort.", e:{m:-9,i:-6}},
+ b:{q:"« Gardons le même modèle. »", e:{i:7,m:-14,o:3}, suite:{dans:4, t:"Les entrepôts sont pleins", x:"Onze mille voitures invendues. Les concessionnaires refusent les livraisons et certains ont pris la représentation d’une autre marque. Le stock coûte plus cher chaque mois qu’il dort.", e:{m:-9,i:-6}, q:{texte:"Onze mille voitures invendues. On peut les brader à moitié prix pour libérer la trésorerie, ou tenir en espérant que le marché reparte.",
+     choix:[
+      {q:"« Bradons le stock, il faut de l’argent. »", e:{m:8,i:-10,o:3},
+       c:"Les entrepôts se vident en six semaines. Ceux qui avaient payé le prix fort l’an dernier ne l’oublieront pas."},
+      {q:"« Tenons : le marché finira par repartir. »", e:{i:5,m:-9,o:-4},
+       c:"On attend. Le stock dort, la trésorerie fond, et le marché ne repart pas cette année-là."}]}},
     c:"On produit toujours la même, de mieux en mieux, de moins en moins cher. Et de moins en moins souvent achetée."},
  c:{q:"« Gardons le châssis, changeons la carrosserie. »", e:{m:4,i:-8,o:-3}, g:["Marchés"],
     c:"On habille l’ancienne en neuve. Les concessionnaires respirent ; les ingénieurs de la concurrence sourient."}},
@@ -1914,7 +1978,12 @@ const CARTES_II = [
  f:"Les syndicats ne sont pas reconnus dans l’automobile américaine avant la fin des années 1930 : les grandes firmes entretiennent des services de sécurité privés qui surveillent les ateliers et écartent les meneurs. Le syndicat automobile UAW ne sera reconnu chez Ford qu’en 1941, après des années d’affrontements. Le **rapport de force social** met une génération à rattraper la transformation technique.",
  a:{q:"« Recevons les syndicalistes. »", e:{o:13,p:9,i:-12,m:-3},
     c:"On s’assoit à la même table. Les actionnaires parlent d’abdication ; les usines voisines, de contagion."},
- b:{q:"« Chassons-les par le service d’ordre. »", e:{i:8,o:-14,p:-11}, suite:{dans:4, t:"Les journaux ont eu les photographies", x:"Un reporter suivait le groupe. Les clichés des hommes de la sécurité sont en première page de deux quotidiens, et un élu du Michigan demande une enquête sur les méthodes de la maison.", e:{p:-10,o:-5,m:-3}},
+ b:{q:"« Chassons-les par le service d’ordre. »", e:{i:8,o:-14,p:-11}, suite:{dans:4, t:"Les journaux ont eu les photographies", x:"Un reporter suivait le groupe. Les clichés des hommes de la sécurité sont en première page de deux quotidiens, et un élu du Michigan demande une enquête sur les méthodes de la maison.", e:{p:-10,o:-5,m:-3}, q:{texte:"Un élu du Michigan demande une enquête. Le service juridique propose un démenti public ; le service du personnel propose de recevoir les syndicalistes.",
+     choix:[
+      {q:"« Publions un démenti. »", e:{i:5,p:-11,o:-7},
+       c:"Le démenti paraît en page six. Les photographies, elles, étaient en première page."},
+      {q:"« Recevons-les, et que cela se sache. »", e:{o:10,p:12,i:-10,m:-3},
+       c:"La rencontre a lieu devant les journalistes. Les actionnaires parlent de reddition ; l’enquête est abandonnée."}]}},
     c:"On disperse, on fiche, on licencie les meneurs. L’atelier se tait — et n’oublie pas."}},
 
 {t:"Le chronomètre descend à l’atelier.", qui:"Walter Kessler, ingénieur chargé d’organiser la production", req:["Organisation"],
