@@ -621,6 +621,54 @@ body[data-niveau="II"] .situ .ex{color:#3D474F}
 .plateau.un .question{margin-top:22px}
 .plateau.un .rep{margin-top:10px}
 
+/* ---------- la trace de travail ------------------------------------ */
+.plateau.un.trace{max-width:980px}
+.trace .bilan{margin:18px 0 0;text-align:left}
+.trace .bilan h2{font-size:21px}
+.carnet{margin:.3em 0 0;padding-left:1.4em;font-size:14.5px;line-height:1.5}
+.carnet li{margin:.45em 0}
+.carnet .an{display:inline-block;min-width:3.4em;color:var(--rge);font-weight:bold;font-size:13px}
+.carnet .aff{color:var(--enc2)}
+.carnet .dec{display:block;margin-left:3.4em;color:var(--enc);font-weight:bold}
+
+.qz{margin:14px 0;padding:12px 14px;border:1px solid var(--fil);border-radius:2px;
+  background:rgba(255,255,255,.28)}
+.qz.juste{border-color:#3E7A3A;background:rgba(62,122,58,.10)}
+.qz.faux{border-color:#8E2413;background:rgba(142,36,19,.08)}
+.qzq{font-size:15.5px;line-height:1.4;margin-bottom:9px}
+.qzr{display:flex;flex-direction:column;gap:6px}
+.qzr button{margin:0;text-align:left;font-size:14.5px;padding:8px 12px;box-shadow:none;
+  background:rgba(255,255,255,.5);border:1px solid var(--fil)}
+.qzr button:hover:not(:disabled){transform:none;border-color:var(--lai);background:#fff}
+.qzr button.pris{border-color:var(--lai);background:rgba(184,137,74,.18);font-weight:bold}
+.qzr button.bonne{border-color:#3E7A3A;background:rgba(62,122,58,.18);font-weight:bold}
+.qzr button:disabled{cursor:default;opacity:.92}
+.qzx{margin-top:9px;padding-top:8px;border-top:1px solid var(--fil);
+  font-size:13.5px;line-height:1.55;color:var(--enc2)}
+.score{margin-top:16px;padding:12px 16px;border-radius:2px;text-align:center;
+  background:linear-gradient(160deg,#8C6A38,#6B4E27);color:#FFF4DE;font-size:16px}
+.score b{font-size:26px;font-family:var(--serif)}
+.score span{display:block;font-size:13px;opacity:.85;margin-top:3px}
+
+.trace label{display:block;margin:12px 0;font-size:14.5px;color:var(--enc2)}
+.trace textarea,.trace input[type=text]{
+  display:block;width:100%;margin-top:5px;padding:9px 11px;
+  font-family:var(--sans);font-size:15px;color:var(--enc);
+  background:rgba(255,255,255,.55);border:1px solid var(--fil);border-radius:2px;resize:vertical}
+.trace textarea:focus,.trace input:focus{outline:none;border-color:var(--lai);background:#fff}
+.trace label.nom input{max-width:320px}
+
+@media print{
+  body::before,body::after,#scene,header,footer{display:none !important}
+  body{background:#fff !important;color:#000 !important}
+  .bureau::before,.bureau::after{display:none}
+  .trace .bilan{box-shadow:none;border:1px solid #999;background:#fff !important;
+    break-inside:avoid;page-break-inside:avoid}
+  .trace h1,.trace .sous{color:#000 !important;text-shadow:none !important}
+  .trace .centre{display:none}
+  .qzr button:not(.pris):not(.bonne){display:none}
+}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1293,7 +1341,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -1312,6 +1360,7 @@ function choisir(quel){
   /* ce que cette décision fera germer plus tard */
   if(r.suite) E.graines.push({tour:E.tour+r.suite.dans, s:r.suite, de:c.t, choix:r.q, semee:E.tour});
   E.vues.push(c.t);
+  E.carnet.push({t:c.t, q:r.q, an:(E.mode==="campagne"?AN(E.tour):null)});
   E.consq=r.c;
   E.tour++;
 
@@ -1781,6 +1830,223 @@ function suiteGraine(){
   piocher(); rendre();
 }
 
+/* ==================================================================
+   LE QUESTIONNAIRE DE FIN
+
+   On ne pose que des questions portant sur ce que l'élève a réellement
+   rencontré dans SA partie : chaque question est rattachée à une carte
+   ou à un événement. Deux élèves n'auront donc pas le même questionnaire,
+   et celui qui a ouvert les rapports d'enquête y retrouvera ses lectures.
+
+   Trois réponses, une seule juste, et une explication qui renvoie à la
+   notion du cours — le questionnaire doit apprendre, pas seulement noter.
+   ================================================================== */
+const QUIZ_I = [
+{c:"Le charbon manque à la filature.",
+ q:"Pourquoi le charbon est-il décisif dans la première révolution industrielle ?",
+ r:["C’est lui qui chauffe l’eau des machines à vapeur",
+    "C’est avec lui qu’on fabrique le fil de coton",
+    "Il sert surtout à chauffer les logements ouvriers"],
+ b:0, x:"Le charbon est la **ressource** énergétique de toute la période. La Grande-Bretagne en possède d’énormes gisements : c’est l’une des raisons pour lesquelles la révolution industrielle y commence."},
+
+{c:"Un mécanicien vous montre un plan.",
+ q:"Qu’est-ce que la machine à vapeur change pour l’emplacement des usines ?",
+ r:["Elles ne sont plus obligées de s’installer au bord d’une rivière",
+    "Elles doivent désormais être construites près d’un fleuve",
+    "Elles peuvent enfin fonctionner sans ouvriers"],
+ b:0, x:"Avant la vapeur, il fallait la force de l’eau : l’usine dépendait de la géographie et s’arrêtait quand la rivière gelait. La vapeur la libère de cette contrainte."},
+
+{c:"Quarante familles attendent à la grille.",
+ q:"Comment appelle-t-on le départ des paysans vers les villes industrielles ?",
+ r:["L’exode rural", "L’urbanisation", "L’émigration"],
+ b:0, x:"L’**exode rural** fournit la **main-d’œuvre**, l’une des conditions de la révolution industrielle. Il produit en même temps l’**urbanisation** : Manchester passe de 25 000 habitants en 1772 à plus de 300 000 en 1851."},
+
+{c:"Un bâtisseur propose soixante cottages.",
+ q:"Pourquoi construit-on des maisons ouvrières « dos à dos » ?",
+ r:["Pour loger le plus de monde possible au moindre coût",
+    "Pour protéger les habitants du froid",
+    "Parce qu’un règlement de la ville l’imposait"],
+ b:0, x:"Elles partagent trois murs sur quatre : pas de traversée d’air, pas de cour, pas d’évacuation. Le logement ouvrier est le premier endroit où se lit l’inégalité du progrès."},
+
+{c:"L’eau croupit devant les portes.",
+ q:"Selon l’enquête officielle de 1842, quelle est l’espérance de vie moyenne d’un ouvrier de Manchester ?",
+ r:["Environ 17 ans", "Environ 35 ans", "Environ 50 ans"],
+ b:0, x:"Contre trente-huit ans dans un comté rural voisin. La mortalité des jeunes enfants pèse lourd dans ce chiffre, qui obligera l’État à intervenir."},
+
+{c:"Liverpool propose une voie ferrée.",
+ q:"Qu’a d’exceptionnel la ligne Liverpool–Manchester ouverte en 1830 ?",
+ r:["C’est la première au monde à relier deux grandes villes",
+    "C’est la première à utiliser une locomotive à vapeur",
+    "C’est la plus longue jamais construite"],
+ b:0, x:"Le chemin de fer transforme l’échelle des **marchés** : ce qu’on produit ici peut être vendu partout. Il crée aussi une demande énorme de fer et de charbon — une innovation en entraîne d’autres."},
+
+{c:"Des acheteurs attendent à Hambourg.",
+ q:"Pourquoi les débouchés lointains sont-ils une condition de la production de masse ?",
+ r:["Sans acheteurs nombreux, des machines coûteuses ne sont jamais rentables",
+    "Parce que le coton ne pousse qu’à l’étranger",
+    "Parce que la loi interdisait de vendre sur place"],
+ b:0, x:"Les **marchés** sont l’une des sept conditions. L’industrie et le commerce mondial se développent ensemble, souvent à travers l’Empire britannique."},
+
+{c:"Une fileuse demande à vous parler.",
+ q:"Quel travail confie-t-on aux enfants dans les filatures ?",
+ r:["Passer sous les machines en marche pour renouer les fils cassés",
+    "Surveiller les comptes de l’atelier",
+    "Conduire les machines à vapeur"],
+ b:0, x:"On les appelle des « rattacheurs » : ils sont les seuls assez petits pour passer sans qu’on arrête la production. Le salaire de l’enfant est indispensable au revenu familial."},
+
+{c:"Un contremaître veut chronométrer les gestes.",
+ q:"Qu’appelle-t-on la division du travail ?",
+ r:["Découper la fabrication en tâches simples confiées chacune à un ouvrier différent",
+    "Partager les bénéfices entre les ouvriers",
+    "Répartir les ouvriers entre plusieurs usines"],
+ b:0, x:"Adam Smith l’a décrite dès 1776 à propos d’une fabrique d’épingles. On produit beaucoup plus, mais chacun ne sait plus faire qu’un fragment du métier."},
+
+{c:"Le pain a doublé depuis le printemps.",
+ q:"Pourquoi le prix du pain est-il un enjeu politique majeur pour les ouvriers ?",
+ r:["Il représente près de la moitié du budget d’une famille ouvrière",
+    "Parce qu’il est taxé plus que les autres aliments",
+    "Parce que les ouvriers ne mangeaient que du pain"],
+ b:0, x:"Le salaire industriel est versé en argent : l’ouvrier dépend entièrement du marché, contrairement au paysan qui produisait une partie de sa nourriture."},
+
+{c:"Une pétition contre les droits sur le grain.",
+ q:"Que sont les Corn Laws, abolies en 1846 ?",
+ r:["Des taxes sur le grain importé, qui protégeaient les propriétaires terriens",
+    "Des lois limitant le travail des enfants",
+    "Des règlements sur la qualité du pain"],
+ b:0, x:"Elles maintenaient le pain cher. La Ligue contre les Corn Laws naît à **Manchester en 1838** : c’est l’un des premiers grands conflits entre la richesse foncière et la richesse industrielle."},
+
+{c:"Le monde entier défile au Crystal Palace.",
+ q:"Que révèle le recensement britannique de 1851 ?",
+ r:["Le pays compte pour la première fois plus de citadins que de ruraux",
+    "La population a doublé en dix ans",
+    "Un habitant sur deux travaille en usine"],
+ b:0, x:"C’est l’aboutissement de l’exode rural commencé un siècle plus tôt. La même année, l’**Exposition universelle** met en scène la suprématie industrielle britannique."},
+
+{ev:"Peterloo",
+ q:"Que s’est-il passé à Peterloo, à Manchester, le 16 août 1819 ?",
+ r:["La cavalerie a chargé une foule réunie pour réclamer le droit de vote",
+    "Une filature a brûlé, faisant dix-huit morts",
+    "Les ouvriers ont détruit les métiers mécaniques"],
+ b:0, x:"Soixante mille personnes s’étaient rassemblées ; on compte dix-huit morts. Le nom parodie **Waterloo**, quatre ans plus tôt."},
+
+{ev:"La grève des bouchons",
+ q:"Comment les grévistes d’août 1842 arrêtaient-ils les usines ?",
+ r:["En retirant le bouchon des chaudières, ce qui coupait la vapeur",
+    "En bloquant les portes des ateliers",
+    "En sabotant les rails du chemin de fer"],
+ b:0, x:"Sans vapeur, rien ne tourne. C’est la première grève générale de l’histoire industrielle britannique."},
+
+{ev:"Les briseurs de métiers",
+ q:"Qui brise les métiers mécaniques dans le Lancashire en 1826 ?",
+ r:["Des tisserands à bras que la machine a ruinés",
+    "Des paysans hostiles à l’industrie",
+    "Des ouvriers réclamant de meilleurs salaires"],
+ b:0, x:"Ils ne pouvaient plus vivre de leur métier. La mécanisation ne crée pas seulement des emplois : elle en détruit, et pas les mêmes."},
+];
+
+const QUIZ_II = [
+{c:"Un ingénieur propose de faire venir la voiture à l’ouvrier.",
+ q:"Qu’est-ce que le travail à la chaîne, adopté chez Ford en 1913 ?",
+ r:["La pièce se déplace devant des ouvriers immobiles, chacun faisant un seul geste",
+    "Les ouvriers se déplacent d’une voiture à l’autre",
+    "Chaque ouvrier monte une voiture entière"],
+ b:0, x:"L’idée vient des abattoirs de Chicago. Le temps de montage d’un châssis tombe de **12 h 30 à 1 h 33** : c’est le cœur de la **production de masse**."},
+
+{c:"Personne ne reste plus de quelques jours.",
+ q:"Chez Ford en 1913, combien fallait-il embaucher de personnes pour garder cent ouvriers à leur poste pendant un an ?",
+ r:["Environ 370", "Environ 150", "Environ 105"],
+ b:0, x:"Le travail était si répétitif que personne ne restait. C’est le coût caché de la **division du travail** poussée à l’extrême, et ce qui provoquera le salaire de cinq dollars par jour."},
+
+{c:"Qui mérite les cinq dollars ?",
+ q:"À quoi servait le « département sociologique » créé par Ford en 1914 ?",
+ r:["À visiter les foyers ouvriers pour vérifier leur mode de vie",
+    "À étudier la fatigue des ouvriers sur la chaîne",
+    "À organiser les loisirs du personnel"],
+ b:0, x:"Seuls les ouvriers jugés méritants touchaient le salaire complet. L’entreprise ne se contente plus d’acheter du travail : elle entend façonner un mode de vie."},
+
+{c:"Le client demande une autre couleur.",
+ q:"Pourquoi toutes les Ford T étaient-elles noires ?",
+ r:["Seule cette peinture séchait assez vite pour suivre la cadence de la chaîne",
+    "Parce que le noir coûtait moins cher que les autres couleurs",
+    "Parce que Henry Ford détestait les couleurs vives"],
+ b:0, x:"Une contrainte technique devenue règle commerciale. La **standardisation** rend le prix bas possible — mais suppose que le client renonce à choisir."},
+
+{c:"Une usine qui fabriquerait tout.",
+ q:"Qu’appelle-t-on l’intégration verticale ?",
+ r:["Posséder toutes les étapes, de la matière première à la vente",
+    "Construire des usines à plusieurs étages",
+    "Faire travailler ensemble plusieurs entreprises"],
+ b:0, x:"L’usine de River Rouge aura ses hauts fourneaux, sa verrerie, sa centrale et son port. L’entreprise ne dépend plus de personne — mais immobilise des **capitaux** considérables."},
+
+{c:"L’ouvrière de la ligne 4 demande à parler.",
+ q:"Quelle conséquence le travail à la chaîne a-t-il sur le savoir-faire de l’ouvrier ?",
+ r:["Il n’en a plus besoin : on le forme en une heure, et on le remplace aussi vite",
+    "Il doit apprendre un métier plus complexe qu’avant",
+    "Il devient plus autonome dans son travail"],
+ b:0, x:"Marx parlait d’**aliénation** pour ce rapport où le travailleur devient étranger à ce qu’il produit. Gramsci observe en 1934 que l’homme réduit au geste continue pourtant de penser."},
+
+{c:"General Motors change de modèle chaque année.",
+ q:"Quelle stratégie Alfred Sloan oppose-t-il à la voiture unique de Ford ?",
+ r:["Une gamme complète et un modèle renouvelé chaque année",
+    "Des voitures encore moins chères",
+    "Une production entièrement automatisée"],
+ b:0, x:"C’est l’invention de l’**obsolescence** commerciale et le passage à la **consommation de masse** : il ne suffit plus de produire moins cher, il faut créer le désir d’acheter."},
+
+{c:"Faut-il vendre à crédit ?",
+ q:"Qu’apporte le crédit à la consommation, qui se répand dans les années 1920 ?",
+ r:["Acheter tout de suite avec un revenu qu’on n’a pas encore gagné",
+    "Payer moins cher en achetant en grande quantité",
+    "Emprunter de l’argent à son employeur"],
+ b:0, x:"Il soutient la **consommation de masse** et fait entrer durablement les ménages dans l’endettement — l’une des fragilités qui aggraveront la crise de 1929."},
+
+{c:"Cinq jours de travail au lieu de six.",
+ q:"Quel est l’argument de Ford pour bien payer ses ouvriers ?",
+ r:["Un ouvrier bien payé devient le client de ce qu’il fabrique",
+    "Un ouvrier bien payé travaille plus vite",
+    "La loi l’obligeait à augmenter les salaires"],
+ b:0, x:"C’est le cœur du **fordisme** : produire en masse suppose de consommer en masse, donc de partager une part des gains de **productivité**."},
+
+{c:"Le chronomètre descend à l’atelier.",
+ q:"Qu’est-ce que l’organisation scientifique du travail, théorisée par Frederick Taylor ?",
+ r:["Chronométrer chaque geste et confier à un bureau le soin de dire comment travailler",
+    "Faire travailler les ouvriers en équipes autonomes",
+    "Remplacer les ouvriers par des machines"],
+ b:0, x:"Le **taylorisme** précède le fordisme et le rend possible : sans temps mesurés, une chaîne ne peut pas être réglée. Le savoir passe de l’ouvrier au bureau des méthodes."},
+
+{c:"Les pièces ne s’emboîtent pas.",
+ q:"Qu’est-ce que l’interchangeabilité des pièces ?",
+ r:["Toutes les copies d’une pièce sont identiques, donc n’importe laquelle convient",
+    "Les pièces peuvent servir sur plusieurs modèles différents",
+    "Les ouvriers peuvent changer de poste librement"],
+ b:0, x:"Elle permet le montage à la chaîne et la réparation sans atelier. Elle supprime en revanche le métier d’ajusteur : la qualification passe de l’atelier au bureau d’études."},
+
+{c:"Faut-il arrêter la voiture qui vous a faits ?",
+ q:"Combien de Ford T ont été produites entre 1908 et 1927 ?",
+ r:["Plus de quinze millions", "Environ deux millions", "Environ cinquante millions"],
+ b:0, x:"Son prix est tombé de 850 à moins de 300 dollars grâce à la seule production de masse. Mais plus une production est spécialisée, plus il coûte cher d’en changer."},
+
+{ev:"Dodge contre Ford",
+ q:"Qu’établit l’arrêt Dodge contre Ford de 1919 ?",
+ r:["Une société est dirigée d’abord pour le profit de ses propriétaires",
+    "Les ouvriers ont droit à une part des bénéfices",
+    "L’État peut contrôler les prix d’une entreprise"],
+ b:0, x:"Deux actionnaires reprochaient à la direction de tout réinvestir au lieu de verser des **dividendes**. C’est l’un des arrêts les plus cités du droit des sociétés."},
+
+{ev:"Jeudi noir",
+ q:"Pourquoi la crise de 1929 frappe-t-elle l’automobile plus que d’autres secteurs ?",
+ r:["On repousse l’achat d’une voiture bien avant celui du pain",
+    "Les usines automobiles étaient les plus endettées",
+    "Les ouvriers de l’automobile ont fait grève"],
+ b:0, x:"La production américaine chute des trois quarts en quatre ans. La **production de masse** révèle sa fragilité : des usines conçues pour tourner à plein deviennent ruineuses dès que la demande faiblit."},
+
+{ev:"L’incendie de la Triangle Shirtwaist",
+ q:"Pourquoi l’incendie de la Triangle Shirtwaist, en 1911, a-t-il fait 146 morts ?",
+ r:["Les portes de secours avaient été verrouillées",
+    "L’atelier se trouvait en sous-sol",
+    "Les pompiers sont arrivés trop tard"],
+ b:0, x:"On les fermait pour empêcher les ouvrières de sortir. Cet incendie est à l’origine des premières lois américaines de sécurité au travail."},
+];
+
 /* ---------- fins ---------- */
 const FINS_I={
  o:{t:"Les machines brisées",
@@ -1823,7 +2089,7 @@ function rendreFin(){
     ${N.lecons.map(x=>`<li>${x}</li>`).join("")}
   </ul></div>
   <p class="centre"><button class="plein" onclick="nouvellePartie('${E.mode}',N.id)">Rejouer</button>
-  <button onclick="accueil()">Menu</button></p>`;
+  <button class="plein" onclick="rendreTrace()">Ma trace de travail</button><button onclick="accueil()">Menu</button></p>`;
 }
 
 
@@ -2301,7 +2567,7 @@ const NIVEAUX = {
      but:"Votre but : mener la ville jusqu’en 1851 sans qu’aucune force ne vous lâche — puis découvrir quelle Manchester vous avez bâtie.",
      note:"<strong>Pourquoi 1851 ?</strong> Cette année-là, Londres expose sous le Crystal Palace tout ce que l’industrie britannique sait faire, et le recensement établit que le pays compte désormais plus de citadins que de ruraux — une première dans l’histoire. C’est le moment où la société née en 1780 peut enfin se regarder en face.",
      avant:"Plus les industriels sont contents, plus la ville grossit. Et plus elle grossit, <strong>plus les ouvriers s’épuisent tout seuls</strong>, sans que vous ayez rien décidé : les logements ne suivent jamais le rythme des usines.",
-     forces:FORCES_I, cartes:CARTES_I, fins:FINS_I, verdict:VERDICT_I, ev:EV_I,
+     forces:FORCES_I, cartes:CARTES_I, fins:FINS_I, verdict:VERDICT_I, ev:EV_I, quiz:QUIZ_I,
      tours:18, a0:1780, a1:1851, pop0:36267, unite:"Population", unite2:"habitants",
  croissance:(a,b,u)=>`La population passe de ${fmt(a)} à ${fmt(b)} habitants. Les logements ne suivent pas : les ouvriers perdent ${u.toFixed(1)} points.`,
  impatience:"Les marchands, eux, commencent à regarder vers Leeds.",
@@ -2317,7 +2583,7 @@ const NIVEAUX = {
      but:"Votre but : mener l’usine jusqu’en 1932 sans qu’aucune force ne vous lâche — puis découvrir quelle entreprise vous avez bâtie.",
      note:"<strong>Pourquoi 1932 ?</strong> Le 7 mars, plusieurs milliers de chômeurs marchent sur les usines de Dearborn pour demander du travail. La police tire. La chaîne qui avait fait la prospérité de la ville venait de produire du chômage de masse : c’est là que la deuxième révolution industrielle se regarde en face.",
      avant:"Plus les actionnaires sont contents, plus la production monte. Et plus elle monte, <strong>plus la cadence use les ouvriers d’elle-même</strong>, sans que vous ayez rien décidé : la chaîne ne ralentit jamais toute seule.",
-     forces:FORCES_II, cartes:CARTES_II, fins:FINS_II, verdict:VERDICT_II, ev:EV_II,
+     forces:FORCES_II, cartes:CARTES_II, fins:FINS_II, verdict:VERDICT_II, ev:EV_II, quiz:QUIZ_II,
      tours:18, a0:1908, a1:1932, pop0:10600, unite:"Production", unite2:"voitures par an",
  croissance:(a,b,u)=>`La production passe de ${fmt(a)} à ${fmt(b)} voitures par an. La chaîne suit le rythme, les hommes moins : les ouvriers perdent ${u.toFixed(1)} points.`,
  impatience:"Les clients, eux, commencent à regarder chez General Motors.",
@@ -2328,6 +2594,161 @@ const NIVEAUX = {
      ]},
 };
 let N = NIVEAUX.I;
+
+/* ==================================================================
+   LA TRACE DE TRAVAIL
+   Ce que l'élève emporte, et ce que le professeur récupère.
+   ================================================================== */
+
+/* On ne tire que des questions portant sur ce qu'il a réellement vu. */
+function questionsDeLaPartie(){
+  const vues = new Set(E.carnet.map(d=>d.t));
+  const evs  = new Set(E.evVus);
+  let lot = N.quiz.filter(q => (q.c && vues.has(q.c)) || (q.ev && evs.has(q.ev)));
+  /* s'il en manque, on complète avec le reste du niveau */
+  if(lot.length < 8){
+    const reste = N.quiz.filter(q => !lot.includes(q));
+    melanger(reste);
+    lot = lot.concat(reste.slice(0, 8-lot.length));
+  }
+  melanger(lot);
+  return lot.slice(0, 8);
+}
+
+function melanger(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+}
+
+function rendreTrace(){
+  if(!E.quiz) { E.quiz = questionsDeLaPartie(); E.rep = E.quiz.map(()=>null); E.corrige=false; }
+  const rep = E.rep;
+  const fait = rep.filter(x=>x!==null).length;
+  const note = E.corrige ? rep.filter((x,i)=>x===E.quiz[i].b).length : 0;
+  const pct  = Math.round(100*note/E.quiz.length);
+
+  app.innerHTML=`
+  <div class="bureau"><div class="plateau un trace">
+    <h1 style="font-size:clamp(26px,4vw,40px)">Ma trace de travail</h1>
+    <p class="sous">${N.lieu}, ${N.sous.replace(N.lieu+", ","")} — ${E.mode==="campagne"?"campagne":"survie"}</p>
+
+    <div class="bilan">
+      <h2 style="margin-top:0">Mon carnet de bord</h2>
+      <p style="margin:.2em 0 .8em;font-size:14px;color:var(--enc2)">
+        ${E.carnet.length} décision${E.carnet.length>1?"s":""} prise${E.carnet.length>1?"s":""}.</p>
+      <ol class="carnet">${E.carnet.map(d=>`<li>
+        ${d.an?`<span class="an">${d.an}</span>`:""}
+        <span class="aff">${esc(d.t)}</span>
+        <span class="dec">${esc(d.q||"")}</span></li>`).join("")}</ol>
+    </div>
+
+    <div class="bilan">
+      <h2 style="margin-top:0">Ce que j’ai retenu</h2>
+      <p style="margin:.2em 0 1em;font-size:14px;color:var(--enc2)">
+        Huit questions, tirées des affaires que vous avez traitées.</p>
+      ${E.quiz.map((q,i)=>`<div class="qz ${E.corrige?(rep[i]===q.b?"juste":"faux"):""}">
+        <div class="qzq">${i+1}. ${esc(q.q)}</div>
+        <div class="qzr">${q.r.map((t,j)=>`
+          <button class="${rep[i]===j?"pris":""} ${E.corrige&&j===q.b?"bonne":""}"
+            ${E.corrige?"disabled":""} onclick="repondre(${i},${j})">${esc(t)}</button>`).join("")}</div>
+        ${E.corrige?`<div class="qzx">${gras(esc(q.x))}</div>`:""}
+      </div>`).join("")}
+      ${E.corrige
+        ? `<div class="score">Connaissances acquises : <b>${pct}&nbsp;%</b>
+             <span>${note} bonne${note>1?"s":""} réponse${note>1?"s":""} sur ${E.quiz.length}</span></div>`
+        : `<p class="centre" style="margin:18px 0 0">
+             <button class="plein" ${fait<E.quiz.length?"disabled":""} onclick="corriger()">
+               ${fait<E.quiz.length?`Encore ${E.quiz.length-fait} question${E.quiz.length-fait>1?"s":""}`:"Corriger mes réponses"}</button></p>`}
+    </div>
+
+    <div class="bilan">
+      <h2 style="margin-top:0">Ma réflexion</h2>
+      <label>La décision dont je suis le plus sûr, et pourquoi :
+        <textarea id="r1" rows="3" placeholder="…"></textarea></label>
+      <label>La décision que je regrette, et ce que je ferais autrement :
+        <textarea id="r2" rows="3" placeholder="…"></textarea></label>
+      <label>Ce que cette partie m’apprend sur le progrès industriel :
+        <textarea id="r3" rows="3" placeholder="…"></textarea></label>
+      <label class="nom">Mon nom :
+        <input id="rnom" type="text" placeholder="Prénom et nom"></label>
+    </div>
+
+    <p class="centre" style="margin:22px 0 0">
+      <button class="plein" onclick="copierTrace()">Copier ma trace</button>
+      <button onclick="telechargerTrace()">Télécharger</button>
+      <button onclick="window.print()">Imprimer</button>
+      <button onclick="rendreFin()">Retour au verdict</button>
+    </p>
+    <p class="centre" id="msgcopie" style="min-height:1.3em;color:var(--pap);font-size:14px"></p>
+  </div></div>`;
+  /* on ne perd pas ce qui a déjà été écrit en cas de recalcul */
+  ["r1","r2","r3","rnom"].forEach(k=>{ const e=document.getElementById(k); if(e&&E["t_"+k]) e.value=E["t_"+k]; });
+  ["r1","r2","r3","rnom"].forEach(k=>{ const e=document.getElementById(k);
+    if(e) e.addEventListener("input",()=>{ E["t_"+k]=e.value; }); });
+}
+
+function repondre(i,j){ E.rep[i]=j; rendreTrace(); }
+function corriger(){ E.corrige=true; rendreTrace(); }
+
+/* Le document à rendre : du texte simple, qui se colle partout. */
+function texteTrace(){
+  const note = E.rep.filter((x,i)=>x===E.quiz[i].b).length;
+  const pct  = Math.round(100*note/E.quiz.length);
+  const L = [];
+  L.push("LE PRIX DU PROGRÈS — trace de travail");
+  L.push(N.lieu+", "+N.sous.replace(N.lieu+", ","")+"  ·  "+(E.mode==="campagne"?"campagne":"survie"));
+  L.push("Nom : "+((E.t_rnom||"").trim()||"…"));
+  L.push("");
+  L.push("RÉSULTAT DE LA PARTIE");
+  L.push("  "+(E.fini==="verdict" ? "Menée jusqu’au bout." : "Interrompue : "+(N.fins[E.fini]?N.fins[E.fini].t:E.fini)));
+  L.push("  Décisions prises : "+E.carnet.length);
+  L.push("  "+N.unite+" finale : "+fmt(E.pop));
+  L.push("  Conditions réunies : "+E.acquis.length+" / "+CONDITIONS.length
+    +(E.acquis.length?"  ("+E.acquis.join(", ")+")":""));
+  L.push("  Rapports d’enquête consultés : "+((E.lus&&E.lus.length)||0)+" sur "+E.carnet.length);
+  L.push("");
+  L.push("MON CARNET DE BORD");
+  E.carnet.forEach((d,i)=>{
+    L.push("  "+String(i+1).padStart(2)+". "+(d.an?"["+d.an+"] ":"")+d.t);
+    L.push("      → "+(d.q||""));
+  });
+  L.push("");
+  L.push("CE QUE J’AI RETENU  —  "+(E.corrige ? pct+" % ("+note+"/"+E.quiz.length+")" : "questionnaire non corrigé"));
+  if(E.corrige) E.quiz.forEach((q,i)=>{
+    const j=E.rep[i];
+    L.push("  "+(j===q.b?"[juste]":"[faux] ")+" "+q.q);
+    L.push("      ma réponse : "+(j==null?"—":q.r[j]));
+    if(j!==q.b) L.push("      réponse attendue : "+q.r[q.b]);
+  });
+  L.push("");
+  L.push("MA RÉFLEXION");
+  L.push("  La décision dont je suis le plus sûr :");
+  L.push("      "+((E.t_r1||"").trim()||"…"));
+  L.push("  La décision que je regrette :");
+  L.push("      "+((E.t_r2||"").trim()||"…"));
+  L.push("  Ce que cette partie m’apprend sur le progrès industriel :");
+  L.push("      "+((E.t_r3||"").trim()||"…"));
+  return L.join("\n");
+}
+
+function copierTrace(){
+  const t = texteTrace(), m = document.getElementById("msgcopie");
+  const dire = ok => { if(m) m.textContent = ok
+    ? "Copié. Vous pouvez le coller dans un document ou dans Teams."
+    : "La copie a échoué — utilisez « Télécharger »."; };
+  if(navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(t).then(()=>dire(true)).catch(()=>dire(false));
+  else dire(false);
+}
+
+function telechargerTrace(){
+  const nom = ((E.t_rnom||"").trim().replace(/[^\p{L}\p{N} -]/gu,"") || "eleve").replace(/\s+/g,"-");
+  const b = new Blob([texteTrace()], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(b);
+  a.download = "prix-du-progres-"+nom+"-"+N.lieu.toLowerCase()+".txt";
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
 
 /* ---------- accueil ---------- */
 function accueil(){
