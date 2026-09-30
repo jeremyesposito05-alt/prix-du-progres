@@ -7,27 +7,30 @@ son/fin.mp3
 Le jeu la cherche là et bascule dessus dès que la partie se termine — verdict atteint ou force
 effondrée. **Sans ce fichier, la musique du niveau baisse simplement** : rien ne casse.
 
-## Pourquoi une musique à part
+## Le ton à viser
 
 L'élève reste plusieurs minutes sur ces écrans : le verdict, son carnet de bord, le
-questionnaire, sa réflexion, la validation. La musique du niveau n'y a plus sa place — on ne
-décide plus, on relit ce qu'on a fait.
+questionnaire, sa réflexion. La musique accompagne une **lecture**, pas une action — on doit
+pouvoir écrire par-dessus sans être dérangé.
 
-Elle doit donc accompagner une **lecture**, pas une action. C'est la contrainte principale :
-on doit pouvoir écrire par-dessus sans être dérangé.
-
-Elle sert aussi bien à une réussite qu'à un échec. **Ne la faites donc ni triomphante ni
-funèbre** : le jeu ajoute déjà par-dessus une cloche claire ou sombre selon l'issue.
+**Ni triomphante, ni triste.** Elle sert aussi bien à une réussite qu'à un échec, et le jeu
+ajoute déjà par-dessus une cloche claire ou sombre selon l'issue. Cherchez le ton d'un
+**générique de fin de documentaire** : on referme un dossier, on a appris quelque chose, la
+lumière revient. Chaleureux et posé plutôt que grave.
 
 ## Le prompt
 
-> Pièce instrumentale lente et grave, pour la fin d'une histoire. Piano feutré, quelques notes
-> espacées, nappe de cordes très basse en arrière-plan, texture chaude et un peu voilée comme un
-> vieil enregistrement. Tempo très lent, environ soixante pulsations, sans batterie, sans montée,
-> sans résolution triomphale. Une mélodie simple qui revient, tenue en mineur mais sans
-> lourdeur : le ton est celui du bilan, pas du deuil. Doit rester très en arrière pour qu'on
-> puisse lire et écrire par-dessus. Boucle sans fin marquée : le morceau doit pouvoir se
-> reprendre sans qu'on entende la couture. Durée 2 à 3 minutes.
+> Pièce instrumentale apaisée et lumineuse, comme un générique de fin de documentaire. Piano
+> clair jouant un motif simple qui revient, arpèges doux de guitare acoustique, nappe de cordes
+> chaude en arrière-plan. Tonalité majeure, avec quelques couleurs modales qui donnent de la
+> profondeur sans tristesse. Tempo modéré, autour de soixante-quinze pulsations, régulier et
+> tranquille. Pas de batterie, pas de montée dramatique, pas de fin triomphale : le sentiment
+> est celui du travail accompli et du recul qu'on prend. Doit rester en arrière-plan pour qu'on
+> puisse lire et écrire par-dessus. Boucle sans fin marquée, pour pouvoir se reprendre sans
+> qu'on entende la couture. Durée 2 à 3 minutes.
+
+Si le résultat sonne encore mélancolique, ajoutez au prompt : *« résolument optimiste, teinte
+chaleureuse, aucune mélancolie »*, et demandez un tempo un peu plus vif, vers quatre-vingts.
 
 ## Les mêmes contraintes que les autres
 
