@@ -868,6 +868,27 @@ body.surmenu main{max-width:1080px}
 #volson:hover::-moz-range-thumb{background:var(--bs-gold)}
 @media(max-width:620px){ #volson{width:58px} }
 
+/* ---------- rendre sa trace avant de quitter ----------------------- */
+.validation{border-left:4px solid var(--rge) !important}
+.validation .jalons{list-style:none;margin:0 0 14px;padding:0}
+.validation .jalons li{
+  position:relative; padding:5px 0 5px 30px; font-size:14.5px; color:var(--enc2);
+}
+.validation .jalons li::before{
+  content:"○"; position:absolute; left:6px; top:4px; font-size:15px; color:var(--fil);
+}
+.validation .jalons li.fait{color:var(--enc)}
+.validation .jalons li.fait::before{content:"●";color:#3E7A3A}
+.validation .coche{
+  display:flex; align-items:flex-start; gap:9px; font-size:14.5px; color:var(--enc);
+  cursor:pointer; padding:9px 11px; border:1px solid var(--fil); border-radius:2px;
+  background:rgba(255,255,255,.4);
+}
+.validation .coche input{margin-top:2px;width:16px;height:16px;cursor:pointer;flex:0 0 auto}
+#btvalid:disabled{opacity:.55;cursor:default;transform:none;box-shadow:none}
+.arendre{margin:12px 0 0;font-size:14px;color:#E0A88F;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.rendu{margin:12px 0 0;font-size:14px;color:#9FCE8E;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1007,6 +1028,7 @@ body[data-niveau="II"] .question{color:#D9E3ED}
    ================================================================== */
 const BOUCLES = {
   menu:{ f:"son/menu.mp3",      debut:2.00, fin:167.6 },
+  fin: { f:"son/fin.mp3",       debut:0.00, fin:0     },  /* fin calée à la lecture */
   I:   { f:"son/niveau-I.mp3",  debut:0.00, fin:142.2 },
   II:  { f:"son/niveau-II.mp3", debut:0.75, fin:136.8 },
 };
@@ -1129,7 +1151,14 @@ const SON = {
 
   demarrer(L, b, fondu){
     try{
-      if(L.a.getAttribute("src") !== b.f){ L.a.src = b.f; L.a.load(); }
+      if(L.a.getAttribute("src") !== b.f){
+        L.a.src = b.f; L.a.load();
+        /* fin:0 veut dire « on ne connaît pas la durée » : on la déduit
+           du fichier dès qu'il est lu, pour pouvoir boucler dessus. */
+        if(!b.fin) L.a.addEventListener("loadedmetadata", ()=>{
+          if(L.a.duration && isFinite(L.a.duration)) b.fin = Math.max(1, L.a.duration - 1.2);
+        }, {once:true});
+      }
       L.a.currentTime = b.debut;
     }catch(e){}
     if(this.actif) L.a.play().catch(()=>{});
@@ -1614,7 +1643,7 @@ function choisir(quel){
 }
 
 function finir(cause){
-  try{ SON.fin(cause) }catch(e){}
+  try{ SON.fin(cause); SON.ambiance("fin"); }catch(e){}
   E.fini=cause;
   if(E.mode==="infini"){
     /* On se mesure à la POPULATION atteinte, jamais au nombre de tours :
@@ -2313,8 +2342,11 @@ function rendreFin(){
   <div class="bilan"><h2 style="margin-top:0">Ce que vous venez d’apprendre</h2><ul>
     ${N.lecons.map(x=>`<li>${x}</li>`).join("")}
   </ul></div>
-  <p class="centre"><button class="plein" onclick="nouvellePartie('${E.mode}',N.id)">Rejouer</button>
-  <button class="plein" onclick="rendreTrace()">Ma trace de travail</button><button onclick="accueil()">Menu</button></p>`;
+  ${E.traceValidee
+    ? `<p class="centre"><button class="plein" onclick="nouvellePartie('${E.mode}',N.id)">Rejouer</button><button onclick="rendreTrace()">Revoir ma trace</button><button onclick="accueil()">Menu</button></p>
+       <p class="centre rendu">Trace validée. Vous pouvez rejouer ou changer d’époque.</p>`
+    : `<p class="centre"><button class="plein" onclick="rendreTrace()">Rédiger et rendre ma trace</button></p>
+       <p class="centre arendre">La partie n’est pas terminée tant que votre trace n’est pas rendue.</p>`}`;
 }
 
 
@@ -2898,17 +2930,34 @@ function rendreTrace(){
     </div>
 
     <p class="centre" style="margin:22px 0 0">
-      <button class="plein" onclick="copierTrace()">Copier ma trace</button>
-      <button onclick="telechargerTrace()">Télécharger</button>
+      <button class="plein" onclick="telechargerTrace()">Télécharger (Word)</button>
+      <button onclick="copierTrace()">Copier ma trace</button>
       <button onclick="window.print()">Imprimer</button>
       <button onclick="rendreFin()">Retour au verdict</button>
     </p>
     <p class="centre" id="msgcopie" style="min-height:1.3em;color:var(--pap);font-size:14px"></p>
+
+    <div class="bilan validation" id="valid">
+      <h2 style="margin-top:0">Avant de quitter</h2>
+      <p style="margin:.2em 0 1em;font-size:14px;color:var(--enc2)">
+        Votre travail doit être rendu. Tant qu’il ne l’est pas, la partie reste ouverte.</p>
+      <ul class="jalons">
+        <li id="j1">Écrire votre nom</li>
+        <li id="j2">Corriger le questionnaire</li>
+        <li id="j3">Enregistrer la trace — téléchargée ou copiée</li>
+      </ul>
+      <label class="coche"><input type="checkbox" id="jenvoi" onchange="rafraichirValidation()">
+        J’ai envoyé ma trace à mon professeur.</label>
+      <p class="centre" style="margin:16px 0 0">
+        <button class="plein" id="btvalid" disabled onclick="validerTrace()">Valider et terminer</button>
+      </p>
+    </div>
   </div></div>`;
   /* on ne perd pas ce qui a déjà été écrit en cas de recalcul */
   ["r1","r2","r3","rnom"].forEach(k=>{ const e=document.getElementById(k); if(e&&E["t_"+k]) e.value=E["t_"+k]; });
   ["r1","r2","r3","rnom"].forEach(k=>{ const e=document.getElementById(k);
-    if(e) e.addEventListener("input",()=>{ E["t_"+k]=e.value; }); });
+    if(e) e.addEventListener("input",()=>{ E["t_"+k]=e.value; rafraichirValidation(); }); });
+  rafraichirValidation();
 }
 
 function repondre(i,j){ E.rep[i]=j; rendreTrace(); }
@@ -2961,18 +3010,142 @@ function copierTrace(){
     ? "Copié. Vous pouvez le coller dans un document ou dans Teams."
     : "La copie a échoué — utilisez « Télécharger »."; };
   if(navigator.clipboard && navigator.clipboard.writeText)
-    navigator.clipboard.writeText(t).then(()=>dire(true)).catch(()=>dire(false));
+    navigator.clipboard.writeText(t).then(()=>{E.traceEnregistree=true;dire(true);rafraichirValidation()}).catch(()=>dire(false));
   else dire(false);
+}
+
+
+/* ==================================================================
+   LE DOCUMENT À RENDRE
+   Un HTML aux espaces de noms d'Office, servi en .doc : Word l'ouvre
+   comme un document, un navigateur comme une page. La charte de l'école
+   s'applique ici — ce n'est plus le jeu, c'est une copie.
+   ================================================================== */
+function htmlTrace(){
+  const note = E.corrige ? E.rep.filter((x,i)=>x===E.quiz[i].b).length : null;
+  const pct  = note===null ? null : Math.round(100*note/E.quiz.length);
+  const nom  = (E.t_rnom||"").trim() || "…";
+  const e = t => String(t==null?"":t)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const g = t => e(t).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
+  const dt = new Date().toLocaleDateString("fr-CH",{day:"numeric",month:"long",year:"numeric"});
+
+  const carnet = E.carnet.map((d,i)=>`
+    <tr>
+      <td class=n>${i+1}</td>
+      <td class=an>${d.an?e(d.an):""}</td>
+      <td>${e(d.t)}<div class=dec>${e(d.q||"")}</div></td>
+    </tr>`).join("");
+
+  const quiz = !E.corrige ? "<p class=vide>Le questionnaire n’a pas été corrigé.</p>"
+    : E.quiz.map((q,i)=>{
+      const j=E.rep[i], ok=(j===q.b);
+      return `<div class="q ${ok?'ok':'ko'}">
+        <p class=qq><b>${i+1}.</b> ${e(q.q)}</p>
+        <p class=qr><span class=et>${ok?"Juste":"Faux"}</span>
+           Votre réponse : ${j==null?"—":e(q.r[j])}</p>
+        ${ok?"":`<p class=qa>Réponse attendue : <b>${e(q.r[q.b])}</b></p>`}
+        <p class=qx>${g(q.x)}</p>
+      </div>`;
+    }).join("");
+
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<title>Le prix du progrès — ${e(nom)}</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+@page{size:A4;margin:2cm 1.8cm}
+body{font-family:Calibri,"Segoe UI",sans-serif;font-size:11pt;color:#2E3945;line-height:1.45}
+h1{font-family:"SangBleu OG Sans",Georgia,serif;font-size:24pt;color:#1A2047;
+   margin:0 0 2pt;font-weight:normal}
+h2{font-family:"SangBleu OG Sans",Georgia,serif;font-size:14pt;color:#14387F;
+   margin:20pt 0 7pt;font-weight:normal;border-bottom:1pt solid #F3BE31;padding-bottom:3pt}
+.bandeau{border-left:4pt solid #F3BE31;padding-left:10pt;margin-bottom:16pt}
+.sous{color:#9C9895;font-size:10pt;margin:0}
+.ident{margin:10pt 0 0;font-size:11pt}
+.ident b{color:#1A2047}
+table{border-collapse:collapse;width:100%;margin:6pt 0}
+td,th{border:0.5pt solid #C9CBD2;padding:5pt 7pt;vertical-align:top;font-size:10.5pt}
+th{background:#E7E9EF;color:#1A2047;text-align:left;font-weight:bold}
+td.n{width:22pt;text-align:right;color:#9C9895}
+td.an{width:42pt;color:#CA5007;font-weight:bold}
+.dec{margin-top:2pt;font-weight:bold;color:#1A2047}
+.fiche td{border:none;padding:2pt 8pt 2pt 0}
+.fiche td.k{color:#9C9895;width:150pt}
+.q{border-left:3pt solid #C9CBD2;padding:6pt 0 6pt 10pt;margin:9pt 0}
+.q.ok{border-left-color:#3E7A3A}
+.q.ko{border-left-color:#CA5007}
+.qq{margin:0 0 4pt}
+.qr{margin:0;font-size:10.5pt}
+.qa{margin:2pt 0 0;font-size:10.5pt;color:#CA5007}
+.qx{margin:4pt 0 0;font-size:10pt;color:#5A6570}
+.et{display:inline-block;min-width:38pt;font-weight:bold}
+.q.ok .et{color:#3E7A3A}
+.q.ko .et{color:#CA5007}
+.score{background:#1A2047;color:#fff;padding:9pt 14pt;margin:10pt 0}
+.score b{font-size:20pt;color:#F3BE31}
+.refl{border:0.5pt solid #C9CBD2;padding:8pt 10pt;margin:7pt 0;min-height:30pt}
+.refl .k{color:#9C9895;font-size:10pt;display:block;margin-bottom:3pt}
+.vide{color:#9C9895;font-style:italic}
+.pied{margin-top:24pt;padding-top:6pt;border-top:0.5pt solid #C9CBD2;
+      font-size:9pt;color:#9C9895}
+</style></head><body>
+
+<div class=bandeau>
+  <h1>Le prix du progrès</h1>
+  <p class=sous>${e(N.lieu)}, ${e(N.sous.replace(N.lieu+", ",""))} — ${E.mode==="campagne"?"campagne":"mode survie"}</p>
+  <p class=ident><b>Nom :</b> ${e(nom)} &nbsp;&nbsp;·&nbsp;&nbsp; <b>Date :</b> ${e(dt)}</p>
+</div>
+
+<h2>Résultat de la partie</h2>
+<table class=fiche>
+  <tr><td class=k>Issue</td><td>${E.fini==="verdict"
+      ? "Menée jusqu’au bout de la période."
+      : "Interrompue — "+e(N.fins[E.fini]?N.fins[E.fini].t:E.fini)}</td></tr>
+  <tr><td class=k>Décisions prises</td><td>${E.carnet.length}</td></tr>
+  <tr><td class=k>${e(N.unite)} finale</td><td>${e(fmt(E.pop))} ${e(N.unite2)}</td></tr>
+  <tr><td class=k>Conditions réunies</td><td>${E.acquis.length} sur ${CONDITIONS.length}${
+      E.acquis.length?" — "+e(E.acquis.join(", ")):""}</td></tr>
+  <tr><td class=k>Rapports d’enquête consultés</td><td>${(E.lus&&E.lus.length)||0} sur ${E.carnet.length}</td></tr>
+</table>
+
+<h2>Mon carnet de bord</h2>
+<table>
+  <tr><th class=n>N°</th><th class=an>Année</th><th>L’affaire, et ce que j’ai décidé</th></tr>
+  ${carnet}
+</table>
+
+<h2>Ce que j’ai retenu</h2>
+${pct===null?"":`<p class=score>Connaissances acquises : <b>${pct}&nbsp;%</b>
+  &nbsp;&nbsp;(${note} bonne${note>1?"s":""} réponse${note>1?"s":""} sur ${E.quiz.length})</p>`}
+${quiz}
+
+<h2>Ma réflexion</h2>
+<div class=refl><span class=k>La décision dont je suis le plus sûr, et pourquoi</span>
+  ${e((E.t_r1||"").trim())||"&nbsp;"}</div>
+<div class=refl><span class=k>La décision que je regrette, et ce que je ferais autrement</span>
+  ${e((E.t_r2||"").trim())||"&nbsp;"}</div>
+<div class=refl><span class=k>Ce que cette partie m’apprend sur le progrès industriel</span>
+  ${e((E.t_r3||"").trim())||"&nbsp;"}</div>
+
+<p class=pied>Collège Alpin Beau Soleil · Unité 1 — Quand l’innovation change la société · Grade 10.
+Les personnages du jeu sont des figures composites ; les événements datés sont authentiques et cités.</p>
+</body></html>`;
 }
 
 function telechargerTrace(){
   const nom = ((E.t_rnom||"").trim().replace(/[^\p{L}\p{N} -]/gu,"") || "eleve").replace(/\s+/g,"-");
-  const b = new Blob([texteTrace()], {type:"text/plain;charset=utf-8"});
+  const b = new Blob(["﻿"+htmlTrace()], {type:"application/msword;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(b);
-  a.download = "prix-du-progres-"+nom+"-"+N.lieu.toLowerCase()+".txt";
+  a.download = "prix-du-progres-"+nom+"-"+N.lieu.toLowerCase()+".doc";
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  E.traceEnregistree = true;
+  const m=document.getElementById("msgcopie");
+  if(m) m.textContent = "Document téléchargé. Il s’ouvre dans Word.";
+  rafraichirValidation();
 }
 
 /* ==================================================================
@@ -3005,6 +3178,43 @@ function demarrer(){
   try{ SON.reveiller(); }catch(e){}
   accueil();
 }
+
+/* ---------- la validation de la trace ------------------------------ */
+function etatValidation(){
+  const nom = ((E.t_rnom||"").trim().length >= 3);
+  const cor = !!E.corrige;
+  const enr = !!E.traceEnregistree;
+  const env = !!(document.getElementById("jenvoi")||{}).checked;
+  return {nom, cor, enr, env, tout: nom && cor && enr && env};
+}
+
+function rafraichirValidation(){
+  const v = etatValidation();
+  const mk = (id, ok) => { const e=document.getElementById(id); if(e) e.className = ok?"fait":""; };
+  mk("j1", v.nom); mk("j2", v.cor); mk("j3", v.enr);
+  const b = document.getElementById("btvalid");
+  if(b){
+    b.disabled = !v.tout;
+    b.textContent = v.tout ? "Valider et terminer"
+      : !v.nom ? "Écrivez d’abord votre nom"
+      : !v.cor ? "Corrigez d’abord le questionnaire"
+      : !v.enr ? "Enregistrez d’abord votre trace"
+      : "Cochez la case ci-dessus";
+  }
+}
+
+function validerTrace(){
+  if(!etatValidation().tout) return;
+  E.traceValidee = true;
+  rendreFin();
+}
+
+/* Le navigateur avertit si l'on ferme l'onglet avec une trace non rendue. */
+window.addEventListener("beforeunload", ev=>{
+  if(typeof E!=="undefined" && E && E.fini && !E.traceValidee){
+    ev.preventDefault(); ev.returnValue = "";
+  }
+});
 
 /* ---------- accueil ---------- */
 function accueil(){
