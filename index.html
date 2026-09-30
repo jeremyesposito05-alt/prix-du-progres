@@ -929,7 +929,10 @@ const SON = {
   lecteur(i){
     if(this.lecteurs[i]) return this.lecteurs[i];
     const a = new Audio();
-    a.preload="auto"; a.crossOrigin="anonymous"; a.volume=1;
+    /* Pas de crossOrigin : les fichiers viennent du même site, et le
+       demander fait échouer le chargement — en file:// toujours, et sur
+       un serveur qui n'envoie pas les en-têtes CORS. */
+    a.preload="auto"; a.volume=1;
     const L = {a, g:null, ok:false};
     if(this.ctx){
       try{
