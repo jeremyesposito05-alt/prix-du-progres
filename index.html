@@ -539,6 +539,22 @@ body[data-niveau="II"] .bureau::after{
 .col-g > *:hover,.col-d > *:hover{transform:rotate(0)}
 .d-enquete{transition:transform .2s}
 
+/* L'exposé : ce que dit le dossier, avant que quelqu'un n'entre. Texte
+   courant, pas d'italique — l'italique est réservé aux paroles. */
+.situ .ex{font-size:15.5px;line-height:1.6;color:#4A3B2C;margin:4px 0 14px;
+  max-width:72ch;min-height:4.4em}
+body[data-niveau="II"] .situ .ex{color:#3D474F}
+.situ .parle{margin-top:0}
+.situ .d{margin-top:2px}
+@media(max-width:1000px){.situ .ex{min-height:0}}
+
+/* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
+.question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
+  font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
+  letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.75)}
+body[data-niveau="II"] .question{color:#D9E3ED}
+@media(max-width:1000px){.question{margin:6px 0 2px}}
+
 /* ---------- le courrier ---------------------------------------------- */
 .courrier{
   background:linear-gradient(158deg,#EFE2C6,#DCCBA6) !important;
@@ -671,6 +687,7 @@ const CONDITIONS = ["Ressources","Savoirs techniques","Capitaux","Main-d’œuvr
 const CARTES_I = [
 {t:"Le charbon manque à la filature.", qui:"Josiah Halliwell, filateur de Shudehill",
  d:"« Ma machine est à l’arrêt trois jours sur sept, faute de charbon. Creusez un canal jusqu’au bassin houiller et je vous promets deux filatures de plus avant Noël. »",
+ ex:"Trois filatures sur cinq ont dû s’arrêter la semaine dernière, faute de combustible. Les charretiers réclament le double et livrent quand ils veulent. Le conseil doit se prononcer sur le tracé d’un canal avant que la terre ne gèle.",
  f:"Une machine à vapeur brûle plusieurs tonnes de charbon par jour. Le bassin houiller le plus proche est à une trentaine de kilomètres, et une péniche transporte trente fois la charge d’une charrette.",
  a:{q:"« Qu’on creuse le canal. »", e:{i:12,m:10,o:-6,p:-4}, g:["Ressources","Transports"],
     c:"Les péniches arrivent chargées. L’énergie cesse d’être un obstacle — au prix de mois de terrassement, payés par la ville."},
@@ -681,6 +698,7 @@ const CARTES_I = [
 
 {t:"Un mécanicien vous montre un plan.", qui:"Thomas Ainsworth, mécanicien",
  d:"« Une seule machine à vapeur au sous-sol, et toutes les broches des quatre étages tournent ensemble. J’ai vu cela fonctionner à Cromford. Il vous faut du charbon, et de l’audace. »", req:["Ressources"],
+ ex:"Il a déplié ses dessins sur la table du conseil et les a laissés là toute la matinée. La dépense est considérable, et deux fabricants de la ville ont déjà fait savoir qu’ils suivraient votre décision avant d’engager la leur.",
  f:"Avant la vapeur, une filature dépendait de la force d’une rivière : il fallait s’installer près de l’eau et s’arrêter quand elle gelait. La machine à vapeur libère l’usine de la géographie.",
  a:{q:"« Installons la machine à vapeur. »", e:{i:14,m:5,o:-8}, g:["Savoirs techniques"],
     c:"Une seule machine remplace des dizaines de bras. Ceux qui restent suivent désormais son rythme, pas le leur."},
@@ -691,6 +709,7 @@ const CARTES_I = [
 
 {t:"Quarante familles attendent à la grille.", qui:"Abel Crompton, contremaître",
  d:"« Elles sont là depuis l’aube, avec leurs enfants, venues du Lancashire à pied. Elles accepteront n’importe quel salaire — c’est bien ce qui m’ennuie. Je les prends toutes ? »",
+ ex:"Elles ont marché depuis le nord du comté. Le contremaître a fermé la grille en attendant vos instructions et la foule ne se disperse pas. Chacune de ces familles représente des bras pour les métiers — et des bouches dans une ville qui manque déjà de tout.",
  f:"Les campagnes anglaises se vident. Les enclosures ont privé beaucoup de paysans de l’usage des terres communes : ils arrivent en ville sans rien et acceptent n’importe quel salaire.",
  a:{q:"« Embauchons-les toutes. »", e:{i:10,m:4,o:-10,p:-5}, pop:.20, g:["Main-d’œuvre"],
     c:"Les filatures tournent jour et nuit. Les nouveaux venus s’entassent où ils peuvent, et tirent les salaires vers le bas."},
@@ -701,6 +720,7 @@ const CARTES_I = [
 
 {t:"Un bâtisseur propose soixante cottages.", qui:"Amos Pilkington, bâtisseur",
  d:"« Le terrain derrière la filature est libre. Je vous bâtis soixante maisons dos à dos avant l’hiver : une brique d’épaisseur, pas de cour, pas d’égout. Ou rien, et ils resteront dans les caves. »",
+ ex:"Le terrain derrière la filature a été vendu hier. Le bâtisseur a deux devis sous le bras et un seul hiver devant lui. Ce qui se décide aujourd’hui tiendra debout pendant un siècle, pour le meilleur ou pour le pire.",
  f:"Les maisons ouvrières dites « dos à dos » partagent trois de leurs quatre murs avec les voisines. Une seule façade, aucun courant d’air, une cour et des latrines pour plusieurs dizaines d’habitants.",
  a:{q:"« Bâtissons vite, et au plus bas prix. »", e:{o:9,i:2,p:-6}, pop:.10,
     c:"Des murs aussi minces que possible, mais un toit. La ville en attire davantage encore."},
@@ -711,6 +731,7 @@ const CARTES_I = [
 
 {t:"Deux heures de plus par jour.", qui:"Josiah Halliwell, filateur",
  d:"« Liverpool veut son fil pour mars et nous ne tiendrons pas. Deux heures de plus et la commande est sauvée. Mes ouvriers ont des bouches à nourrir : ils comprendront. »",
+ ex:"La commande de Liverpool doit partir en mars et les métiers ne suivent pas. Les fabricants ont fait leurs comptes : il manque deux heures par jour et par ouvrier. Ils attendent votre accord avant de faire changer les horloges de l’atelier.",
  f:"Dans les années 1830, la journée ordinaire en filature va de douze à seize heures, six jours sur sept. L’éclairage au gaz a rendu le travail de nuit possible.",
  a:{q:"« Passons à quatorze heures par jour. »", e:{i:13,m:6,o:-14,p:-6},
     c:"Quatorze heures durant, on entre avant le jour et on sort après la nuit. Les accidents se multiplient en fin de journée."},
@@ -719,6 +740,7 @@ const CARTES_I = [
 
 {t:"Le Parlement a voté le Factory Act.", qui:"Sir Charles Beresford, envoyé de Londres", apres:1830,
  d:"« La loi de 1833 est claire : aucun enfant de moins de neuf ans dans les filatures, neuf heures au plus pour les moins de treize. Londres enverra quatre inspecteurs pour tout le royaume. Quatre. Qu’en ferez-vous ? »",
+ ex:"La loi est arrivée par la poste de Londres ce matin. Les fabricants l’ont déjà lue et calculé ce qu’elle leur coûterait. Dans les faubourgs, on sait seulement qu’il est question des enfants, et l’on attend de voir ce que la ville en fera.",
  f:"La loi de 1833 interdit d’employer des enfants de moins de neuf ans dans le textile et limite la journée des moins de treize ans. C’est la première à prévoir un contrôle — avec quatre inspecteurs pour tout le royaume.",
  a:{q:"« Appliquons la loi : les enfants sortent. »", e:{p:12,o:10,i:-10,m:-4},
     c:"Les plus jeunes sortent des ateliers. Certaines familles perdent d’un coup le tiers de leur revenu."},
@@ -729,6 +751,7 @@ const CARTES_I = [
 
 {t:"L’eau croupit devant les portes.", qui:"Dr William Rait, médecin des pauvres",
  d:"« Cinq fièvres cette semaine, toutes dans la même rue. Il n’y a ni pavé ni égout : l’eau sale reste là où elle tombe. Ce ne sont pas les malades qu’il faut soigner, c’est la rue. »",
+ ex:"Le médecin a apporté son registre et l’a ouvert devant vous. Les mêmes rues reviennent à chaque page. Creuser coûterait le budget de deux années, et il faudrait éventrer des quartiers entiers pendant des mois.",
  f:"Avant les années 1840, aucune ville industrielle anglaise n’a d’égouts dignes de ce nom. Les eaux usées stagnent dans des rues non pavées où jouent les enfants.",
  a:{q:"« Creusons les égouts. »", e:{o:11,p:10,i:-6,m:-8},
     c:"Le chantier est long et cher. Les fièvres reculent là où il passe."},
@@ -739,6 +762,7 @@ const CARTES_I = [
 
 {t:"Liverpool propose une voie ferrée.", qui:"Ezra Duckworth, négociant de Liverpool", apres:1820,
  d:"« Une locomotive a fait le trajet en deux heures, là où mes charrettes mettent la journée. Ceux qui auront la ligne prendront le marché. Ceux qui ne l’auront pas le perdront. »",
+ ex:"Les ingénieurs ont levé le tracé et les actionnaires de Liverpool ont réuni la moitié des fonds. Ils veulent une réponse avant la fin du mois, faute de quoi ils desserviront une autre ville. La ligne passerait au travers de terres que la commune devrait racheter.",
  f:"Liverpool est le port par lequel arrive le coton brut d’Amérique et par lequel repart le fil. La ligne ouverte en 1830 est la première au monde à relier deux grandes villes.",
  a:{q:"« Ouvrons la ligne de chemin de fer. »", e:{m:14,i:9,o:-4,p:-3}, g:["Transports","Marchés"],
     c:"Le coton brut arrive le matin, le fil repart le soir. La ville change d’échelle."},
@@ -749,6 +773,7 @@ const CARTES_I = [
 
 {t:"Des acheteurs attendent à Hambourg.", qui:"Ezra Duckworth, négociant", req:["Transports"],
  d:"« J’ai des commandes de Hambourg et de Rio qui dorment sur mon bureau. Si vos métiers ne doublent pas, j’achèterai le fil à Oldham. Cela ne me coûtera qu’une journée de voiture. »",
+ ex:"Le négociant a posé sa liasse de commandes sur la table sans dire un mot. Elles valent plus que la production de l’année entière. Il faudra produire davantage, et vite, ou les laisser partir ailleurs.",
  f:"Le coton de Manchester s’exporte dans le monde entier. C’est ce débouché qui rend la production de masse rentable : sans marché, des machines coûteuses ne servent à rien.",
  a:{q:"« Doublons les métiers à tisser. »", e:{i:10,m:12,o:-11}, g:["Marchés"],
     c:"On produit deux fois plus avec les mêmes murs. On y tient aussi deux fois moins longtemps."},
@@ -759,6 +784,7 @@ const CARTES_I = [
 
 {t:"Un médecin demande une salle et deux lits.", qui:"Dr William Rait, médecin des pauvres",
  d:"« Un seul praticien pour huit mille âmes. Je ne vous demande pas un hôpital : une salle, deux lits, et de quoi acheter de la quinine. »",
+ ex:"Il vient pour la troisième fois. Depuis sa dernière visite, deux épidémies ont traversé le quartier et il a soigné ce qu’il pouvait sur le pas des portes. La somme demandée est modeste ; c’est le principe qui divise le conseil.",
  f:"Une enquête officielle de 1842 estime l’espérance de vie moyenne d’un ouvrier de Manchester à dix-sept ans, contre trente-huit dans un comté rural voisin. La mortalité des jeunes enfants pèse lourd dans ce chiffre.",
  a:{q:"« Ouvrons le dispensaire. »", e:{o:10,p:7,m:-6,i:-3},
     c:"Le dispensaire ne désemplit pas. On y découvre l’ampleur de ce qu’on ne voyait pas."},
@@ -769,6 +795,7 @@ const CARTES_I = [
 
 {t:"On loue désormais les sous-sols.", qui:"Le révérend Ellis Hargreaves",
  d:"« J’ai enterré quatre enfants cette semaine, tous venus de la même cave. On y loue le sol comme on loue une chambre, à des familles entières. Fermez ces logements. »",
+ ex:"Le révérend tient le compte des enterrements de sa paroisse et il l’a apporté. Louer une cave rapporte à son propriétaire autant qu’une chambre, et rien n’interdit de le faire. Les fermer mettrait à la rue ceux qui y vivent.",
  f:"Au début des années 1840, on estime que quinze à vingt mille habitants de Manchester vivent dans des caves : une pièce en sous-sol, sans fenêtre ni évacuation, souvent humide. C’est le logement le moins cher de la ville.",
  a:{q:"« On ferme les logements en cave. »", e:{p:9,o:-6,i:-4,m:-2},
     c:"Les caves sont murées — et ceux qui y vivaient se retrouvent à la rue. Fermer un taudis ne crée pas un logement."},
@@ -779,6 +806,7 @@ const CARTES_I = [
 
 {t:"Une fileuse demande à vous parler.", qui:"Mary Kearsley, fileuse à Ancoats",
  d:"« Mon garçon a onze ans. Il passe sous les métiers en marche pour rattacher les fils, parce qu’il est le seul assez petit. S’il en sort, nous ne mangeons plus. S’il y reste, il y restera pour de bon. C’est vous qui choisissez, pas moi. »",
+ ex:"Elle a attendu la fin de son poste pour venir, et elle repart travailler dans une heure. Ce qu’elle décrit se passe dans les filatures de la ville, pas ailleurs. Elle ne demande rien pour elle-même.",
  f:"Les enfants sont employés comme « rattacheurs » : assez petits pour passer sous les métiers en marche et renouer les fils cassés sans qu’on arrête la machine.",
  a:{q:"« Interdisons le travail des enfants. »", e:{p:11,o:3,i:-11,m:-4},
     c:"Les enfants sortent. Leurs familles perdent un salaire sur trois, et le leur disent."},
@@ -787,6 +815,7 @@ const CARTES_I = [
 
 {t:"Un contremaître veut chronométrer les gestes.", qui:"Abel Crompton, contremaître", req:["Savoirs techniques"],
  d:"« Chacun à son poste, chaque geste compté, et je vous tire un tiers de fil en plus des mêmes machines. Ils n’aimeront pas. Ils s’y feront. »",
+ ex:"Il a passé trois semaines à mesurer, carnet en main, sans rien dire à personne. Ses chiffres tiennent sur une page et promettent un tiers de production en plus sans une machine de plus. L’atelier a compris ce qu’il faisait et l’ambiance a changé.",
  f:"Avant l’usine, l’artisan décidait de son rythme. La discipline d’atelier — horaires fixes, poste assigné, amendes — est une nouveauté que les ouvriers vivent comme une dépossession.",
  a:{q:"« Organisons le travail en postes fixes. »", e:{i:12,m:6,o:-12}, g:["Organisation"],
     c:"Le rendement grimpe. L’ouvrier cesse de conduire son travail : c’est le travail qui le conduit."},
@@ -797,6 +826,7 @@ const CARTES_I = [
 
 {t:"Trois morts dans la même ruelle.", qui:"Dr William Rait, médecin des pauvres", apres:1830,
  d:"« Les mêmes symptômes chez les trois. Si c’est le choléra, il suivra l’eau, et l’eau passe partout où il n’y a pas d’égout. Décidez aujourd’hui — pas la semaine prochaine. »",
+ ex:"Les trois dans la nuit, et le médecin n’a pas encore prévenu les familles des maisons voisines. Fermer le quartier arrêterait deux filatures. Ne rien faire, c’est parier que ce n’est pas ce qu’il croit.",
  f:"Le choléra atteint la Grande-Bretagne en 1831. On ignore encore qu’il se transmet par l’eau : on l’attribue aux mauvaises odeurs. Ce sont les quartiers sans égouts qui paient le plus lourd tribut.",
  a:{q:"« Bouclons le quartier et nettoyons. »", e:{o:12,p:12,i:-12,m:-10},
     c:"Le quartier est bouclé, les filatures à l’arrêt. L’épidémie s’éteint plus vite qu’ailleurs."},
@@ -805,6 +835,7 @@ const CARTES_I = [
 
 {t:"Le dernier terrain libre du centre.", qui:"Miss Agnes Thorne, dame d’œuvres",
  d:"« Il y a dans cette ville des enfants de six ans qui n’ont jamais vu un arbre. Ce terrain est le dernier qui reste. Après celui-ci, il n’y en aura plus jamais. »",
+ ex:"Deux offres sont sur la table : celle d’un négociant en entrepôts, et celle d’une société de dames patronnesses qui a réuni une souscription. La ville tranche, et ce terrain ne reviendra jamais sur le marché.",
  f:"Manchester passe d’environ 25 000 habitants en 1772 à plus de 300 000 en 1851. La ville se construit sans plan d’ensemble : chaque terrain libre est bâti dès qu’il se vend.",
  a:{q:"« Faisons un parc public. »", e:{o:10,p:8,m:-9,i:-6},
     c:"Un parc au milieu des cheminées. On y vient le dimanche, en habits propres."},
@@ -815,6 +846,7 @@ const CARTES_I = [
 
 {t:"Le pain a doublé depuis le printemps.", qui:"Mary Kearsley, fileuse à Ancoats",
  d:"« Nous ne demandons pas la fortune. Nous demandons de quoi manger en travaillant. Sinon les métiers s’arrêteront d’eux-mêmes, et ce ne sera pas de notre fait. »",
+ ex:"Les ouvrières des filatures ont cessé le travail deux heures hier après-midi, sans meneur et sans casse. Elles ont désigné l’une d’entre elles pour venir parler. Les fabricants jurent qu’ils ne tiendront pas une hausse générale des salaires.",
  f:"Le pain représente près de la moitié du budget d’une famille ouvrière. Quand son prix monte, c’est aussitôt la faim — et l’agitation.",
  a:{q:"« Accordons la hausse des salaires. »", e:{o:13,i:-9,m:-6,p:3},
     c:"Les salaires montent. Les fabricants jurent qu’ils ne tiendront pas l’année."},
@@ -823,6 +855,7 @@ const CARTES_I = [
 
 {t:"Une pétition contre les droits sur le grain.", qui:"Josiah Halliwell, filateur", apres:1830,
  d:"« Les Corn Laws tiennent le pain cher pour protéger les propriétaires terriens. Pain cher, salaires réclamés, coûts en hausse : ce sont eux qui vivent sur notre dos. Signez avec nous. »",
+ ex:"La feuille circule dans toutes les filatures du comté et les signatures s’accumulent. Ceux qui la portent sont les mêmes qui refusent d’augmenter les salaires. Londres suit de près qui l’appuie et qui s’en abstient.",
  f:"Les Corn Laws taxent le grain importé pour protéger les propriétaires terriens. Les industriels y voient la cause du pain cher, donc des salaires qu’on leur réclame. La Ligue contre les Corn Laws naît à Manchester en 1838.",
  a:{q:"« Signons la pétition contre les Corn Laws. »", e:{i:10,m:9,o:5,p:-11},
     c:"Manchester devient le cœur de la Ligue. Londres le remarque, et n’apprécie pas."},
@@ -833,6 +866,7 @@ const CARTES_I = [
 
 {t:"Le monde entier défile au Crystal Palace.", qui:"Le secrétaire du conseil de ville", apres:1840,
  d:"« Londres expose tout ce que ce pays sait faire, et six millions de visiteurs viendront voir. On nous demande nos cotonnades — et certains voudront voir d’où elles sortent. »",
+ ex:"Le comité d’organisation demande ce que la ville enverra, et sous quel nom. Des journalistes ont déjà annoncé leur venue pour voir les filatures. On peut préparer ce qu’ils verront — ou les laisser circuler.",
  f:"L’Exposition universelle de 1851 rassemble à Londres les produits du monde entier sous une halle de verre et de fer. Six millions de visiteurs y défilent en cinq mois.",
  a:{q:"« Repeignons les façades avant la visite. »", e:{m:8,i:6,p:5,o:-7},
     c:"Les visiteurs voient une ville prospère et ordonnée. Ancoats est à dix minutes, et personne n’y va."},
@@ -843,6 +877,7 @@ const CARTES_I = [
 
 {t:"Le feu a pris aux cardes cette nuit.", qui:"Abel Crompton, contremaître",
  d:"« Trois étages effondrés, quarante familles sans travail ce matin. Le propriétaire dit qu’il ne rebâtira pas sans aide de la ville. »",
+ ex:"Il a fallu quarante minutes pour que les pompes arrivent. Les murs tiennent encore mais les planchers sont tombés. Quarante familles se sont présentées ce matin devant une grille fermée, et le propriétaire attend de savoir s’il rebâtit.",
  f:"Les filatures brûlent souvent : coton, huile, poussière en suspension et lampes à flamme nue. Les escaliers sont étroits et les issues peu nombreuses.",
  a:{q:"« Aidons le propriétaire à reconstruire. »", e:{i:10,o:7,m:-9,p:-4},
     c:"Les murs se relèvent en quatre mois. On n’a pas discuté des issues de secours."},
@@ -853,6 +888,7 @@ const CARTES_I = [
 
 {t:"Un prédicateur décrit ce qu’il voit.", qui:"Le révérend Ellis Hargreaves",
  d:"« Du haut de ma chaire je dis ce que je vois : des caves, des fièvres, des enfants sous les machines. On m’écoute. Et l’on commence à répéter mes mots dans la rue. »",
+ ex:"Ses sermons attirent désormais plus de monde que l’office du dimanche, et des feuilles imprimées en circulent jusqu’à Londres. Il n’accuse personne nommément. C’est précisément ce qui le rend difficile à combattre.",
  f:"Les Églises dissidentes sont très implantées dans les villes industrielles. Leurs pasteurs comptent parmi les premiers à décrire publiquement les conditions de vie des ouvriers.",
  a:{q:"« Ouvrons une enquête sur les quartiers. »", e:{p:9,o:8,i:-9,m:-4},
     c:"L’enquête établit noir sur blanc ce que chacun savait. Il devient difficile de ne rien faire."},
@@ -1051,12 +1087,14 @@ function rendre(){
         <span class="onglet">Affaire du jour</span>
         <div class="ct">Une nouvelle affaire vous arrive</div>
         <div class="t"></div>
+        <div class="ex"></div>
         <div class="parle">${esc(c.qui)}</div>
         <div class="d"></div></div>
     </div>
     <div class="col col-d">
       ${courrier(D())}
     </div>
+    <div class="question" ${D()}>Que décidez-vous ?</div>
     <div class="rep ${trois.length===2?"deux":""}" ${D()}>
       ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
         <span class="q">${esc(c[k].q)}</span><span class="impacts">${impacts(c[k].e)}</span></button>`).join("")}
@@ -1069,7 +1107,7 @@ function rendre(){
     <span class="cond">${CONDITIONS.map(x=>`<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
   </div>`;
   app.classList.remove("presse");
-  ecrire(c.t, c.d);
+  ecrire(c.t, c.ex, c.d);
   majVue();
 }
 
@@ -1216,16 +1254,25 @@ function courrier(attr){
 
 /* Le titre s'inscrit, puis la réplique. On garde le texte de côté pour
    pouvoir le poser d'un coup si le joueur clique. */
-function ecrire(titre, replique){
+function ecrire(titre, expose, replique){
   stopperMachines();
-  E.ecrit = {t:titre, d:replique};
-  const t=app.querySelector(".situ .t"), r=app.querySelector(".situ .d");
+  E.ecrit = {t:titre, ex:expose||"", d:replique};
+  const t=app.querySelector(".situ .t"),
+        x=app.querySelector(".situ .ex"),
+        r=app.querySelector(".situ .d");
   if(!t||!r) return;
   if(window.SANS_CHRONO || app.classList.contains("presse")){
-    t.textContent=titre; r.textContent=replique; return;
+    t.textContent=titre; if(x) x.textContent=E.ecrit.ex; r.textContent=replique; return;
   }
-  t.textContent=""; r.textContent="";
-  E.machines=[ taper(t, titre, 21, ()=>{ E.machines.push(taper(r, replique, 12)); }) ];
+  t.textContent=""; if(x) x.textContent=""; r.textContent="";
+  /* Le titre se pose, l'exposé défile vite, la réplique se dit.
+     Un clic n'importe où termine l'ensemble : voir finirEcriture(). */
+  E.machines=[ taper(t, titre, 20, ()=>{
+    if(!x || !E.ecrit.ex) { E.machines.push(taper(r, replique, 12)); return; }
+    E.machines.push(taper(x, E.ecrit.ex, 7, ()=>{
+      E.machines.push(taper(r, replique, 12));
+    }));
+  }) ];
 }
 
 function taper(el, txt, ms, fin){
@@ -1246,8 +1293,11 @@ function stopperMachines(){
 function finirEcriture(){
   stopperMachines();
   if(!E || !E.ecrit) return;
-  const t=app.querySelector(".situ .t"), r=app.querySelector(".situ .d");
+  const t=app.querySelector(".situ .t"),
+        x=app.querySelector(".situ .ex"),
+        r=app.querySelector(".situ .d");
   if(t) t.textContent=E.ecrit.t;
+  if(x) x.textContent=E.ecrit.ex||"";
   if(r) r.textContent=E.ecrit.d;
 }
 
@@ -1332,6 +1382,7 @@ const FORCES_II = {
 const CARTES_II = [
 {t:"Un ingénieur a dessiné un convoyeur.", qui:"Walter Kessler, ingénieur de production",
  d:"« Au lieu que l’homme aille au châssis, c’est le châssis qui vient à l’homme. Chacun fait un geste, toujours le même, et ne bouge plus de sa place. Je vous promets de diviser le temps de montage par huit. »",
+ ex:"Il a monté une chaîne d’essai dans un coin de l’atelier et l’a fait tourner trois jours durant. Les chiffres sont sur votre bureau. Installer le système dans toute l’usine suppose de tout réaménager et d’arrêter la production plusieurs semaines.",
  f:"L’idée vient des abattoirs de Chicago, où les carcasses circulaient sur un rail devant des ouvriers immobiles. Appliquée à l’automobile en 1913, elle inverse le principe : c’est la pièce qui se déplace, plus l’homme.",
  a:{q:"« Installons la chaîne mobile. »", e:{i:14,m:8,o:-12}, g:["Organisation","Savoirs techniques"],
     c:"Douze heures trente pour un châssis, puis une heure trente-trois. Le geste est simple. La journée, elle, ne l’est plus."},
@@ -1342,6 +1393,7 @@ const CARTES_II = [
 
 {t:"Trois cent soixante-dix pour cent.", qui:"Frank Doyle, actionnaire", req:["Organisation"],
  d:"« Voici le chiffre que votre chaîne produit vraiment : pour garder cent hommes à leur poste, il faut en embaucher trois cent soixante-dix dans l’année. Ils partent au bout de quelques jours. Former, reformer, reformer encore — cela nous ruine. »",
+ ex:"Le service du personnel a rendu son rapport annuel et personne n’y a cru avant de vérifier. La chaîne fonctionne parfaitement ; ce sont les hommes qui ne restent pas. Chaque départ coûte une formation, et l’on forme désormais toute la journée.",
  f:"Le taux de rotation mesure le renouvellement du personnel. À 370 %, il faut embaucher près de quatre personnes dans l’année pour chaque poste à tenir. Former chaque nouveau venu coûte cher.",
  a:{q:"« Doublons le salaire : cinq dollars par jour. »", e:{o:16,m:6,i:-11,p:8},
     c:"Le salaire double d’un coup. Dix mille hommes font la queue devant l’usine le lendemain matin, et l’on cesse de partir."},
@@ -1352,6 +1404,7 @@ const CARTES_II = [
 
 {t:"Qui mérite les cinq dollars ?", qui:"Dr Emmett Crowe, du département sociologique", apres:1914,
  d:"« Le salaire double n’est pas un dû, c’est une récompense. Laissez mes inspecteurs visiter les foyers : ils vérifieront qu’on n’y boit pas, qu’on y épargne, que la famille est tenue. Ceux qui vivent mal ne toucheront que la moitié. »",
+ ex:"Le salaire doublé a fait la une des journaux du pays entier et l’on vous demande maintenant comment il sera attribué. Une administration est prête à fonctionner dès lundi, avec ses inspecteurs et ses registres. Il reste à dire ce qu’elle aura le droit de vérifier.",
  f:"Ford crée en 1914 un « département sociologique » : des enquêteurs visitent les foyers ouvriers pour vérifier la sobriété, l’épargne et la tenue du ménage. Seuls les jugés méritants touchent le salaire complet.",
  a:{q:"« Inspectons la vie privée des ouvriers. »", e:{i:7,p:4,o:-11},
     c:"On entre chez les ouvriers pour compter les bouteilles et lire les livrets d’épargne. Le salaire s’achète en obéissance."},
@@ -1360,6 +1413,7 @@ const CARTES_II = [
 
 {t:"Le client demande une autre couleur.", qui:"Elias Bright, concessionnaire à Chicago",
  d:"« On me réclame du bleu, du vert, une carrosserie fermée pour l’hiver. Je réponds ce qu’on me dit de répondre : noir. Combien de temps croyez-vous que cela tiendra ? »",
+ ex:"Les concessionnaires ont fait remonter les mêmes demandes depuis six mois. La peinture noire est la seule qui sèche assez vite pour suivre la chaîne ; toute autre teinte impose de ralentir ou de construire des séchoirs. Le service commercial attend un arbitrage.",
  f:"Une seule peinture séchait assez vite pour suivre la cadence de la chaîne : un noir au bitume. Une contrainte technique était devenue une règle commerciale.",
  a:{q:"« Une seule couleur : le noir. »", e:{i:9,m:-8,o:2}, g:["Organisation"],
     c:"Une seule teinte sèche assez vite pour la chaîne. Le prix baisse encore. Le choix, lui, a disparu."},
@@ -1370,6 +1424,7 @@ const CARTES_II = [
 
 {t:"Une usine qui fabriquerait tout.", qui:"Frank Doyle, actionnaire", req:["Savoirs techniques"],
  d:"« Le minerai entre d’un côté, la voiture sort de l’autre. Nos fonderies, notre verre, notre caoutchouc, nos bateaux. Plus un fournisseur pour nous tenir à la gorge. Il faut construire au bord de la rivière, et il faut beaucoup d’argent. »",
+ ex:"Le terrain au bord de la rivière est à vendre et les banques ont fait leur offre. Le projet engagerait la maison pour dix ans. En face, trois fournisseurs viennent d’augmenter leurs prix en même temps, ce qui n’est probablement pas un hasard.",
  f:"On appelle intégration verticale le fait de posséder toutes les étapes, de la mine à la vente. River Rouge, construite à partir de 1917, aura ses hauts fourneaux, sa verrerie, sa centrale électrique et son port.",
  a:{q:"« Bâtissons River Rouge : tout sous un toit. »", e:{i:13,m:6,o:-7,p:-5}, g:["Ressources","Capitaux"],
     c:"La plus grande usine du monde. Rien n’y dépend de personne — et personne n’y échappe à rien."},
@@ -1380,6 +1435,7 @@ const CARTES_II = [
 
 {t:"L’ouvrière de la ligne 4 demande à parler.", qui:"Anna Kowalczyk, ouvrière à Highland Park",
  d:"« Je pose la même vis, quatre cents fois par jour, depuis deux ans. Je ne sais toujours pas à quoi sert la pièce d’à côté. Le soir je ne parle plus. Vous m’avez donné cinq dollars — vous ne m’avez pas rendu mon métier. »",
+ ex:"Le contremaître a transmis la demande sans commentaire, ce qui ne lui ressemble pas. Elle est parmi les plus anciennes de l’atelier et n’a jamais manqué un poste. Ce qu’elle vient dire ne figure dans aucun rapport de production.",
  f:"Le travail à la chaîne décompose la fabrication en gestes élémentaires de quelques secondes. L’ouvrier n’a plus besoin d’un savoir-faire — et ne voit jamais l’objet fini.",
  a:{q:"« Ne changeons rien à son poste. »", e:{i:8,o:-12,p:-6},
     c:"Le geste reste ce qu’il est. Elle retourne à sa vis, et vous savez désormais ce qu’elle en pense."},
@@ -1390,6 +1446,7 @@ const CARTES_II = [
 
 {t:"General Motors change de modèle chaque année.", qui:"Elias Bright, concessionnaire", apres:1920,
  d:"« Chez eux, la voiture de l’an prochain ne ressemble pas à celle de cette année — et ils la vendent à crédit, en douze versements. Mes clients viennent regarder la nôtre et repartent chez eux. »",
+ ex:"Leur nouveau catalogue est arrivé au bureau et circule de main en main. Les ventes de la maison ont reculé pour le troisième trimestre consécutif. Le réseau de concessionnaires demande ce qu’il doit répondre aux clients.",
  f:"À la tête de General Motors, Alfred Sloan invente le modèle renouvelé chaque année et la gamme : une voiture pour chaque bourse et chaque âge de la vie. Sa maison vend aussi à crédit dès 1919.",
  a:{q:"« Changeons de modèle chaque année. »", e:{m:13,i:-10,o:-4}, g:["Marchés"],
     c:"Il faut refaire les outillages, réapprendre les gestes, tout recommencer. Le client, lui, revient."},
@@ -1400,6 +1457,7 @@ const CARTES_II = [
 
 {t:"Faut-il vendre à crédit ?", qui:"Frank Doyle, actionnaire", apres:1920,
  d:"« L’ouvrier gagne cinq dollars et la voiture en coûte quatre cents. À crédit, il l’achète demain au lieu d’économiser trois ans. Nos concurrents ont monté leur propre banque pour cela. »",
+ ex:"La concurrence a monté sa propre banque et finance l’achat en douze versements. Les chiffres montrent qu’une voiture vendue à crédit se vend deux ans plus tôt qu’une voiture payée comptant. Le conseil est partagé, et la question est autant morale que comptable.",
  f:"Le crédit à la consommation se répand par l’automobile dans les années 1920. Il permet d’acheter avec un revenu qu’on n’a pas encore, et fait entrer durablement les ménages dans l’endettement.",
  a:{q:"« Vendons à crédit, en douze versements. »", e:{m:14,i:6,p:-8,o:2}, g:["Capitaux","Marchés"],
     c:"On vend d’un coup à des gens qui n’avaient pas l’argent. On leur vend aussi des années de dettes."},
@@ -1410,6 +1468,7 @@ const CARTES_II = [
 
 {t:"Cinq jours de travail au lieu de six.", qui:"Harriet Vance, journaliste", apres:1922,
  d:"« Vous répétez partout qu’un ouvrier bien payé achète des voitures. Poussez donc le raisonnement : un ouvrier qui a son samedi a le temps de s’en servir. Oserez-vous ? »",
+ ex:"Aucune loi n’y oblige et aucun concurrent ne l’a fait. La presse a eu vent que la question était posée, et attend. Les contremaîtres prédisent l’effondrement du rendement ; le service des ventes rappelle que l’ouvrier est aussi un acheteur.",
  f:"L’argument est qu’un ouvrier bien payé et disponible devient le client de ce qu’il fabrique. C’est le cœur de ce qu’on appellera le fordisme : produire en masse suppose de consommer en masse.",
  a:{q:"« Passons à cinq jours de travail. »", e:{o:14,p:11,m:5,i:-13},
     c:"Le monde entier en parle. Les autres patrons de Detroit vous détestent pour longtemps."},
@@ -1420,6 +1479,7 @@ const CARTES_II = [
 
 {t:"Un organisateur distribue des tracts à la grille.", qui:"Sam Rusin, organisateur syndical",
  d:"« Nous ne demandons pas votre usine. Nous demandons de discuter la cadence avec quelqu’un qui ait le droit de dire non. Vous pouvez nous recevoir aujourd’hui, ou nous retrouver dehors dans dix ans. »",
+ ex:"Il est là chaque matin depuis une semaine, sur le trottoir d’en face, hors du terrain de l’usine. Les hommes prennent les feuilles et les lisent. Le service de sécurité propose d’intervenir ; le service juridique rappelle que la rue ne vous appartient pas.",
  f:"Les syndicats ne sont pas reconnus dans l’automobile américaine avant la fin des années 1930. Les grandes firmes entretiennent des services de sécurité privés chargés de surveiller les ateliers.",
  a:{q:"« Recevons les syndicalistes. »", e:{o:13,p:9,i:-12,m:-3},
     c:"On s’assoit à la même table. Les actionnaires parlent d’abdication ; les usines voisines, de contagion."},
@@ -1428,6 +1488,7 @@ const CARTES_II = [
 
 {t:"Le chronomètre descend à l’atelier.", qui:"Walter Kessler, ingénieur", req:["Organisation"],
  d:"« Nous avons mesuré chaque geste au dixième de seconde. En supprimant les mouvements inutiles, je gagne onze secondes par voiture. Multipliez par la production de l’année. »",
+ ex:"Les études de temps sont terminées sur deux lignes et les gains sont mesurables. Appliquer les nouveaux temps signifie réécrire chaque fiche de poste. Les ouvriers ont vu les ingénieurs avec leurs montres et savent ce qui se prépare.",
  f:"Frederick Taylor a théorisé l’organisation scientifique du travail : décomposer chaque tâche, chronométrer chaque geste, supprimer les mouvements inutiles. Le savoir passe de l’ouvrier au bureau des méthodes.",
  a:{q:"« Appliquons les temps chronométrés. »", e:{i:12,m:5,o:-13},
     c:"Onze secondes gagnées mille fois par jour. C’est l’ouvrier qui les paie, une par une."},
@@ -1438,6 +1499,7 @@ const CARTES_II = [
 
 {t:"Un homme se présente avec une jambe en moins.", qui:"Dr Emmett Crowe, du département sociologique",
  d:"« Nous avons classé les postes : sept mille d’entre eux peuvent être tenus assis, cent soixante-dix par un homme sans jambes, une dizaine par un aveugle. Le geste est si simple qu’il n’exige presque plus de corps. Faut-il les embaucher ? »",
+ ex:"Le bureau d’embauche l’a renvoyé vers vous faute de règle établie. Le service des méthodes a justement classé tous les postes selon ce qu’ils exigent du corps. La question n’est plus de savoir si c’est possible, mais si on le fait.",
  f:"Parce que les postes sont décomposés en gestes simples, l’entreprise recense ceux qui peuvent être tenus assis, par un homme amputé ou par un aveugle. Ford en employa plusieurs milliers.",
  a:{q:"« Embauchons les ouvriers handicapés. »", e:{o:8,p:12,m:4,i:-5},
     c:"Des centaines d’hommes que personne ne voulait entrent à l’usine. Le travail décomposé aura eu cela pour lui."},
@@ -1448,6 +1510,7 @@ const CARTES_II = [
 
 {t:"Les machines réclament du courant.", qui:"Walter Kessler, ingénieur",
  d:"« Une seule machine à vapeur et ses courroies au plafond : quand elle casse, l’usine entière s’arrête. Un moteur électrique par machine, et chaque poste devient indépendant. Il faut refaire toute l’installation. »",
+ ex:"Une courroie a cassé mardi et deux mille hommes sont restés à ne rien faire pendant quatre heures. La compagnie d’électricité propose un contrat et un échéancier. Refaire l’installation immobiliserait les ateliers par roulement pendant des mois.",
  f:"Dans une usine à vapeur, une seule machine entraîne tout l’atelier par des courroies au plafond. Le moteur électrique individuel libère chaque poste et permet de ranger les machines dans l’ordre du travail.",
  a:{q:"« Électrifions toute l’usine. »", e:{i:11,m:4,o:3,p:2}, g:["Ressources","Savoirs techniques"],
     c:"Chaque machine tourne pour elle-même. On peut enfin disposer les postes dans l’ordre du travail, et non sous les courroies."},
@@ -1458,6 +1521,7 @@ const CARTES_II = [
 
 {t:"La pièce ne s’ajuste plus.", qui:"Walter Kessler, ingénieur",
  d:"« Trois fournisseurs, trois tolérances. Nos ajusteurs passent leurs journées à limer des pièces qui devraient entrer seules. Imposons la même cote à tout le monde, au centième. »",
+ ex:"Le contrôle a rejeté un lot entier hier : les pièces venaient de trois fournisseurs et aucune n’entrait dans l’autre. Les ajusteurs rattrapent à la lime, poste par poste, et c’est ce qui coûte le plus cher dans la voiture. Imposer une cote unique fâchera les fournisseurs.",
  f:"La pièce interchangeable suppose que toutes les copies soient identiques au centième près. C’est elle qui permet de monter sans ajuster, et de réparer sans atelier — mais elle supprime le métier d’ajusteur.",
  a:{q:"« Imposons une cote unique à tous. »", e:{i:12,m:6,o:-4}, g:["Savoirs techniques","Organisation"],
     c:"Toute pièce entre dans toute voiture. L’ajusteur qualifié devient un homme qui pose."},
@@ -1468,6 +1532,7 @@ const CARTES_II = [
 
 {t:"Le marché s’est arrêté d’un coup.", qui:"Frank Doyle, actionnaire", apres:1928,
  d:"« Octobre. Les commandes ne tombent plus, elles s’annulent. Nous avons les stocks, les usines, les hommes — et personne en face. Il faut décider vite, et ce sera brutal dans tous les cas. »",
+ ex:"Les annulations arrivent plus vite qu’on ne les enregistre. Les entrepôts sont pleins et la trésorerie tiendra deux mois. Ce qui se décide cette semaine décidera de la vie de milliers de familles dans une ville qui ne vit que de vous.",
  f:"La crise de 1929 frappe l’automobile plus que tout : on repousse l’achat d’une voiture bien avant celui du pain. La production américaine chute des trois quarts en quatre ans.",
  a:{q:"« Fermons les lignes et licencions. »", e:{i:9,o:-16,p:-12,m:-5},
     c:"Des milliers d’hommes dehors en une semaine, dans une ville qui n’existe que par vous."},
@@ -1476,6 +1541,7 @@ const CARTES_II = [
 
 {t:"Ils marchent vers l’usine.", qui:"Harriet Vance, journaliste", apres:1930,
  d:"« Ils sont plusieurs milliers sur la route de Dearborn, sans armes, et ils demandent du travail et de quoi manger. Vos gardes sont postés à la grille. Que doivent-ils faire quand la tête du cortège arrivera ? »",
+ ex:"Le cortège est parti du centre-ville en fin de matinée et grossit à chaque carrefour. Il n’y a ni armes ni mot d’ordre de violence. Les gardes sont postés à la grille et attendent des instructions qui ne peuvent plus attendre.",
  f:"Au creux de la Dépression, Detroit compte près d’un chômeur sur trois. Des marches de la faim s’organisent dans tout le pays pour réclamer du travail et des secours.",
  a:{q:"« Bloquons la grille par la force. »", e:{i:4,o:-17,p:-16},
     c:"On tire. Quatre morts sur la route, et des photographies qui feront le tour du pays pour un siècle."},
@@ -1484,6 +1550,7 @@ const CARTES_II = [
 
 {t:"La publicité coûte un million.", qui:"Elias Bright, concessionnaire",
  d:"« Nos concurrents achètent des pages entières et font rêver. Nous, nous publions des tarifs. La voiture la moins chère du monde ne se vend pas toute seule quand le voisin en propose une plus belle au même prix. »",
+ ex:"Les agences ont présenté leurs projets et la somme demandée dépasse le budget d’un atelier entier. La maison n’a jamais fait de réclame autrement qu’en affichant ses prix. Le réseau de vente affirme que cela ne suffit plus.",
  f:"La publicité de masse se développe avec la presse illustrée dans les années 1920. Elle ne vend plus seulement un produit mais une image de soi — et l’automobile en devient le terrain privilégié.",
  a:{q:"« Achetons des pages de publicité. »", e:{m:11,i:-7,p:-3}, g:["Marchés"],
     c:"On vend désormais une idée avec la voiture. Elle coûte plus cher que la tôle."},
@@ -1494,6 +1561,7 @@ const CARTES_II = [
 
 {t:"Deux hommes attendent à l’embauche.", qui:"Sam Rusin, organisateur syndical",
  d:"« Celui-ci vient de Géorgie, il est noir, et aucune usine de cette ville ne le prendra. Vous, vous embauchez. Je veux savoir si vous le mettrez à la fonderie, comme tous les autres, ou sur une ligne comme n’importe qui. »",
+ ex:"Le bureau du personnel applique jusqu’ici un usage que personne n’a jamais écrit. Les deux hommes ont les mêmes états de service et postulent au même poste. Ce que vous direz aujourd’hui deviendra la règle de la maison.",
  f:"Des centaines de milliers d’Afro-Américains quittent alors le Sud ségrégué pour les usines du Nord : c’est la Grande Migration. Dans la plupart des firmes, on les cantonne aux postes les plus pénibles, à la fonderie.",
  a:{q:"« Embauchons-le sur la ligne, comme les autres. »", e:{o:9,p:13,i:-6,m:-2},
     c:"Detroit compte peu d’usines qui le font. On vient de loin pour y travailler — et l’atelier gronde quelques semaines."},
@@ -1502,6 +1570,7 @@ const CARTES_II = [
 
 {t:"Faut-il arrêter la voiture qui vous a faits ?", qui:"Frank Doyle, actionnaire", apres:1924, req:["Marchés"],
  d:"« Quinze millions d’exemplaires. C’est la voiture la plus vendue de l’histoire, et elle ne se vend plus. La remplacer, c’est arrêter les chaînes six mois et refaire chaque outil de la maison. »",
+ ex:"Les stocks ne s’écoulent plus et les concessionnaires cessent de commander. Changer de modèle suppose de refaire chaque outil, chaque gabarit, chaque fiche de poste. Personne dans l’industrie n’a jamais tenté un arrêt de cette ampleur.",
  f:"La Ford T fut produite à plus de quinze millions d’exemplaires entre 1908 et 1927. Son prix tomba de 850 dollars à moins de 300, grâce à la seule production de masse.",
  a:{q:"« Arrêtons tout et changeons de modèle. »", e:{m:13,i:-12,o:-9,p:2}, g:["Marchés"],
     c:"Six mois d’usine muette, soixante mille hommes sans salaire — puis une file d’attente devant les concessions."},
@@ -1512,6 +1581,7 @@ const CARTES_II = [
 
 {t:"Un contremaître interdit de parler.", qui:"Anna Kowalczyk, ouvrière",
  d:"« Il est interdit de s’asseoir, de siffler, de parler à son voisin. On nous surveille jusque dans la façon de tenir la tête. Vous appelez cela de la discipline. Nous, nous avons un autre mot. »",
+ ex:"Le règlement d’atelier a été affiché la semaine dernière et il s’applique déjà. Deux ouvriers ont été sanctionnés pour s’être adressé la parole à leur poste. L’ouvrière qui vient vous voir parle au nom de sa ligne entière.",
  f:"Le règlement d’atelier interdisait de s’asseoir, de siffler, de parler à son voisin. Les ouvriers avaient mis au point une façon de parler sans remuer les lèvres, qu’ils appelaient entre eux le « murmure de Ford ».",
  a:{q:"« Maintenons l’interdiction de parler. »", e:{i:7,o:-11,p:-5},
     c:"Le règlement tient. On apprend à parler sans remuer les lèvres — les ouvriers appellent cela le fordisme."},
