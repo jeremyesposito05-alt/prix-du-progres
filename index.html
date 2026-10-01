@@ -1540,6 +1540,57 @@ header .marque img ~ svg.blason{display:none}
 .cr-pli.cr-scelle .cd{letter-spacing:.14em}
 .cr-pli.cr-scelle .crt{color:var(--rge)}
 
+/* ---------- le décor photographique --------------------------------
+   Une seule image fixe : la pièce ne bouge pas pendant qu'on fait
+   défiler les papiers, exactement comme on ne déplace pas les murs en
+   se penchant sur son bureau. */
+#decor{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-position:center top; background-size:cover;
+  background-repeat:no-repeat; opacity:0; transition:opacity 1s ease-out;
+}
+body[data-decor="photo"] #decor{opacity:1}
+
+/* la fenêtre dessinée s'efface, mais reste dans le fichier */
+body[data-decor="photo"] #scene{display:none}
+/* l'écran de titre a sa propre illustration : la pièce n'y est pas */
+body.surtitre #decor{display:none}
+
+/* Le bas de l'écran s'assombrit : les papiers blancs ont besoin d'un
+   fond calme, et la boiserie seule ne suffit pas quand on fait défiler
+   jusqu'aux propositions. */
+body[data-decor="photo"] #decor::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,
+    rgba(12,9,6,0) 0%, rgba(12,9,6,0) 26%,
+    rgba(12,9,6,.42) 54%, rgba(12,9,6,.72) 100%);
+}
+
+/* L'arête du plateau n'a plus de sens devant une boiserie : il n'y a
+   plus de bureau dessiné, c'est la pièce qui en tient lieu. */
+body[data-decor="photo"] .bureau::before{display:none}
+body[data-decor="photo"] .bureau::after{
+  left:-4vw; right:-4vw; top:-10px; bottom:-60px;
+  background:linear-gradient(180deg, rgba(14,10,7,.55), rgba(14,10,7,.3) 55%, transparent);
+  border-radius:4px;
+}
+
+/* Le tableau des forces pend devant la baie : on lui donne l'ombre
+   portée d'un objet suspendu, et un peu de la lumière du couchant. */
+body[data-decor="photo"] .tableau{
+  box-shadow:0 26px 54px rgba(0,0,0,.72), 0 0 0 1px rgba(0,0,0,.35),
+             0 -2px 18px rgba(255,190,110,.1);
+}
+
+/* Les papiers se détachent plus nettement sur une photographie que sur
+   un aplat : on renforce leur ombre, sans toucher à leur couleur. */
+body[data-decor="photo"] .dossier,
+body[data-decor="photo"] .choix,
+body[data-decor="photo"] .carnet,
+body[data-decor="photo"] .courrier{
+  box-shadow:0 14px 34px rgba(0,0,0,.6);
+}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1607,6 +1658,7 @@ body[data-niveau="II"] .question{color:#D9E3ED}
 </head>
 <body>
 <!-- La fenêtre du bureau. Décor peint en CSS/SVG : aucune image requise. -->
+<div id="decor" aria-hidden="true"></div>
 <div id="scene" aria-hidden="true">
   <div class="ciel"></div>
   <div class="vue"></div>
@@ -2427,6 +2479,7 @@ function peindreVille(){
 /* Une image existe-t-elle pour ce niveau ? Si oui elle remplace le décor
    peint ; si non, rien ne se voit — le jeu reste beau sans elle. */
 function chercherVue(){
+  poserDecor();
   if(!SC.el) return;
   SC.el.classList.remove("aimg");
   const src="img/vue-"+N.id+".jpg", im=new Image();
@@ -3464,6 +3517,36 @@ function carnet(d){
 
     </div>
   </details>`;
+}
+
+/* ==================================================================
+   LE DÉCOR
+
+   "photo"  : la pièce de bureau photographiée, baie vitrée comprise.
+              Le tableau des forces pend devant la baie, les papiers
+              se posent sur la boiserie.
+   "dessin" : la fenêtre peinte en SVG, qui s'encrasse et dont les
+              cheminées poussent à mesure que la ville enfle.
+
+   Un seul mot à changer pour passer de l'un à l'autre. Rien n'est
+   supprimé : les deux décors vivent côte à côte dans le fichier.
+   ================================================================== */
+const DECOR = "photo";
+
+function poserDecor(){
+  const el = document.getElementById("decor");
+  if(!el) return;
+  if(DECOR !== "photo"){ document.body.dataset.decor = "dessin"; return; }
+  const src = "img/decor/bureau-" + ((typeof N!=="undefined" && N) ? N.id : "I") + ".jpg";
+  if(el.dataset.src === src) return;            // déjà en place
+  const im = new Image();
+  im.onload  = ()=>{ el.style.backgroundImage = `url("${src}")`;
+                     el.dataset.src = src;
+                     document.body.dataset.decor = "photo"; };
+  /* Detroit n'a pas encore sa pièce : on garde la fenêtre dessinée. */
+  im.onerror = ()=>{ el.dataset.src = src;
+                     document.body.dataset.decor = "dessin"; };
+  im.src = src;
 }
 
 /* ---------- fins ---------- */
