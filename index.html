@@ -1095,19 +1095,19 @@ details.acteur[open] .pli::after{content:" ▲"}
    C'est le seul moment où l'on s'adresse au joueur avant la partie :
    le texte se centre, la justification est tenue courte pour que les
    lignes restent lisibles, et tout s'écrit à la machine. */
-#app > .role{text-align:center}
-#app > .role > *{max-width:72ch;margin-left:auto;margin-right:auto}
-#app > .role .r-qui{margin-top:.3em;margin-bottom:.3em}
-#app > .role .r-but{margin-top:.6em;margin-bottom:0}
-#app > .role .note-source{max-width:82ch}
+.mission > .role{text-align:center;margin:0}
+.mission > .role > *{max-width:72ch;margin-left:auto;margin-right:auto}
+.mission > .role .r-qui{margin-top:.3em;margin-bottom:.3em}
+.mission > .role .r-but{margin-top:.6em;margin-bottom:0}
+.mission > .role .note-source{max-width:82ch}
 
 /* tant que ça s'écrit, le curseur clignote et le bloc se clique */
-#app > .role[data-encours]{cursor:pointer}
-#app > .role[data-encours] > *:not(:empty)::after{
+.mission > .role[data-encours]{cursor:pointer}
+.mission > .role[data-encours] > *:not(:empty)::after{
   content:"▌"; color:var(--rge); opacity:.75;
   animation:battre-curseur .7s steps(1) infinite; margin-left:1px;
 }
-#app > .role[data-encours] > *:empty::after{content:none}
+.mission > .role[data-encours] > *:empty::after{content:none}
 @keyframes battre-curseur{0%,50%{opacity:.75}51%,100%{opacity:0}}
 
 /* ---------- l'écran de fin ----------------------------------------
@@ -1223,6 +1223,49 @@ details.acteur[open] .pli::after{content:" ▲"}
   .fin-tete{grid-template-columns:1fr;justify-items:center;text-align:center;gap:14px}
   .fin-chiffres{grid-template-columns:1fr}
   .fin-portrait{order:3}
+}
+
+/* ---------- les deux vues qui encadrent la mission ----------------
+   Le jeu s'appelle « Le prix du progrès » : à gauche ce qu'on paie,
+   à droite qui le paie. Dit avant la première carte, en deux images.
+   Chacune se retire si son fichier manque, et le texte reprend la
+   place — Detroit n'a pas encore les siennes. */
+.mission{
+  display:grid; gap:18px; align-items:stretch; margin:18px 0 0;
+  grid-template-columns:minmax(120px,1fr) minmax(0,3.2fr) minmax(120px,1fr);
+}
+.mission-illu{
+  margin:0; display:flex; flex-direction:column; min-height:0;
+  border:1px solid var(--fil); border-radius:2px; overflow:hidden;
+  background:var(--pap2); box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+.mission-illu img{
+  width:100%; flex:1 1 auto; min-height:0; object-fit:cover; display:block;
+  object-position:50% 48%;
+}
+.mission-illu figcaption{
+  flex:0 0 auto; font-size:11.5px; line-height:1.4; font-style:italic;
+  color:var(--enc2); padding:8px 10px 9px; text-align:center;
+  background:linear-gradient(180deg, rgba(255,255,255,.5), transparent 70%), var(--pap);
+  border-top:1px solid var(--fil);
+}
+/* un filet d'encre du côté du texte, comme sur les autres papiers */
+.mi-g{border-right:3px solid var(--lai)}
+.mi-d{border-left:3px solid var(--rge)}
+
+.mission-note{
+  text-align:center; font-size:12.5px; line-height:1.5; font-style:italic;
+  color:#9C8A70; margin:10px 0 0;
+}
+.mission-note strong{font-style:normal;color:#C6AF86}
+
+/* en dessous de 980 px, les deux vues passent au-dessus, côte à côte :
+   le contraste tient, le texte garde toute la largeur */
+@media(max-width:980px){
+  .mission{grid-template-columns:1fr 1fr}
+  .mission > .role{grid-column:1 / -1; order:3}
+  .mission-illu{max-height:230px}
+  .mission-illu img{min-height:120px}
 }
 
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
@@ -2876,7 +2919,7 @@ function taperHTML(el, html, ms, pas, fin){
    paragraphe. Un clic n'importe où pose tout d'un coup — on ne retient
    personne qui a déjà lu. */
 function ecrireMission(){
-  const bloc = app.querySelector(":scope > .role");
+  const bloc = app.querySelector(".mission > .role");
   if(!bloc) return;
   const parts = Array.from(bloc.children);
   if(!parts.length) return;
@@ -3559,6 +3602,8 @@ const NIVEAUX = {
      avant:"Plus les industriels sont contents, plus la ville grossit. Et plus elle grossit, <strong>plus les ouvriers s’épuisent tout seuls</strong>, sans que vous ayez rien décidé : les logements ne suivent jamais le rythme des usines.",
      forces:FORCES_I, cartes:CARTES_I, fins:FINS_I, verdict:VERDICT_I, ev:EV_I, quiz:QUIZ_I,
      tours:18, a0:1780, a1:1851, pop0:36267, unite:"Population", unite2:"habitants",
+     vues:{g:"La ville qu’on montre : les quais, le coton, les trains.",
+           d:"La même ville deux rues plus loin : la fumée, les courées, les enfants."},
      reel:"Vous partiez de 36 267 habitants en 1780. Le vrai Manchester en comptait <b>303 382</b> au recensement de 1851 : la ville a été multipliée par huit en deux générations.",
  croissance:(a,b,u)=>`La population passe de ${fmt(a)} à ${fmt(b)} habitants. Les logements ne suivent pas : les ouvriers perdent ${u.toFixed(1)} points.`,
  impatience:"Les marchands, eux, commencent à regarder vers Leeds.",
@@ -3576,6 +3621,8 @@ const NIVEAUX = {
      avant:"Plus les actionnaires sont contents, plus la production monte. Et plus elle monte, <strong>plus la cadence use les ouvriers d’elle-même</strong>, sans que vous ayez rien décidé : la chaîne ne ralentit jamais toute seule.",
      forces:FORCES_II, cartes:CARTES_II, fins:FINS_II, verdict:VERDICT_II, ev:EV_II, quiz:QUIZ_II,
      tours:18, a0:1908, a1:1932, pop0:10600, unite:"Production", unite2:"voitures par an",
+     vues:{g:"L’usine qu’on fait visiter : la chaîne, les voitures, le salaire.",
+           d:"Ce que la chaîne laisse : la cadence, l’usure, puis le chômage."},
      reel:"Vous partiez de 10 600 voitures par an. Entre 1908 et 1927, Ford a produit en tout un peu plus de <b>15 millions</b> de Ford T — près de deux millions pour la seule année 1923.",
  croissance:(a,b,u)=>`La production passe de ${fmt(a)} à ${fmt(b)} voitures par an. La chaîne suit le rythme, les hommes moins : les ouvriers perdent ${u.toFixed(1)} points.`,
  impatience:"Les clients, eux, commencent à regarder chez General Motors.",
@@ -4041,6 +4088,12 @@ function menuNiveau(id){
   app.innerHTML=`
   <h1>${N.lieu}</h1>
   <p class="sous">${N.sous}</p>
+  <div class="mission">
+    <figure class="mission-illu mi-g">
+      <img src="img/niveau/${N.id}-gauche.jpg" alt="" loading="lazy"
+           onerror="this.closest('figure').remove()">
+      <figcaption>${esc(N.vues.g)}</figcaption>
+    </figure>
   <div class="role">
     <div class="r">${N.role}</div>
     <p class="r-qui">${N.qui}</p>
@@ -4048,6 +4101,14 @@ function menuNiveau(id){
     <p class="note-role">${N.note}</p>
     <p class="note-source">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
   </div>
+    <figure class="mission-illu mi-d">
+      <img src="img/niveau/${N.id}-droite.jpg" alt="" loading="lazy"
+           onerror="this.closest('figure').remove()">
+      <figcaption>${esc(N.vues.d)}</figcaption>
+    </figure>
+  </div>
+  <p class="mission-note">Ces deux vues sont des <strong>illustrations</strong>, pas des documents
+  d’époque : elles montrent le contraste, elles ne le prouvent pas.</p>
   <div class="acteurs">${CLES.map(k=>`<details class="acteur">
      <summary>
        <figure class="embleme"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
