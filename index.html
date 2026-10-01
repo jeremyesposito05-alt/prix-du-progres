@@ -1405,6 +1405,38 @@ header .marque img ~ svg.blason{display:none}
 @media(max-width:1000px){ .cn-cond{grid-template-columns:1fr 1fr 1fr} }
 @media(max-width:620px){ .cn-cond{grid-template-columns:1fr 1fr} }
 
+/* ---------- le carnet se plie -------------------------------------
+   Même geste que le rapport d'enquête. Replié, le rabat garde l'année
+   et le numéro de la décision : on peut dégager le bureau sans perdre
+   le fil. */
+.carnet > summary{
+  list-style:none; cursor:pointer; display:flex; align-items:center; gap:11px;
+  margin:-27px -16px 0; padding:11px 16px 10px;
+}
+.carnet > summary::-webkit-details-marker{display:none}
+.carnet[open] > summary{margin-bottom:4px}
+.cn-rabat{font-size:13px; color:var(--enc2); flex:1 1 auto; line-height:1.3}
+.cn-rabat b{font-family:var(--serif); font-size:17px; color:var(--rge);
+  font-variant-numeric:tabular-nums}
+.carnet .pli{
+  flex:0 0 auto; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--enc2); border:1px solid var(--fil); border-radius:2px;
+  padding:3px 9px; background:rgba(255,255,255,.45); white-space:nowrap;
+}
+.carnet .pli::before{content:"Ouvrir"}
+.carnet[open] .pli::before{content:"Fermer"}
+.carnet .pli::after{content:" ▼"}
+.carnet[open] .pli::after{content:" ▲"}
+.carnet[open] .pli{color:var(--rge); border-color:var(--rge)}
+/* ouvert, la feuille dit déjà l’année : le rabat ne la répète pas */
+.carnet[open] .cn-rabat{display:none}
+/* replié, ni spirale ni filet de marge : il n'y a plus de feuille */
+.carnet:not([open])::after{content:none}
+.carnet:not([open]){padding-bottom:0}
+/* ouvert, la spirale se replace sous le rabat */
+.carnet[open] .spirale{top:auto; margin-top:-2px; position:relative; height:12px}
+.carnet[open]::after{top:50px}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2125,7 +2157,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],courbe:[{t:0,pop:N.pop0}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:true,courbe:[{t:0,pop:N.pop0}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -2380,6 +2412,7 @@ document.addEventListener("toggle",e=>{
     document.body.dataset.acteursLus =
       String(document.querySelectorAll("details.acteur[open]").length);
   }
+  if(t.classList&&t.classList.contains("carnet")&&E) E.carnetOuvert = t.open;
   if(t.classList&&t.classList.contains("d-enquete")&&t.open&&E){
     if(!E.lus) E.lus=[];
     const k=(E.carte&&E.carte.t)||"";
@@ -3238,8 +3271,15 @@ function batons(){
 
 function carnet(d){
   const manque = CONDITIONS.filter(x=>!E.acquis.includes(x)).length;
-  return `<div class="carnet dossier" ${d||""}>
-    <span class="onglet">Carnet de bord</span>
+  const ouvert = (E.carnetOuvert !== false);
+  return `<details class="carnet dossier" ${ouvert?"open":""} ${d||""}>
+    <summary>
+      <span class="onglet">Carnet de bord</span>
+      <span class="cn-rabat">${E.mode==="campagne"
+        ? `<b>${AN(E.tour)}</b> · décision ${E.tour+1} sur ${N.tours}`
+        : `<b>Survie</b> · décision ${E.tour+1}`}</span>
+      <span class="pli"></span>
+    </summary>
     <div class="spirale" aria-hidden="true"></div>
     <div class="feuille">
 
@@ -3272,7 +3312,7 @@ function carnet(d){
         manque ? "" : " — vous les avez toutes"}.</p>
 
     </div>
-  </div>`;
+  </details>`;
 }
 
 /* ---------- fins ---------- */
