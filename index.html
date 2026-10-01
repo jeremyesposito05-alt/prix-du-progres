@@ -1110,6 +1110,121 @@ details.acteur[open] .pli::after{content:" ▲"}
 #app > .role[data-encours] > *:empty::after{content:none}
 @keyframes battre-curseur{0%,50%{opacity:.75}51%,100%{opacity:0}}
 
+/* ---------- l'écran de fin ----------------------------------------
+   Le verdict se lit sur du papier, comme tout ce qui vient du bureau.
+   Sur fond sombre, il ressemblait à un écran de jeu vidéo ; ici il
+   ressemble à un rapport qu'on classe. */
+
+/* le cachet : on ne doit pas pouvoir rater que c'est fini */
+.fin-cachet{display:flex;justify-content:center;margin:26px 0 4px}
+.fin-cachet span{
+  font-family:var(--serif); font-size:clamp(19px,3.1vw,30px);
+  letter-spacing:.2em; text-transform:uppercase; color:var(--rge);
+  border:3px double var(--rge); border-radius:4px;
+  padding:9px 26px 8px; transform:rotate(-1.6deg);
+  background:rgba(255,255,255,.07);
+  box-shadow:0 2px 14px rgba(0,0,0,.4), inset 0 0 22px rgba(154,42,30,.12);
+  opacity:.92;
+}
+
+.fin-panneau{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 18%),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  color:var(--enc); border:1px solid var(--fil); border-top:4px solid var(--rge);
+  border-radius:2px; box-shadow:0 14px 34px rgba(0,0,0,.5);
+  padding:24px 26px 20px; margin:14px 0 0;
+}
+
+/* l'emblème à gauche, le portrait à droite, le verdict au milieu.
+   Une image absente se retire : la colonne disparaît avec elle. */
+.fin-tete{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center}
+.fin-embleme,.fin-portrait{margin:0;text-align:center;flex:0 0 auto}
+.fin-embleme .rond{
+  display:block;width:clamp(84px,11vw,132px);height:clamp(84px,11vw,132px);
+  border-radius:50%;overflow:hidden;position:relative;
+  box-shadow:inset 0 0 0 1.5px rgba(120,88,40,.5), 0 5px 14px rgba(0,0,0,.34);
+}
+.fin-embleme .rond img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.34) translateY(-6%);
+}
+.fin-portrait img{
+  width:clamp(96px,13vw,158px);height:auto;display:block;
+  border:1px solid var(--fil);box-shadow:0 6px 18px rgba(0,0,0,.42);
+}
+.fin-embleme figcaption,.fin-portrait figcaption{
+  font-size:11px;line-height:1.35;color:var(--enc2);font-style:italic;
+  margin-top:7px;max-width:16ch;margin-left:auto;margin-right:auto;
+}
+
+
+.fin-mots .fin-lieu{
+  font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--enc2);margin:0 0 2px;
+}
+.fin-mots .gros{color:var(--enc);margin:.05em 0 .25em;line-height:1.05}
+.fin-texte{font-size:16.5px;line-height:1.62;margin:0;color:var(--enc2)}
+.fin-texte strong{color:var(--enc)}
+
+/* pourquoi ça s'arrête : la règle, puis les choix qui ont coûté */
+.fin-pourquoi{border-top:1px solid var(--fil);margin-top:20px;padding-top:16px}
+.fin-pourquoi h3{
+  font-family:var(--serif);font-weight:normal;font-size:19px;
+  color:var(--rge);margin:0 0 8px;
+}
+.fin-pourquoi p{font-size:15px;line-height:1.62;color:var(--enc2);margin:.45em 0}
+.fin-pourquoi b{color:var(--enc)}
+.fin-intro-coups{margin-bottom:.3em !important}
+.fin-coups{list-style:none;margin:.2em 0 .6em;padding:0;display:grid;gap:8px}
+.fin-coups li{
+  display:flex;gap:12px;align-items:baseline;
+  background:rgba(255,255,255,.4);border-left:3px solid var(--rge);
+  padding:9px 13px;border-radius:2px;
+}
+.fin-cout{
+  font-family:var(--serif);font-size:21px;color:var(--rge);
+  font-variant-numeric:tabular-nums;flex:0 0 auto;min-width:2.2em;text-align:right;
+}
+.fin-quoi{font-size:14.5px;line-height:1.5;color:var(--enc2)}
+.fin-quoi b{color:var(--enc);display:block}
+.fin-quoi i{font-size:13px;opacity:.85}
+.fin-rattrape{font-style:italic;font-size:14px !important;opacity:.9}
+
+/* les trois chiffres, chacun avec ce qu'il veut dire */
+.fin-chiffres{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0 0}
+.fin-ch{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.45), transparent 22%),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  color:var(--enc); border:1px solid var(--fil); border-left:4px solid var(--lai);
+  border-radius:2px; padding:16px 18px 14px; box-shadow:0 9px 22px rgba(0,0,0,.42);
+}
+.fin-ch-large{grid-column:1 / -1}
+.fin-ch .fin-n{
+  font-family:var(--serif);font-size:clamp(30px,4.4vw,42px);line-height:1;
+  color:var(--rge);font-variant-numeric:tabular-nums;
+}
+.fin-ch .fin-n small{font-size:.48em;color:var(--enc2);letter-spacing:.02em}
+.fin-ch .fin-k{
+  font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--enc2);margin:6px 0 8px;
+}
+.fin-ch .fin-k small{text-transform:none;letter-spacing:0;opacity:.8}
+.fin-ch p{font-size:14px;line-height:1.6;color:var(--enc2);margin:.3em 0 0}
+.fin-ch b{color:var(--enc)}
+.fin-cond{margin:12px 0 0 !important;justify-content:flex-start}
+.fin-cond span{border-color:var(--fil);color:var(--enc2);font-size:12px;padding:3px 10px}
+.fin-cond span.ok{border-color:var(--vrt,#4E7A3A);color:#3F6A2E;background:rgba(120,160,90,.14);font-weight:bold}
+.fin-manque{font-style:italic}
+.fin-record{margin:14px 0 0;color:var(--enc2)}
+
+@media(max-width:820px){
+  .fin-tete{grid-template-columns:1fr;justify-items:center;text-align:center;gap:14px}
+  .fin-chiffres{grid-template-columns:1fr}
+  .fin-portrait{order:3}
+}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1845,7 +1960,7 @@ function choisir(quel){
   E.vues.push(c.t);
   /* A-t-on ouvert le dossier d'enquête avant de trancher ? */
   if(c.f && !(E.lus||[]).includes(c.t)) E.aveugle = (E.aveugle||0) + 1;
-  E.carnet.push({t:c.t, q:r.q, an:(E.mode==="campagne"?AN(E.tour):null),
+  E.carnet.push({t:c.t, q:r.q, e:r.e, an:(E.mode==="campagne"?AN(E.tour):null),
                  lu:!c.f || (E.lus||[]).includes(c.t)});
   E.consq=r.c;
   E.tour++;
@@ -2798,6 +2913,105 @@ function remonter(){
   catch(e){ window.scrollTo(0,0); }
 }
 
+/* ==================================================================
+   L'ÉCRAN DE FIN
+
+   C'est le dernier texte que l'élève lit avant d'écrire le sien : il
+   doit expliquer, pas seulement constater. Trois chiffres y figuraient
+   nus — « Conditions réunies 0 / 7 » ne veut rien dire pour qui vient
+   de perdre. Chacun dit maintenant ce qu'il compte, et à quoi cela se
+   compare dans l'histoire réelle.
+   ================================================================== */
+
+/* La force en cause. Quand une force est tombée, c'est elle. Quand on
+   est allé au bout, on montre celle qui a le plus soutenu et celle qui
+   a le plus payé : c'est ce qui raconte la partie. */
+function visagesFin(){
+  if(CLES.indexOf(E.fini) >= 0){
+    const k = E.fini;
+    return { g:k, gl:"Ceux qui vous ont lâché",
+             d:k, dl:esc(N.forces[k].veut) };
+  }
+  const tri = CLES.slice().sort((a,b)=> E.f[b]-E.f[a]);
+  return { g:tri[0], gl:"Votre appui jusqu’au bout",
+           d:tri[tri.length-1], dl:"Ceux qui ont le plus payé" };
+}
+
+/* Les décisions qui ont le plus coûté à cette force-là. C'est la
+   réponse concrète à « pourquoi ai-je perdu ? » : on nomme les choix,
+   on dit leur prix, on rappelle l'année. */
+function coupsPortes(k, combien){
+  return (E.carnet||[])
+    .filter(d => d.e && d.e[k] < 0)
+    .sort((a,b) => a.e[k] - b.e[k])
+    .slice(0, combien);
+}
+
+function blocPourquoi(){
+  const perdue = CLES.indexOf(E.fini) >= 0;
+  if(!perdue){
+    const bas = CLES.slice().sort((a,b)=> E.f[a]-E.f[b])[0];
+    return `<h3>Pourquoi la partie s’arrête ici</h3>
+      <p>Vous êtes allé au bout : <b>${E.tour}</b> décisions, de ${N.a0} à ${N.a1},
+      sans qu’aucune des quatre forces ne tombe à zéro. Le verdict ci-dessus dépend
+      de l’état dans lequel vous les laissez — la plus basse est
+      <b>${N.forces[bas].nom}</b>, à ${Math.round(E.f[bas])} sur 100.</p>`;
+  }
+  const k = E.fini, coups = coupsPortes(k, 3);
+  return `<h3>Pourquoi la partie s’arrête ici</h3>
+    <p><b>${N.forces[k].nom}</b> est tombé à <b>zéro</b> sur 100. C’est la règle annoncée
+    au départ : une force à zéro cesse de vous suivre, et sans elle plus rien ne
+    fonctionne — ${esc(N.forces[k].veut)}, c’était ce qu’elle réclamait.</p>
+    ${coups.length ? `<p class="fin-intro-coups">Les décisions qui lui ont le plus coûté :</p>
+    <ol class="fin-coups">${coups.map(d=>`<li>
+      <span class="fin-cout">${d.e[k]}</span>
+      <span class="fin-quoi"><b>${esc(d.q)}</b>
+      <i>${d.an?d.an+" — ":""}à l’affaire « ${esc(d.t)} »</i></span>
+    </li>`).join("")}</ol>` : ""}
+    <p class="fin-rattrape">Une force prévient longtemps avant de tomber : le bandeau
+    rouge apparaît dès qu’elle passe sous quinze. C’est le moment de lui céder
+    quelque chose, même au prix d’une autre.</p>`;
+}
+
+/* Les trois chiffres, chacun expliqué. */
+function blocChiffres(){
+  const manque = CONDITIONS.filter(x => !E.acquis.includes(x));
+  return `<div class="fin-chiffres">
+
+    <div class="fin-ch">
+      <div class="fin-n">${E.tour}${E.mode==="campagne"?` <small>/ ${N.tours}</small>`:""}</div>
+      <div class="fin-k">Décisions prises</div>
+      <p>${E.mode==="campagne"
+          ? (E.tour >= N.tours
+             ? "Vous êtes allé jusqu’au bout de la période."
+             : `La campagne en compte ${N.tours}, jusqu’en ${N.a1}. Vous vous êtes arrêté en ${AN(Math.min(E.tour,N.tours-1))}.`)
+          : "En mode survie, on joue tant qu’aucune force ne tombe."}</p>
+    </div>
+
+    <div class="fin-ch">
+      <div class="fin-n">${fmt(E.pop)}</div>
+      <div class="fin-k">${N.unite} finale <small>(${N.unite2})</small></div>
+      <p>${N.reel||""}</p>
+    </div>
+
+    <div class="fin-ch fin-ch-large">
+      <div class="fin-n">${E.acquis.length} <small>/ ${CONDITIONS.length}</small></div>
+      <div class="fin-k">Conditions de la révolution industrielle</div>
+      <p>Ce sont les sept conditions vues en cours : réunies, elles font basculer une
+      société dans l’industrie ; il en manque une, et les machines restent des
+      curiosités. Chacune s’obtient en prenant la décision qui l’apporte.</p>
+      <span class="cond fin-cond">${CONDITIONS.map(x=>
+        `<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
+      <p class="fin-manque">${
+        manque.length === 0 ? "Vous les avez toutes réunies."
+        : manque.length === CONDITIONS.length
+          ? "Vous n’en avez réuni aucune : la ville n’a jamais vraiment basculé."
+          : `Il vous manquait : ${manque.join(", ").toLowerCase()}.`}</p>
+    </div>
+
+  </div>`;
+}
+
 /* ---------- fins ---------- */
 const FINS_I={
  o:{t:"Les machines brisées",
@@ -2825,18 +3039,39 @@ function rendreFin(){
   let titre,texte,tem="";
   if(N.fins[E.fini]){ titre=N.fins[E.fini].t; texte=N.fins[E.fini].x; }
   else { const v=N.verdict(f); titre=v.t; texte=v.x; tem=v.tem.map(temoin).join(""); }
+  const V = visagesFin();
   app.innerHTML=`
-  ${barresForces()}
-  <p class="sous" style="margin:18px 0 0">${E.mode==="campagne"?`${N.lieu}, ${AN(Math.min(E.tour,N.tours-1))}`:"Mode survie"} — partie terminée</p>
-  <div class="gros">${titre}</div>
-  <p style="max-width:68ch;font-size:16.5px">${texte}</p>
-  ${tem}
-  <div class="pied" style="margin-bottom:8px">
-    <span>Décisions prises <b>${E.tour}</b></span>
-    <span>${N.unite} finale <b>${fmt(E.pop)}</b></span>
-    <span>Conditions réunies <b>${E.acquis.length} / ${CONDITIONS.length}</b></span>
-    ${E.mode==="infini"?`<span>Record <b>${fmt(rec)} ${N.unite2}</b></span>`:""}
+  <div class="tableau">
+    <span class="plaque">État des forces à la fin</span>
+    ${barresForces()}
   </div>
+
+  <div class="fin-cachet"><span>Partie terminée</span></div>
+
+  <div class="fin-panneau">
+    <div class="fin-tete">
+      <figure class="fin-embleme">
+        <span class="rond"><img src="img/acteurs/${N.id}-${V.g}-embleme.jpg" alt=""
+             onerror="this.closest('figure').remove()"></span>
+        <figcaption>${V.gl}</figcaption>
+      </figure>
+      <div class="fin-mots">
+        <p class="fin-lieu">${E.mode==="campagne"?`${N.lieu}, ${AN(Math.min(E.tour,N.tours-1))}`:`${N.lieu} — mode survie`}</p>
+        <div class="gros">${titre}</div>
+        <p class="fin-texte">${texte}</p>
+      </div>
+      <figure class="fin-portrait">
+        <img src="img/acteurs/${N.id}-${V.d}-portrait.jpg" alt="" loading="lazy"
+             onerror="this.closest('figure').remove()">
+        <figcaption>${V.dl}</figcaption>
+      </figure>
+    </div>
+    <div class="fin-pourquoi">${blocPourquoi()}</div>
+  </div>
+
+  ${blocChiffres()}
+  ${E.mode==="infini"?`<p class="centre fin-record">Record sur cette époque : <b>${fmt(rec)} ${N.unite2}</b></p>`:""}
+  ${tem}
   <div class="bilan"><h2 style="margin-top:0">Ce que vous venez d’apprendre</h2><ul>
     ${N.lecons.map(x=>`<li>${x}</li>`).join("")}
   </ul></div>
@@ -3324,6 +3559,7 @@ const NIVEAUX = {
      avant:"Plus les industriels sont contents, plus la ville grossit. Et plus elle grossit, <strong>plus les ouvriers s’épuisent tout seuls</strong>, sans que vous ayez rien décidé : les logements ne suivent jamais le rythme des usines.",
      forces:FORCES_I, cartes:CARTES_I, fins:FINS_I, verdict:VERDICT_I, ev:EV_I, quiz:QUIZ_I,
      tours:18, a0:1780, a1:1851, pop0:36267, unite:"Population", unite2:"habitants",
+     reel:"Vous partiez de 36 267 habitants en 1780. Le vrai Manchester en comptait <b>303 382</b> au recensement de 1851 : la ville a été multipliée par huit en deux générations.",
  croissance:(a,b,u)=>`La population passe de ${fmt(a)} à ${fmt(b)} habitants. Les logements ne suivent pas : les ouvriers perdent ${u.toFixed(1)} points.`,
  impatience:"Les marchands, eux, commencent à regarder vers Leeds.",
      lecons:[
@@ -3340,6 +3576,7 @@ const NIVEAUX = {
      avant:"Plus les actionnaires sont contents, plus la production monte. Et plus elle monte, <strong>plus la cadence use les ouvriers d’elle-même</strong>, sans que vous ayez rien décidé : la chaîne ne ralentit jamais toute seule.",
      forces:FORCES_II, cartes:CARTES_II, fins:FINS_II, verdict:VERDICT_II, ev:EV_II, quiz:QUIZ_II,
      tours:18, a0:1908, a1:1932, pop0:10600, unite:"Production", unite2:"voitures par an",
+     reel:"Vous partiez de 10 600 voitures par an. Entre 1908 et 1927, Ford a produit en tout un peu plus de <b>15 millions</b> de Ford T — près de deux millions pour la seule année 1923.",
  croissance:(a,b,u)=>`La production passe de ${fmt(a)} à ${fmt(b)} voitures par an. La chaîne suit le rythme, les hommes moins : les ouvriers perdent ${u.toFixed(1)} points.`,
  impatience:"Les clients, eux, commencent à regarder chez General Motors.",
      lecons:[
