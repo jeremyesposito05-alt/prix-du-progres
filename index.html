@@ -925,6 +925,66 @@ body.surmenu main{max-width:1080px}
   border:1px solid var(--fil); box-shadow:0 3px 10px rgba(0,0,0,.4);
 }
 
+/* ---------- la galerie des acteurs --------------------------------
+   Une fiche par force, repliée. L'emblème et le nom suffisent à la
+   reconnaître ; le portrait et la scène récompensent celui qui ouvre. */
+.acteurs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0 6px;
+  align-items:start}   /* une fiche fermee ne doit pas s etirer */
+@media(max-width:820px){.acteurs{grid-template-columns:1fr}}
+
+details.acteur{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 26%),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  border:1px solid var(--fil); border-left:4px solid var(--lai); border-radius:2px;
+  color:var(--enc); box-shadow:0 9px 22px rgba(0,0,0,.44); overflow:hidden;
+}
+details.acteur summary{
+  list-style:none; cursor:pointer; display:flex; align-items:center; gap:13px;
+  padding:12px 15px;
+}
+details.acteur summary::-webkit-details-marker{display:none}
+details.acteur[open]{border-left-color:var(--rge)}
+
+.embleme{margin:0;flex:0 0 auto}
+.embleme img{width:58px;height:58px;object-fit:contain;display:block;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.3))}
+
+
+.nom-acteur{font-family:var(--serif);font-size:20px;line-height:1.1}
+summary .veut{font-size:12.5px;font-style:italic;color:var(--rge);
+  flex:1 1 100%; order:3; margin-top:-4px}
+@media(min-width:560px){ summary .veut{flex:1 1 auto; order:0; margin-top:0} }
+details.acteur .pli{
+  margin-left:auto; flex:0 0 auto; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--enc2);
+  border:1px solid var(--fil); border-radius:2px; padding:3px 9px;
+  background:rgba(255,255,255,.45); white-space:nowrap;
+}
+details.acteur .pli::before{content:"Ouvrir le dossier"}
+details.acteur[open] .pli::before{content:"Fermer"}
+details.acteur .pli::after{content:" ▼"}
+details.acteur[open] .pli::after{content:" ▲"}
+
+.acteur .fiche{padding:0 15px 15px;display:grid;gap:0 15px;
+  grid-template-columns:122px minmax(0,1fr)}
+@media(max-width:560px){ .acteur .fiche{grid-template-columns:1fr} }
+.acteur .fiche .role{font-size:14px;line-height:1.6;color:var(--enc2);
+  border-top:1px solid var(--fil);padding-top:12px;margin-top:12px}
+.acteur .fiche .role strong{color:var(--enc)}
+
+.portrait-acteur{margin:12px 0 0;width:100%}
+.portrait-acteur img{
+  width:100%;height:auto;display:block;border:1px solid var(--fil);
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+.scene-acteur{grid-column:1 / -1;margin:13px 0 0}
+.scene-acteur img{
+  width:100%;height:auto;display:block;border:1px solid var(--fil);
+  box-shadow:0 6px 18px rgba(0,0,0,.42);
+}
+@media(max-width:560px){ .portrait-acteur{float:none;width:100%;margin:0 0 10px} }
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1869,6 +1929,10 @@ document.addEventListener("click",e=>{
    dira au professeur qui a enquêté et qui a tranché à l'aveugle. */
 document.addEventListener("toggle",e=>{
   const t=e.target;
+  if(t.classList&&t.classList.contains("acteur")&&t.open){
+    document.body.dataset.acteursLus =
+      String(document.querySelectorAll("details.acteur[open]").length);
+  }
   if(t.classList&&t.classList.contains("d-enquete")&&t.open&&E){
     if(!E.lus) E.lus=[];
     const k=(E.carte&&E.carte.t)||"";
@@ -3426,10 +3490,22 @@ function menuNiveau(id){
     <p class="note-role">${N.note}</p>
     <p class="note-source">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
   </div>
-  <div class="acteurs">${CLES.map(k=>`<div class="acteur">
-     <div class="tete">${illuActeur(k)}${icone(k)}<span>${N.forces[k].nom}</span></div>
-     <div class="veut">${esc(N.forces[k].veut)}</div>
-     <div class="role">${gras(esc(N.forces[k].role))}</div></div>`).join("")}</div>
+  <div class="acteurs">${CLES.map(k=>`<details class="acteur">
+     <summary>
+       <figure class="embleme"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
+         onerror="this.closest('figure').remove()"></figure>
+       <span class="nom-acteur">${N.forces[k].nom}</span>
+       <span class="veut">${esc(N.forces[k].veut)}</span>
+       <span class="pli"></span>
+     </summary>
+     <div class="fiche">
+       <figure class="portrait-acteur"><img src="img/acteurs/${N.id}-${k}-portrait.jpg" alt="" loading="lazy"
+         onerror="this.closest('figure').remove()"></figure>
+       <div class="role">${gras(esc(N.forces[k].role))}</div>
+       <figure class="scene-acteur"><img src="img/acteurs/${N.id}-${k}-scene.jpg" alt="" loading="lazy"
+         onerror="this.closest('figure').remove()"></figure>
+     </div>
+   </details>`).join("")}</div>
   <p class="centre" style="margin:24px 0 8px">
     <button class="plein" onclick="nouvellePartie('campagne',N.id)">Campagne · ${N.tours} décisions jusqu’en ${N.a1}</button>
     <button onclick="nouvellePartie('infini',N.id)">Survie${rec?` · record ${fmt(rec)} ${N.unite2}`:""}</button>
