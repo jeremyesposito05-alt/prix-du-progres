@@ -1932,6 +1932,14 @@ const SON = {
       if(!this.amb || !BOUCLES[this.amb]) return;
       const L=this.lecteurs[this.actifL];
       if(!L || L.a.paused) return;
+      /* Point de bouclage encore inconnu : on le prend dès que la durée
+         est lisible, et surtout on ne boucle pas avant de le savoir —
+         sinon « currentTime >= 0 - 2,5 » est vrai tout de suite. */
+      if(!b.fin || !isFinite(b.fin)){
+        if(L.a.duration && isFinite(L.a.duration))
+          b.fin = Math.max(1, L.a.duration - 1.2);
+        return;
+      }
       if(L.a.currentTime >= b.fin - CROISE){
         const autre = this.lecteur(this.actifL^1);
         this.demarrer(autre, b, false);
