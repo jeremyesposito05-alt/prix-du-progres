@@ -1533,6 +1533,13 @@ header .marque img ~ svg.blason{display:none}
   .courrier .cachet::after{animation:none; opacity:.5}
 }
 
+/* ---------- le pli pas encore décacheté --------------------------- */
+.courrier .pli.scelle::before{content:"Voir le pli"}
+.courrier[open] .pli.scelle::before{content:"Fermer"}
+.cr-pli.cr-scelle{border-left-color:var(--rge)}
+.cr-pli.cr-scelle .cd{letter-spacing:.14em}
+.cr-pli.cr-scelle .crt{color:var(--rge)}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2657,11 +2664,22 @@ function courrier(attr){
   const classe = `courrier dossier ${proche?"attente":""} ${neufs?"neuf":""} ${der&&!proche?"ouvert":""}`;
   const cachet = neufs ? `<span class="cachet" aria-label="${neufs} pli${neufs>1?"s":""} à lire">${neufs}</span>` : "";
 
-  /* Tant que rien n'est arrivé, il n'y a rien à ouvrir. */
-  if(!recus.length)
+  /* Sans pli en attente et sans pli reçu, il n'y a rien à ouvrir : le
+     dossier reste un simple carton, et il ne remue pas. */
+  if(!recus.length && !proche)
     return `<div class="${classe}" ${attr}>
       <span class="onglet">Courrier</span>${cachet}
       <div class="env"></div>${resume}</div>`;
+
+  /* Ce qu'un messager peut dire sans briser le cachet. */
+  const scelle = proche ? `<article class="cr-pli cr-scelle">
+      <div class="cd">Cachet intact</div>
+      <div class="crt">Un messager attend dans l’antichambre</div>
+      <p class="crx">Le pli ne s’ouvre pas ici : il sera lu devant le conseil, à votre
+      <strong>prochaine décision</strong>. Ce qu’on sait déjà, c’est qu’une nouvelle du
+      dehors va tomber — et qu’elle ne vous demandera pas votre avis.
+      Gardez-vous une marge sur vos quatre forces.</p>
+    </article>` : "";
 
   return `<details class="${classe}" ${attr}>
     <summary>
@@ -2669,10 +2687,10 @@ function courrier(attr){
       <span class="env"></span>
       <span class="cr-bas">
         <span class="cr-tete">${resume}</span>
-        <span class="pli" data-n="${recus.length}"></span>
+        <span class="pli ${proche?"scelle":""}" data-n="${recus.length}"></span>
       </span>
     </summary>
-    <div class="cr-plis">${recus.map(v=>`<article class="cr-pli">
+    <div class="cr-plis">${scelle}${recus.map(v=>`<article class="cr-pli">
       <div class="cd">${esc(v.date)}</div>
       <div class="crt">${esc(v.t)}</div>
       <p class="crx">${gras(esc(v.x))}</p>
