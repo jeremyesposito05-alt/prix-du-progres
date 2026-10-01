@@ -985,6 +985,92 @@ details.acteur[open] .pli::after{content:" ▲"}
 }
 @media(max-width:560px){ .portrait-acteur{float:none;width:100%;margin:0 0 10px} }
 
+/* ---------- le blason au tableau ----------------------------------
+   L'emblème gravé passe devant le pictogramme. Le pictogramme reste
+   dans la page : si l'image manque, onerror la retire et la règle
+   « img ~ svg » cesse de s'appliquer — il réapparaît de lui-même. */
+.blason{
+  display:block;margin:0 auto 7px;width:56px;height:56px;position:relative;
+  border-radius:50%;overflow:hidden;
+}
+.blason img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.38) translateY(-7%);   /* on serre sur le sceau */
+}
+/* le pictogramme reprend sa place si l'image manque : la règle ne
+   s'applique plus dès que onerror a retiré l'image du document */
+.blason img ~ svg{display:none}
+.blason svg{width:29px;height:29px;display:block;margin:13px auto 0}
+.blason::after{
+  content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  box-shadow:inset 0 0 0 1.5px rgba(120,88,40,.55), inset 0 2px 6px rgba(0,0,0,.28),
+             0 3px 8px rgba(0,0,0,.3);
+}
+@media(max-width:700px){ .blason{width:46px;height:46px} }
+
+/* ---------- la force qui encaisse ---------------------------------
+   Le chiffre descend, mais un chiffre ne se voit pas tomber. Le jeton
+   tressaille une demi-seconde : on sait tout de suite qui a payé. */
+@keyframes secousse{
+  0%  {transform:translate3d(0,0,0) rotate(0)}
+  10% {transform:translate3d(-5px,1px,0) rotate(-1.1deg)}
+  24% {transform:translate3d(5px,-1px,0) rotate(1.1deg)}
+  38% {transform:translate3d(-4px,1px,0) rotate(-.8deg)}
+  52% {transform:translate3d(4px,0,0) rotate(.8deg)}
+  68% {transform:translate3d(-2px,0,0) rotate(-.3deg)}
+  84% {transform:translate3d(2px,0,0) rotate(.2deg)}
+  100%{transform:translate3d(0,0,0) rotate(0)}
+}
+@keyframes rougir{
+  0%  {box-shadow:0 8px 18px rgba(0,0,0,.45)}
+  22% {box-shadow:0 8px 18px rgba(0,0,0,.45), 0 0 0 2px var(--rge), 0 0 22px rgba(154,42,30,.55)}
+  100%{box-shadow:0 8px 18px rgba(0,0,0,.45)}
+}
+.force.secouee{animation:secousse .62s cubic-bezier(.36,.07,.19,.97) both,
+                         rougir .95s ease-out both}
+.force.secouee .nom b{color:var(--rge)}
+@media(prefers-reduced-motion:reduce){
+  .force.secouee{animation:rougir .95s ease-out both}
+}
+
+/* ---------- le rapport d'enquête ----------------------------------
+   Trois gestes pour qu'on ait envie de l'ouvrir : une lettrine comme
+   sur les imprimés de l'époque, un blanc au milieu, et les faits qui
+   accrochent l'œil — dates, chiffres, notions du cours. */
+.d-enquete .corps{color:var(--enc) !important;font-size:15px;line-height:1.68}
+
+.d-enquete .corps .init{
+  float:left; font-family:var(--serif); font-size:2.85em; line-height:.72;
+  margin:.1em .12em -.04em 0; color:var(--rge); font-weight:normal;
+}
+.d-enquete .corps .alinea{display:block;height:.9em}
+
+/* une date, une quantité : ce qu'on doit pouvoir citer de mémoire */
+.d-enquete .corps .fait{
+  font-style:normal; font-weight:bold; color:var(--rge);
+  font-variant-numeric:tabular-nums; letter-spacing:.01em;
+  white-space:nowrap;
+}
+
+/* les notions du cours, soulignées au crayon plutôt qu'au trait net */
+.d-enquete .corps strong{
+  color:var(--enc); font-weight:bold;
+  background-image:linear-gradient(transparent 58%, rgba(176,138,54,.42) 58%, rgba(176,138,54,.42) 92%, transparent 92%);
+  padding:0 .1em; border-radius:1px;
+}
+
+/* ---------- la signature ------------------------------------------ */
+.signature{
+  display:inline-block; margin-top:5px; font-family:var(--serif);
+  font-style:italic; font-size:12px; color:#8A7558; letter-spacing:.02em;
+}
+.signature b{font-weight:normal;font-style:normal;color:#B99A62;letter-spacing:.04em}
+.titre-ecran .paraphe{
+  margin:9px 0 0; font-family:var(--serif); font-style:italic;
+  font-size:13px; color:rgba(255,255,255,.62); letter-spacing:.03em;
+}
+.titre-ecran .paraphe b{font-weight:normal;font-style:normal;color:rgba(255,255,255,.86)}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1098,7 +1184,9 @@ body[data-niveau="II"] .question{color:#D9E3ED}
 </header>
 
 <main id="app"></main>
-<footer>Unité 1 — Quand l’innovation change la société</footer>
+<footer>Unité 1 — Quand l’innovation change la société<br>
+  <span class="signature">Conçu et écrit par <b>Jeremy Esposito</b> · Collège Alpin Beau Soleil</span>
+</footer>
 
 <script>
 "use strict";
@@ -1235,6 +1323,13 @@ const SON = {
     if(this.amb===quoi) return;
     this.amb = quoi;
     const b = BOUCLES[quoi];
+    /* hors d'une partie — menu, écran de fin — la tension retombe */
+    if(quoi!=="I" && quoi!=="II"){
+      this.tension = 0;
+      if(this.filtre)  this.glisser(this.filtre.frequency, 7200, 2.5);
+      if(this.gainMus) this.glisser(this.gainMus.gain, 1, 2.5);
+      this.lecteurs.forEach(L=>{ if(L){ try{ L.a.playbackRate = 1 }catch(e){} } });
+    }
     this.lecteurs.forEach(L=>{ if(L) this.vol(L, 0, .5); });
     clearInterval(this.veille); this.veille=null;
     if(!b || !this.pret){ setTimeout(()=>this.stopTous(), 700); return; }
@@ -1327,6 +1422,7 @@ const SON = {
   /* ---------- la tension ---------------------------------------------- */
   majTension(){
     if(!this.pret) return;
+    if(this.amb!=="I" && this.amb!=="II") return;   /* ni au menu, ni à la fin */
     if(typeof E==="undefined" || !E || !E.f) return;
     const bas = Math.min(E.f.i, E.f.o, E.f.m, E.f.p);
     const t = Math.max(0, Math.min(1, (62-bas)/52));
@@ -1689,7 +1785,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -1703,7 +1799,7 @@ function piocher(){
 
 function choisir(quel){
   const c=E.carte, r=c[quel];
-  CLES.forEach(k=>{ if(r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
+  appliquer(r.e);
   (r.g||[]).forEach(g=>{ if(!E.acquis.includes(g)) E.acquis.push(g); });
   /* ce que cette décision fera germer plus tard */
   if(r.suite) E.graines.push({tour:E.tour+r.suite.dans, s:r.suite, de:c.t, choix:r.q, semee:E.tour});
@@ -1771,6 +1867,7 @@ function impacts(e){
   }).join("");
 }
 function barresForces(){
+  oublierSecousse();
   return `<div class="forces">${CLES.map(k=>{
     const v=E.f[k];
     const col = v>55?"var(--vert)" : v>35?"var(--accent)" : v>20?"#D08A2A" : "var(--rge)";
@@ -1778,11 +1875,23 @@ function barresForces(){
     const etat = v<=10 ? "critique" : v<=20 ? "danger" : v<=35 ? "fragile" : "";
     const mot  = v<=10 ? "au bord de la rupture" : v<=20 ? "ne tiendra pas longtemps"
                : v<=35 ? "fragile" : "";
-    return `<div class="force ${etat}" title="${N.forces[k].nom} — ${N.forces[k].veut}">
-      ${icone(k)}<div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
+    const coup = (E.secousse||[]).indexOf(k)>=0 ? " secouee" : "";
+    return `<div class="force ${etat}${coup}" title="${N.forces[k].nom} — ${N.forces[k].veut}">
+      <span class="blason"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
+        loading="lazy" onerror="this.remove()">${icone(k)}</span>
+      <div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
       <div class="mini"><i style="width:${v}%;background:${col}"></i></div>
       ${mot?`<div class="etat">${mot}</div>`:""}</div>`;
   }).join("")}</div>`;
+}
+
+/* La secousse ne vaut que pour le rendu qui suit le coup. On l'efface
+   une fois l'animation passée, et une seule fois même si le tableau est
+   peint à deux endroits. */
+let SEC_T = null;
+function oublierSecousse(){
+  if(!E || !E.secousse || !E.secousse.length || SEC_T) return;
+  SEC_T = setTimeout(()=>{ SEC_T=null; if(E) E.secousse=[]; }, 900);
 }
 
 /* Le bandeau d'alerte : il nomme le risque et dit ce qu'il en coûte. */
@@ -1887,7 +1996,7 @@ function rendre(){
           <summary><span class="onglet">Rapport d’enquête</span>
             Le bureau d’enquête a joint une note.
             <span class="pli"></span></summary>
-          <div class="corps">${illuDoc(c)}${gras(esc(c.f))}</div></details>`:""}
+          <div class="corps">${illuDoc(c)}${corpsRapport(c)}</div></details>`:""}
     </div>
     <div class="col col-c">
       <div class="situ dossier d-situation" ${D()}>
@@ -1966,7 +2075,7 @@ function declencher(ev){
   E.evVus.push(ev.t);
   E.derEv = E.tour;
   E.evEnCours = ev;
-  CLES.forEach(k=>{ if(ev.e[k]) E.f[k]=clamp(E.f[k]+ev.e[k]); });
+  appliquer(ev.e);
   if(ev.pop) E.pop = Math.round(E.pop*(1+ev.pop));
   rendreEvenement(ev);
 }
@@ -2023,7 +2132,7 @@ function urgenceChoix(i){
   if(!E.evEnCours || !E.evEnCours.urgence) return suiteEvenement();
   const u=E.evEnCours.urgence;
   const r = i<0 ? u.defaut : u.choix[i];
-  CLES.forEach(k=>{ if(r.e && r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
+  appliquer(r.e);
   E.consq = r.c;
   E.entassement = i<0 ? "Le temps a décidé à votre place." : "";
   suiteEvenement();
@@ -2130,7 +2239,7 @@ function graineMure(){
 function germer(gr){
   E.evEnCours = null;
   E.graineEnCours = gr;
-  CLES.forEach(k=>{ if(gr.s.e[k]) E.f[k]=clamp(E.f[k]+gr.s.e[k]); });
+  appliquer(gr.s.e);
   try{ SON.coup() }catch(e){}
   rendreGraine(gr);
 }
@@ -2176,7 +2285,7 @@ function graineChoix(i){
   const gr=E.graineEnCours;
   if(!gr || !gr.s.q) return suiteGraine();
   const r=gr.s.q.choix[i];
-  CLES.forEach(k=>{ if(r.e[k]) E.f[k]=clamp(E.f[k]+r.e[k]); });
+  appliquer(r.e);
   E.consq=r.c; E.entassement="";
   suiteGraine();
 }
@@ -2479,6 +2588,63 @@ function illuPersonne(qui){
    C'est elle qui doit donner envie d'ouvrir le dossier. */
 function illuDoc(c){
   return illu("img/docs/"+slug(c.t)+".jpg", c.doc||"", "piece");
+}
+
+/* Appliquer un effet — et retenir qui vient d'encaisser. Les forces qui
+   reculent tressailleront au prochain rendu : la conséquence se voit
+   avant de se lire. */
+function appliquer(e){
+  if(!e || !E) return;
+  const frappees=[];
+  CLES.forEach(k=>{
+    if(!e[k]) return;
+    E.f[k] = clamp(E.f[k] + e[k]);
+    if(e[k] < 0) frappees.push(k);
+  });
+  E.secousse = frappees;
+  if(frappees.length){ clearTimeout(SEC_T); SEC_T=null; }
+}
+
+/* ==================================================================
+   LE RAPPORT D'ENQUÊTE, VERSION LISIBLE
+
+   Il arrivait d'un bloc, gris sur gris, et personne ne l'ouvrait deux
+   fois. Trois gestes, aucun sur le fond : on respire au milieu, on
+   fait ressortir les dates et les chiffres, et les notions du cours —
+   déjà en gras dans le texte — sont soulignées au crayon.
+   ================================================================== */
+
+/* Un pavé de huit lignes décourage : au-delà de trois phrases, on
+   respire au milieu. Si le découpage ne retrouve pas le texte entier,
+   on n'y touche pas — mieux vaut un pavé qu'une phrase perdue. */
+function aerer(h){
+  const ph = h.match(/[^.!?…]+[.!?…]+[»”"’']*\s*/g);
+  if(!ph || ph.join("") !== h) return h;
+  /* trois phrases courtes tiennent en un bloc ; trois longues, non */
+  if(ph.length < 3 || (ph.length < 4 && h.length < 340)) return h;
+  const c = Math.ceil(ph.length/2);
+  const tete = ph.slice(0,c).join("");
+  /* jamais au milieu d'une notion mise en gras */
+  if((tete.match(/<strong>/g)||[]).length !== (tete.match(/<\/strong>/g)||[]).length) return h;
+  return tete + '<span class="alinea"></span>' + ph.slice(c).join("");
+}
+
+/* Les dates et les chiffres portent l'essentiel d'un rapport : « 25 000
+   habitants en 1772 », « douze heures ». On les détache, sans jamais
+   toucher à ce qui est déjà balisé. */
+function faits(h){
+  return h.replace(/(<[^>]*>)|(&[a-zA-Z#0-9]+;)|([^<&]+)/g, (m,tag,ent,txt)=>{
+    if(txt === undefined) return m;
+    return txt.replace(/\d+(?:[   .,]\d+)*(?:\s?%)?/g,
+                       x => '<em class="fait">'+x+'</em>');
+  });
+}
+
+/* Le texte du rapport, prêt à lire : lettrine comprise. */
+function corpsRapport(c){
+  let h = faits(aerer(gras(esc(c.f))));
+  h = h.replace(/^([A-ZÀ-ÖØ-Þ])/, '<span class="init">$1</span>');
+  return h;
 }
 
 /* ---------- fins ---------- */
@@ -3310,7 +3476,8 @@ ${quiz}
   ${e((E.t_r3||"").trim())||"&nbsp;"}</div>
 
 <p class=pied>Collège Alpin Beau Soleil · Unité 1 — Quand l’innovation change la société · Grade 10.
-Les personnages du jeu sont des figures composites ; les événements datés sont authentiques et cités.</p>
+Les personnages du jeu sont des figures composites ; les événements datés sont authentiques et cités.<br>
+<i>Le prix du progrès</i> — jeu conçu et écrit par <b>Jeremy Esposito</b>, Collège Alpin Beau Soleil.</p>
 </body></html>`;
 }
 
@@ -3349,6 +3516,7 @@ function titre(){
         <strong>Une seule question : qui paie le progrès ?</strong></p>
       <button class="demarrer" onclick="demarrer()">Démarrer</button>
       <p class="mention">Unité 1 — Quand l’innovation change la société · Grade 10</p>
+      <p class="paraphe">Conçu et écrit par <b>Jeremy Esposito</b></p>
     </div>
   </div>`;
 }
