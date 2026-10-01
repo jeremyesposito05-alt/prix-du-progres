@@ -1327,6 +1327,84 @@ header .marque img ~ svg.blason{display:none}
   .entete-niveau .sous{letter-spacing:.12em}
 }
 
+/* ---------- le carnet de bord -------------------------------------
+   Un bloc à spirale posé sur le coin du bureau. Tout ce qui vivait
+   dans la ligne grise du bas, là où personne ne le lisait. */
+.carnet{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.55), transparent 9%),
+    repeating-linear-gradient(180deg,
+      transparent 0 21px, rgba(90,120,150,.17) 21px 22px),
+    linear-gradient(152deg, #FBF6E6 0%, #EFE4C8 100%) !important;
+  color:var(--enc); border:1px solid var(--fil); border-radius:2px;
+  box-shadow:0 12px 28px rgba(0,0,0,.5);
+  padding:27px 16px 14px; position:relative; --ong:#B08A36;
+}
+/* le filet rouge de la marge, comme sur un bloc d'écolier */
+.carnet::after{
+  content:""; position:absolute; left:11px; top:26px; bottom:0; width:1px;
+  background:rgba(154,42,30,.22); pointer-events:none;
+}
+.carnet .feuille{position:relative; z-index:1; padding-left:7px}
+
+/* la spirale : six anneaux de laiton pincés dans le haut de la feuille */
+.carnet .spirale{
+  position:absolute; left:0; right:0; top:7px; height:13px;
+  display:flex; justify-content:space-evenly; align-items:center;
+  pointer-events:none;
+}
+.carnet .spirale::before,.carnet .spirale::after{content:none}
+.carnet .spirale{
+  background-image:radial-gradient(circle at center,
+    #C9A964 0 2.6px, #7A5E2A 2.6px 3.4px, transparent 3.5px);
+  background-size:17% 100%; background-repeat:repeat-x;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+
+.cn-ligne{display:flex; align-items:baseline; gap:10px; margin:0 0 2px}
+.cn-k{
+  font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--enc2); flex:1 1 auto;
+}
+.cn-v{font-family:var(--serif); font-size:17px; color:var(--enc);
+  font-variant-numeric:tabular-nums}
+.cn-v small{font-size:.66em; color:var(--enc2)}
+.cn-annee .cn-v{font-size:30px; line-height:1.05; color:var(--rge)}
+
+/* les décisions en bâtons */
+.batons{display:flex; flex-wrap:wrap; gap:3px; margin:5px 0 12px}
+.batons i{
+  width:9px; height:13px; border:1px solid rgba(90,70,45,.4); border-radius:1px;
+  background:rgba(255,255,255,.35);
+}
+.batons i.fait{background:var(--lai); border-color:#6A4A22}
+
+/* la courbe */
+.carnet .courbe{display:block; width:100%; height:56px; margin:3px 0 2px}
+.carnet .courbe .aire{fill:rgba(154,42,30,.11)}
+.carnet .courbe .trait{fill:none; stroke:var(--rge); stroke-width:1.8;
+  stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke}
+.carnet .courbe .ici{fill:var(--rge); stroke:#FBF6E6; stroke-width:1.4}
+
+.cn-note{font-size:11px; line-height:1.45; color:var(--enc2);
+  font-style:italic; margin:2px 0 0}
+.cn-sep{height:1px; background:var(--fil); margin:13px 0 11px}
+
+/* les sept conditions, en liste à cocher */
+.cn-cond{list-style:none; margin:7px 0 7px; padding:0;
+  display:grid; grid-template-columns:1fr 1fr; gap:3px 9px}
+.cn-cond li{
+  font-size:11.5px; line-height:1.3; color:var(--enc2);
+  padding-left:15px; position:relative;
+}
+.cn-cond li::before{
+  content:"☐"; position:absolute; left:0; top:-1px; font-size:12px; opacity:.55;
+}
+.cn-cond li.ok{color:#3F6A2E; font-weight:bold}
+.cn-cond li.ok::before{content:"☑"; opacity:1; color:#4E7A3A}
+@media(max-width:1000px){ .cn-cond{grid-template-columns:1fr 1fr 1fr} }
+@media(max-width:620px){ .cn-cond{grid-template-columns:1fr 1fr} }
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2047,7 +2125,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],courbe:[{t:0,pop:N.pop0}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -2078,6 +2156,7 @@ function choisir(quel){
      l'entassement use les ouvriers. C'est le mécanisme d'Ancoats. */
   const taux=1+.03+E.f.i/500+(r.pop||0);
   const avant=E.pop; E.pop=Math.round(E.pop*taux);
+  (E.courbe||(E.courbe=[])).push({t:E.tour, pop:E.pop});
   /* L'entassement s'aggrave avec la TAILLE de la ville, pas seulement
      avec son rythme : loger 400 000 personnes est plus dur que d'en
      loger 40 000. Sans cela, il suffisait de ne jamais industrialiser
@@ -2272,6 +2351,7 @@ function rendre(){
     </div>
     <div class="col col-d">
       ${courrier(D())}
+      ${carnet(D())}
     </div>
     <div class="question" ${D()}>Que décidez-vous ?</div>
     <div class="rep ${trois.length===2?"deux":""}" ${D()}>
@@ -2279,12 +2359,7 @@ function rendre(){
         <span class="q">${esc(c[k].q)}</span><span class="impacts">${impacts(c[k].e)}</span></button>`).join("")}
     </div>
   </div></div>
-  <div class="pied">
-    ${E.mode==="campagne"?`<span>Année <b>${AN(E.tour)}</b></span><span>Décision <b>${E.tour+1}</b> sur ${N.tours}</span>`
-                         :`<span>Mode survie — décision <b>${E.tour+1}</b></span>`}
-    <span>${N.unite} <b>${fmt(E.pop)}</b></span>
-    <span class="cond">${CONDITIONS.map(x=>`<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
-  </div>`;
+  `;
   app.classList.remove("presse");
   ecrire(c.t, c.ex, c.d);
   try{ SON.majTension(); SON.papier() }catch(e){}
@@ -3117,6 +3192,86 @@ function blocChiffres(){
           : `Il vous manquait : ${manque.join(", ").toLowerCase()}.`}</p>
     </div>
 
+  </div>`;
+}
+
+/* ==================================================================
+   LE CARNET DE BORD
+
+   Où en suis-je ? L'année, la décision, la population et sa courbe,
+   les sept conditions. Posé à droite sous le courrier, sur du papier
+   réglé : c'est le document qu'on consulte sans quitter l'affaire.
+   ================================================================== */
+
+/* La courbe de la population, tracée à l'encre. Elle ne vaut pas pour
+   ses valeurs exactes mais pour sa forme : on voit si la ville enfle,
+   et à quel moment elle s'est mise à enfler. */
+function courbePop(){
+  const c = (E.courbe||[]).filter(p=>isFinite(p.pop));
+  if(c.length < 2) return "";
+  const L=250, H=56, m=7;
+  const xs=c.map(p=>p.t), ys=c.map(p=>p.pop);
+  const xa=Math.min.apply(null,xs);
+  const xb=Math.max(Math.max.apply(null,xs), E.mode==="campagne"? N.tours-1 : xa+1);
+  const ya=Math.min.apply(null,ys), yb=Math.max.apply(null,ys);
+  const px = t => m + (L-2*m) * (xb===xa ? 0 : (t-xa)/(xb-xa));
+  const py = v => (H-m) - (H-2*m) * (yb===ya ? .5 : (v-ya)/(yb-ya));
+  const pts = c.map(p=>px(p.t).toFixed(1)+","+py(p.pop).toFixed(1)).join(" ");
+  const d = c[c.length-1];
+  return `<svg class="courbe" viewBox="0 0 ${L} ${H}" preserveAspectRatio="none"
+     role="img" aria-label="Courbe de la ${N.unite.toLowerCase()}">
+    <polygon points="${px(xa).toFixed(1)},${H-m} ${pts} ${px(d.t).toFixed(1)},${H-m}"
+             class="aire"></polygon>
+    <polyline points="${pts}" class="trait"></polyline>
+    <circle cx="${px(d.t).toFixed(1)}" cy="${py(d.pop).toFixed(1)}" r="3.2" class="ici"></circle>
+  </svg>`;
+}
+
+/* Les décisions en bâtons : dix-huit cases, on voit d'un coup ce qui
+   est derrière et ce qui reste. */
+function batons(){
+  if(E.mode!=="campagne") return "";
+  let out="";
+  for(let i=0;i<N.tours;i++) out += `<i class="${i<E.tour?"fait":""}"></i>`;
+  return `<div class="batons">${out}</div>`;
+}
+
+function carnet(d){
+  const manque = CONDITIONS.filter(x=>!E.acquis.includes(x)).length;
+  return `<div class="carnet dossier" ${d||""}>
+    <span class="onglet">Carnet de bord</span>
+    <div class="spirale" aria-hidden="true"></div>
+    <div class="feuille">
+
+      <div class="cn-ligne cn-annee">
+        <span class="cn-k">${E.mode==="campagne"?"Année":"Mode"}</span>
+        <span class="cn-v">${E.mode==="campagne"?AN(E.tour):"survie"}</span>
+      </div>
+
+      <div class="cn-ligne">
+        <span class="cn-k">Décision</span>
+        <span class="cn-v cn-petit">${E.tour+1}${E.mode==="campagne"?` <small>sur ${N.tours}</small>`:""}</span>
+      </div>
+      ${batons()}
+
+      <div class="cn-ligne">
+        <span class="cn-k">${N.unite}</span>
+        <span class="cn-v cn-petit">${fmt(E.pop)}</span>
+      </div>
+      ${courbePop()}
+      <p class="cn-note">${N.a0} : ${fmt(N.pop0)} ${N.unite2}.</p>
+
+      <div class="cn-sep"></div>
+
+      <div class="cn-ligne"><span class="cn-k">Conditions réunies</span>
+        <span class="cn-v cn-petit">${E.acquis.length} <small>sur ${CONDITIONS.length}</small></span></div>
+      <ul class="cn-cond">${CONDITIONS.map(x=>
+        `<li class="${E.acquis.includes(x)?"ok":""}">${x}</li>`).join("")}</ul>
+      <p class="cn-note">Les sept conditions de la révolution industrielle.
+      Certaines affaires n’arrivent que lorsqu’on en a réuni assez${
+        manque ? "" : " — vous les avez toutes"}.</p>
+
+    </div>
   </div>`;
 }
 
