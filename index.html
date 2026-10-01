@@ -1593,7 +1593,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -1612,7 +1612,10 @@ function choisir(quel){
   /* ce que cette décision fera germer plus tard */
   if(r.suite) E.graines.push({tour:E.tour+r.suite.dans, s:r.suite, de:c.t, choix:r.q, semee:E.tour});
   E.vues.push(c.t);
-  E.carnet.push({t:c.t, q:r.q, an:(E.mode==="campagne"?AN(E.tour):null)});
+  /* A-t-on ouvert le dossier d'enquête avant de trancher ? */
+  if(c.f && !(E.lus||[]).includes(c.t)) E.aveugle = (E.aveugle||0) + 1;
+  E.carnet.push({t:c.t, q:r.q, an:(E.mode==="campagne"?AN(E.tour):null),
+                 lu:!c.f || (E.lus||[]).includes(c.t)});
   E.consq=r.c;
   E.tour++;
 
@@ -1639,6 +1642,8 @@ function choisir(quel){
   if(ev) return declencher(ev);
   const gr=graineMure();
   if(gr) return germer(gr);
+  const av=avertissementLecture();
+  if(av) return germer(av);
   piocher(); rendre();
 }
 
@@ -2300,6 +2305,34 @@ const QUIZ_II = [
     "Les pompiers sont arrivés trop tard"],
  b:0, x:"On les fermait pour empêcher les ouvrières de sortir. Cet incendie est à l’origine des premières lois américaines de sécurité au travail."},
 ];
+
+/* Quatre décisions prises sans ouvrir le dossier : le conseil s'en aperçoit.
+   Une seule fois par partie, et jamais collée à un autre événement. */
+function avertissementLecture(){
+  if(!E || E.avertiAveugle) return null;
+  if((E.aveugle||0) < 4) return null;
+  if(E.tour - E.derEv < 2) return null;
+  E.avertiAveugle = true;
+  const lus = (E.lus||[]).length;
+  return {
+    tour: E.tour, semee: E.tour, de: "vos dernières affaires",
+    choix: "« Je tranche sans ouvrir les dossiers. »",
+    s:{ dans:0,
+        t:"Le conseil s’étonne de votre méthode",
+        x:"Le bureau d’enquête vous a remis "+E.aveugle+" rapports que vous n’avez pas ouverts. "
+         +(lus ? "Vous n’en avez consulté que "+lus+". " : "Vous n’en avez consulté aucun. ")
+         +"On commence à dire en ville que vous décidez sans savoir — et ce que cela vous a "
+         +"coûté finit par se voir.",
+        e:{p:-7, m:-4},
+        q:{ texte:"Le bureau d’enquête propose de vous présenter ses notes avant chaque "
+                 +"décision, quitte à vous faire perdre du temps.",
+            choix:[
+             {q:"« Qu’on me les présente, je les lirai. »", e:{p:6,o:3,i:-2},
+              c:"Vous prendrez le temps de lire. Les dossiers sont là : il suffit de les ouvrir."},
+             {q:"« Je continue comme je l’entends. »", e:{i:4,p:-6,o:-4},
+              c:"On ne vous présentera plus rien. Vous déciderez seul, et à l’aveugle."}]}
+      }};
+}
 
 /* ---------- fins ---------- */
 const FINS_I={
@@ -3269,6 +3302,16 @@ function accueil(){
         </div>
         <div class="etape">
           <span class="num">4</span>
+          <div>
+            <h3>Ouvrez les dossiers</h3>
+            <p>Sous chaque affaire, le bureau d’enquête joint un <strong>rapport</strong> : le
+            fait historique, les chiffres, ce que le cours en dit. Il se déplie d’un clic.
+            <strong>Décider sans le lire finit par se savoir</strong> — et les questions de fin
+            porteront sur ce que vous aurez rencontré.</p>
+          </div>
+        </div>
+        <div class="etape">
+          <span class="num">5</span>
           <div>
             <h3>Rien ne se perd</h3>
             <p>À la fin, vous emportez votre carnet de décisions, un questionnaire noté sur ce que
