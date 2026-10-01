@@ -1293,6 +1293,40 @@ details.acteur[open] .pli::after{content:" ▲"}
   .mission-illu img{min-height:120px}
 }
 
+/* ---------- le blason du bandeau ----------------------------------
+   Le tracé reste dans la page : si l'image manque, onerror la retire
+   et la règle « img ~ svg » cesse de s'appliquer. */
+header .marque{display:flex;align-items:center;flex:0 0 auto}
+header .marque img{height:30px;width:auto;display:block;
+  filter:drop-shadow(0 1px 4px rgba(0,0,0,.5))}
+header .marque img ~ svg.blason{display:none}
+@media(max-width:700px){ header .marque img{height:24px} }
+
+/* ---------- le nom du niveau --------------------------------------
+   « Manchester » se détachait mal du bureau : bois sombre, fenêtre
+   claire, et le mot au milieu. On lui pose une plaque, comme sur les
+   portes de bureau, et le nom redevient lisible. */
+.entete-niveau{
+  position:relative; margin:10px 0 2px; padding:13px 26px 14px 18px;
+  border-left:4px solid var(--lai); border-radius:2px;
+  background:linear-gradient(90deg,
+    rgba(16,11,7,.88) 0%, rgba(16,11,7,.74) 55%, rgba(16,11,7,0) 100%);
+  box-shadow:0 10px 26px rgba(0,0,0,.42);
+}
+.entete-niveau h1{
+  margin:0; color:#F6EBD6; line-height:1.02;
+  text-shadow:0 3px 20px rgba(0,0,0,.95), 0 1px 2px rgba(0,0,0,.8);
+}
+.entete-niveau .sous{
+  margin:5px 0 0; color:#CBB596; font-size:12.5px;
+  letter-spacing:.17em; text-transform:uppercase;
+  text-shadow:0 2px 10px rgba(0,0,0,.9);
+}
+@media(max-width:700px){
+  .entete-niveau{padding:11px 16px 12px 14px}
+  .entete-niveau .sous{letter-spacing:.12em}
+}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -1394,7 +1428,8 @@ body[data-niveau="II"] .question{color:#D9E3ED}
 </svg>
 
 <header>
-  <svg class="blason" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="#fff" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg>
+  <span class="marque"><img src="img/blason-bs.png" alt="Collège Alpin Beau Soleil"
+        onerror="this.remove()"><svg class="blason" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="#fff" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg></span>
   <span class="titre">LE PRIX DU PROGRÈS</span>
   <span class="ecole">COLLÈGE ALPIN BEAU SOLEIL · G10</span>
   <span class="son-reglage">
@@ -1443,7 +1478,7 @@ const CROISE = 2.5;   // secondes de fondu entre les deux lecteurs
 const SON = {
   ctx:null, pret:false, actif:true, amb:null, vmax:.85,
   maitre:null, bruit:null, tension:0, tic:null,
-  lecteurs:[], actifL:0, filtre:null, gainMus:null, veille:null, volume:.55,
+  lecteurs:[], actifL:0, filtre:null, gainMus:null, veille:null, vmix:.55,
   horloge:null, prochain:0, battue:0,
 
   dispo(){ return typeof (window.AudioContext||window.webkitAudioContext)==="function"; },
@@ -1533,6 +1568,11 @@ const SON = {
 
   glisser(param, val, t){
     if(!this.ctx) return;
+    /* garde-fou : une cible qui n'est pas un nombre coupait le son en
+       silence. Mieux vaut ne rien faire que tout mettre à zéro. */
+    if(typeof val !== "number" || !isFinite(val)){
+      console.warn("son : fondu ignoré, cible invalide", val); return;
+    }
     const n=this.ctx.currentTime;
     try{ param.cancelScheduledValues(n); param.setValueAtTime(param.value,n);
          param.linearRampToValueAtTime(val, n+t); }
@@ -1575,7 +1615,7 @@ const SON = {
       L.a.currentTime = b.debut;
     }catch(e){}
     if(this.actif) L.a.play().catch(()=>{});
-    this.vol(L, fondu ? this.volume : this.volume, fondu ? 1.8 : CROISE);
+    this.vol(L, this.vmix, fondu ? 1.8 : CROISE);
   },
 
   /* On ne laisse jamais le fichier aller jusqu'au bout : à l'approche du
@@ -4117,8 +4157,10 @@ function menuNiveau(id){
   N=NIVEAUX[id]; document.body.dataset.niveau=id; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
   const rec=record();
   app.innerHTML=`
-  <h1>${N.lieu}</h1>
-  <p class="sous">${N.sous}</p>
+  <div class="entete-niveau">
+    <h1>${N.lieu}</h1>
+    <p class="sous">${N.sous}</p>
+  </div>
   <div class="mission">
     <figure class="mission-illu mi-g">
       <img src="img/niveau/${N.id}-gauche.jpg" alt="" loading="lazy"
