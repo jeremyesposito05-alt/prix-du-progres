@@ -1437,6 +1437,52 @@ header .marque img ~ svg.blason{display:none}
 .carnet[open] .spirale{top:auto; margin-top:-2px; position:relative; height:12px}
 .carnet[open]::after{top:50px}
 
+/* ---------- le courrier, devenu archive ---------------------------
+   Déplié, il rend tous les plis reçus depuis le début : date, texte,
+   source. Les questions de fin portent sur eux, et jusqu'ici rien ne
+   permettait de les relire. */
+.courrier > summary{
+  list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px;
+}
+.courrier > summary::-webkit-details-marker{display:none}
+.cr-tete{flex:1 1 auto; min-width:0}
+.cr-tete .cd{display:block}
+.cr-tete .cq{display:block}
+.courrier .pli{
+  flex:0 0 auto; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--enc2); border:1px solid var(--fil); border-radius:2px;
+  padding:3px 9px; background:rgba(255,255,255,.45); white-space:nowrap;
+}
+.courrier .pli::before{content:"Relire " attr(data-n)}
+.courrier[open] .pli::before{content:"Fermer"}
+.courrier .pli::after{content:" ▼"}
+.courrier[open] .pli::after{content:" ▲"}
+.courrier[open] .pli{color:var(--rge); border-color:var(--rge)}
+
+.cr-plis{margin-top:13px; border-top:1px solid var(--fil); padding-top:11px;
+  display:grid; gap:13px; max-height:none}
+.cr-pli{border-left:3px solid var(--lai); padding-left:12px}
+.cr-pli .cd{font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--rge)}
+.cr-pli .crt{font-family:var(--serif); font-size:17px; color:var(--enc);
+  line-height:1.2; margin:2px 0 4px}
+.cr-pli .crx{font-size:13.5px; line-height:1.55; color:var(--enc2); margin:0}
+.cr-pli .crx strong{color:var(--enc)}
+.cr-pli .crs{font-size:11.5px; line-height:1.45; color:var(--enc2);
+  margin-top:5px; opacity:.9}
+.cr-pli .crs strong{color:var(--rge); font-weight:normal}
+
+/* ---------- la jauge des sept conditions -------------------------- */
+.cn-jauge{
+  height:7px; border-radius:4px; margin:5px 0 9px; overflow:hidden;
+  background:rgba(80,62,42,.2); box-shadow:inset 0 1px 2px rgba(0,0,0,.28);
+}
+.cn-jauge i{
+  display:block; height:100%; border-radius:4px;
+  background:linear-gradient(90deg,#7FA862,#4E7A3A);
+  transition:width .5s ease-out;
+}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2371,6 +2417,7 @@ function rendre(){
             Le bureau d’enquête a joint une note.
             <span class="pli"></span></summary>
           <div class="corps">${illuDoc(c)}${corpsRapport(c)}</div></details>`:""}
+      ${courrier(D())}
     </div>
     <div class="col col-c">
       <div class="situ dossier d-situation" ${D()}>
@@ -2382,7 +2429,6 @@ function rendre(){
         <div class="d"></div></div>
     </div>
     <div class="col col-d">
-      ${courrier(D())}
       ${carnet(D())}
     </div>
     <div class="question" ${D()}>Que décidez-vous ?</div>
@@ -2534,19 +2580,43 @@ function courrierProche(){
   return reste.some(v=>v.an <= an);
 }
 
+/* Les nouvelles du dehors tombent en plein écran et disparaissent. Le
+   courrier les garde : on peut les relire, et les questions de fin
+   portent sur elles. */
 function courrier(attr){
   const proche = courrierProche();
-  const der = E.evVus.length
-    ? N.ev.find(v=>v.t===E.evVus[E.evVus.length-1]) : null;
-  let corps;
-  if(proche) corps = `<div class="cd">À l’instant</div>
-      <div class="cq">Un pli vient d’arriver. Il n’est pas encore ouvert.</div>`;
-  else if(der) corps = `<div class="cd">${esc(der.date)}</div>
-      <div class="cq">${esc(der.t)}</div>`;
-  else corps = `<div class="cq vide">Rien au courrier ce matin.</div>`;
-  return `<div class="courrier dossier ${proche?"attente":""} ${der&&!proche?"ouvert":""}" ${attr}>
-    <span class="onglet">Courrier</span>
-    <div class="env"></div>${corps}</div>`;
+  const recus = E.evVus.map(t=>N.ev.find(v=>v.t===t)).filter(Boolean).reverse();
+  const der = recus[0] || null;
+
+  const resume = proche
+    ? `<span class="cd">À l’instant</span>
+       <span class="cq">Un pli vient d’arriver. Il n’est pas encore ouvert.</span>`
+    : der
+      ? `<span class="cd">${esc(der.date)}</span><span class="cq">${esc(der.t)}</span>`
+      : `<span class="cq vide">Rien au courrier ce matin.</span>`;
+
+  const classe = `courrier dossier ${proche?"attente":""} ${der&&!proche?"ouvert":""}`;
+
+  /* Tant que rien n'est arrivé, il n'y a rien à ouvrir. */
+  if(!recus.length)
+    return `<div class="${classe}" ${attr}>
+      <span class="onglet">Courrier</span>
+      <div class="env"></div>${resume}</div>`;
+
+  return `<details class="${classe}" ${attr}>
+    <summary>
+      <span class="onglet">Courrier</span>
+      <span class="env"></span>
+      <span class="cr-tete">${resume}</span>
+      <span class="pli" data-n="${recus.length}"></span>
+    </summary>
+    <div class="cr-plis">${recus.map(v=>`<article class="cr-pli">
+      <div class="cd">${esc(v.date)}</div>
+      <div class="crt">${esc(v.t)}</div>
+      <p class="crx">${gras(esc(v.x))}</p>
+      <div class="crs"><strong>Fait authentique.</strong> ${gras(esc(v.src))}</div>
+    </article>`).join("")}</div>
+  </details>`;
 }
 
 /* Le titre s'inscrit, puis la réplique. On garde le texte de côté pour
@@ -3270,7 +3340,7 @@ function batons(){
 }
 
 function carnet(d){
-  const manque = CONDITIONS.filter(x=>!E.acquis.includes(x)).length;
+
   const ouvert = (E.carnetOuvert !== false);
   return `<details class="carnet dossier" ${ouvert?"open":""} ${d||""}>
     <summary>
@@ -3305,11 +3375,10 @@ function carnet(d){
 
       <div class="cn-ligne"><span class="cn-k">Conditions réunies</span>
         <span class="cn-v cn-petit">${E.acquis.length} <small>sur ${CONDITIONS.length}</small></span></div>
+      <div class="cn-jauge"><i style="width:${
+        Math.round(100*E.acquis.length/CONDITIONS.length)}%"></i></div>
       <ul class="cn-cond">${CONDITIONS.map(x=>
         `<li class="${E.acquis.includes(x)?"ok":""}">${x}</li>`).join("")}</ul>
-      <p class="cn-note">Les sept conditions de la révolution industrielle.
-      Certaines affaires n’arrivent que lorsqu’on en a réuni assez${
-        manque ? "" : " — vous les avez toutes"}.</p>
 
     </div>
   </details>`;
