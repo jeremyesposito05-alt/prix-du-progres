@@ -677,10 +677,25 @@ body.surtitre main{max-width:none;padding:0;justify-content:stretch}
 
 body.surtitre footer{opacity:0}
 .titre-ecran{
-  position:fixed;inset:0;z-index:5;display:flex;justify-content:center;
-  align-items:flex-start;          /* avec « margin:auto » plus bas : centré */
+  position:fixed;inset:0;z-index:5;
+  display:flex;flex-direction:column;
   overflow-y:auto;overflow-x:hidden;/* tant que ça tient, défilant sinon */
+  padding:clamp(13px,2.4vh,28px) clamp(16px,3.6vw,56px);
 }
+
+/* Les deux bandeaux tiennent les coins ; le centre reste au titre.
+   « flex:0 0 auto » : ils ne s'étirent ni ne se compriment. */
+.te-haut,.te-bas{
+  position:relative; z-index:1; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; width:100%;
+}
+.te-haut{margin-bottom:clamp(6px,1.6vh,18px)}
+.te-bas{margin-top:clamp(6px,1.6vh,18px)}
+.te-bas p{margin:0}
+
+/* « flex:1 0 auto » : le centre occupe la place qui reste, mais ne se
+   laisse jamais comprimer — sinon il serait rogné au lieu de défiler. */
 
 /* L'illustration occupe tout l'écran : elle raconte les trois
    révolutions d'un seul regard, il serait dommage de la masquer. */
@@ -700,29 +715,32 @@ body.surtitre footer{opacity:0}
     linear-gradient(180deg, rgba(26,32,71,.72) 0%, rgba(20,24,54,.26) 28%, rgba(15,18,42,.80) 100%);
 }
 .titre-ecran .dedans{
-  position:relative; text-align:center; max-width:940px;
-  padding:clamp(12px,2.9vh,26px) 22px;
-  margin:auto 0;                   /* centré tant que ça tient */
+  position:relative; z-index:1; flex:1 0 auto;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; max-width:940px; width:100%; margin:0 auto;
+  padding:clamp(8px,1.8vh,20px) 6px;
   animation:paraitre .8s ease-out;
 }
 @keyframes paraitre{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
 .titre-ecran .logo-bs{
-  height:clamp(32px,min(5.4vw,6.4vh),58px);width:auto;
-  margin-bottom:clamp(10px,2.9vh,26px);
+  height:clamp(34px,min(5.4vw,7vh),62px);width:auto;flex:0 0 auto;margin:0;
   filter:drop-shadow(0 3px 14px rgba(0,0,0,.8))}
-.titre-ecran .logo-txt{font-family:var(--serif);font-size:15px;letter-spacing:.2em;
-  color:#fff;margin-bottom:clamp(10px,2.9vh,26px);text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.titre-ecran .logo-txt{font-family:var(--serif);font-size:14px;letter-spacing:.18em;
+  color:#fff;margin:0;flex:0 0 auto;text-shadow:0 2px 12px rgba(0,0,0,.8)}
 
 .titre-ecran .surtitre-txt{
-  font-size:clamp(11px,1.5vw,14px); letter-spacing:.34em; text-transform:uppercase;
-  color:var(--bs-gold); margin-bottom:clamp(7px,1.6vh,14px); text-shadow:0 2px 14px rgba(0,0,0,.9);
+  font-size:clamp(10.5px,1.4vw,14px); letter-spacing:.3em; text-transform:uppercase;
+  color:var(--bs-gold); margin:0; flex:0 1 auto; text-align:right;
+  text-shadow:0 2px 14px rgba(0,0,0,.9);
+  border-top:1px solid rgba(243,190,49,.3); border-bottom:1px solid rgba(243,190,49,.3);
+  padding:7px 0 6px;
 }
 .titre-ecran .surtitre-txt i{font-style:normal;opacity:.5;margin:0 .35em}
 
 .titre-ecran h1{
   font-family:var(--serif); font-weight:normal; color:#fff;
-  font-size:clamp(40px,min(10.5vw,14.5vh),124px); line-height:.92; margin:0;
+  font-size:clamp(40px,min(11.2vw,15vh),142px); line-height:.92; margin:0;
   letter-spacing:-.012em;
   text-shadow:0 4px 40px rgba(0,0,0,.92), 0 1px 3px rgba(0,0,0,.7);
 }
@@ -738,8 +756,9 @@ body.surtitre footer{opacity:0}
   box-shadow:0 0 18px rgba(243,190,49,.45);
 }
 .titre-ecran .accroche{
-  font-size:clamp(14px,min(2.05vw,2.9vh),21px); line-height:1.65; color:#E6EAF5;
-  margin:0 0 clamp(14px,3.8vh,34px); text-shadow:0 2px 16px rgba(0,0,0,.9);
+  font-size:clamp(14px,min(2.1vw,3vh),23px); line-height:1.6; color:#E6EAF5;
+  margin:0 0 clamp(14px,3.6vh,34px); text-shadow:0 2px 16px rgba(0,0,0,.9);
+  max-width:46ch;
 }
 .titre-ecran .accroche strong{color:#fff;font-weight:normal;font-family:var(--serif);
   font-size:1.12em}
@@ -755,11 +774,16 @@ body.surtitre footer{opacity:0}
   box-shadow:0 20px 48px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.8);
 }
 .titre-ecran .mention{
-  margin:clamp(12px,3.3vh,30px) 0 0; font-size:clamp(10px,1.3vw,12px); letter-spacing:.14em;
+  margin:0; font-size:clamp(9.5px,1.2vw,12px); letter-spacing:.14em;
   text-transform:uppercase; color:#A9B2CC; text-shadow:0 2px 10px rgba(0,0,0,.9);
+  text-align:left; flex:0 1 auto;
 }
-@media(max-width:700px){
-  .titre-ecran .dedans{padding:20px 16px}
+@media(max-width:760px){
+  /* plus assez de largeur pour tenir les coins : on réempile, centré */
+  .te-haut,.te-bas{flex-direction:column;gap:7px;text-align:center}
+  .titre-ecran .surtitre-txt,.titre-ecran .mention,.titre-ecran .paraphe{text-align:center}
+  .titre-ecran .accroche{max-width:none}
+  .titre-ecran .dedans{padding:14px 6px}
   .titre-ecran .filet{margin:18px auto 16px}
   .titre-ecran .demarrer{padding:14px 44px}
 }
@@ -997,24 +1021,24 @@ details.acteur[open] .pli::after{content:" ▲"}
    L'emblème gravé passe devant le pictogramme. Le pictogramme reste
    dans la page : si l'image manque, onerror la retire et la règle
    « img ~ svg » cesse de s'appliquer — il réapparaît de lui-même. */
-.blason{
+.sceau{
   display:block;margin:0 auto 7px;width:56px;height:56px;position:relative;
   border-radius:50%;overflow:hidden;
 }
-.blason img{
+.sceau img{
   width:100%;height:100%;object-fit:cover;display:block;
   transform:scale(1.38) translateY(-7%);   /* on serre sur le sceau */
 }
 /* le pictogramme reprend sa place si l'image manque : la règle ne
    s'applique plus dès que onerror a retiré l'image du document */
-.blason img ~ svg{display:none}
-.blason svg{width:29px;height:29px;display:block;margin:13px auto 0}
-.blason::after{
+.sceau img ~ svg{display:none}
+.sceau svg{width:29px;height:29px;display:block;margin:13px auto 0}
+.sceau::after{
   content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
   box-shadow:inset 0 0 0 1.5px rgba(120,88,40,.55), inset 0 2px 6px rgba(0,0,0,.28),
              0 3px 8px rgba(0,0,0,.3);
 }
-@media(max-width:700px){ .blason{width:46px;height:46px} }
+@media(max-width:700px){ .sceau{width:46px;height:46px} }
 
 /* ---------- la force qui encaisse ---------------------------------
    Le chiffre descend, mais un chiffre ne se voit pas tomber. Le jeton
@@ -1074,8 +1098,9 @@ details.acteur[open] .pli::after{content:" ▲"}
 }
 .signature b{font-weight:normal;font-style:normal;color:#B99A62;letter-spacing:.04em}
 .titre-ecran .paraphe{
-  margin:clamp(4px,1vh,9px) 0 0; font-family:var(--serif); font-style:italic;
-  font-size:13px; color:rgba(255,255,255,.62); letter-spacing:.03em;
+  margin:0; font-family:var(--serif); font-style:italic;
+  font-size:clamp(12px,1.25vw,14.5px); color:rgba(255,255,255,.7); letter-spacing:.03em;
+  text-align:right; flex:0 0 auto; text-shadow:0 2px 10px rgba(0,0,0,.9);
 }
 .titre-ecran .paraphe b{font-weight:normal;font-style:normal;color:rgba(255,255,255,.86)}
 
@@ -2074,7 +2099,7 @@ function barresForces(){
                : v<=35 ? "fragile" : "";
     const coup = (E.secousse||[]).indexOf(k)>=0 ? " secouee" : "";
     return `<div class="force ${etat}${coup}" title="${N.forces[k].nom} — ${N.forces[k].veut}">
-      <span class="blason"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
+      <span class="sceau"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
         loading="lazy" onerror="this.remove()">${icone(k)}</span>
       <div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
       <div class="mini"><i style="width:${v}%;background:${col}"></i></div>
@@ -3942,15 +3967,21 @@ function titre(){
   <div class="titre-ecran">
     <div class="illu" aria-hidden="true"></div>
     <div class="voile" aria-hidden="true"></div>
-    <div class="dedans">
+    <div class="te-haut">
       <img class="logo-bs" src="img/logo-beausoleil.png" alt="Collège Alpin Beau Soleil"
            onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-txt',textContent:'COLLÈGE ALPIN BEAU SOLEIL'}))">
       <div class="surtitre-txt">Manchester <i>·</i> Detroit <i>·</i> Demain</div>
+    </div>
+
+    <div class="dedans">
       <h1>Le prix<br><span>du progrès</span></h1>
       <div class="filet"></div>
       <p class="accroche">Vous décidez. Quatre forces vous jugent.<br>
         <strong>Une seule question : qui paie le progrès ?</strong></p>
       <button class="demarrer" onclick="demarrer()">Démarrer</button>
+    </div>
+
+    <div class="te-bas">
       <p class="mention">Unité 1 — Quand l’innovation change la société · Grade 10</p>
       <p class="paraphe">Conçu et écrit par <b>Jeremy Esposito</b></p>
     </div>
