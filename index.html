@@ -1268,12 +1268,6 @@ details.acteur[open] .pli::after{content:" ▲"}
   width:100%; flex:1 1 auto; min-height:0; object-fit:cover; display:block;
   object-position:50% 48%;
 }
-.mission-illu figcaption{
-  flex:0 0 auto; font-size:11.5px; line-height:1.4; font-style:italic;
-  color:var(--enc2); padding:8px 10px 9px; text-align:center;
-  background:linear-gradient(180deg, rgba(255,255,255,.5), transparent 70%), var(--pap);
-  border-top:1px solid var(--fil);
-}
 /* un filet d'encre du côté du texte, comme sur les autres papiers */
 .mi-g{border-right:3px solid var(--lai)}
 .mi-d{border-left:3px solid var(--rge)}
@@ -2254,6 +2248,7 @@ const esc =s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const AN=t=>Math.round(N.a0+(N.a1-N.a0)*t/(N.tours-1));
 
 function nouvellePartie(mode,niv){
+  remonter(true);
   if(niv) N=NIVEAUX[niv];
   document.body.classList.remove("surmenu");
   document.body.dataset.niveau=N.id; peindreVille(); chercherVue();
@@ -3259,9 +3254,11 @@ function ecrireMission(){
 
 /* On remonte au tableau : c'est là que se voit ce qu'on vient de faire.
    En douceur, sauf si l'on a demandé moins d'animations. */
-function remonter(){
-  const doux = !window.matchMedia
-    || !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function remonter(sec){
+  /* sec : d'un coup. On s'en sert quand l'écran change entièrement —
+     glisser depuis le bas d'un menu n'aurait aucun sens. */
+  const doux = !sec && (!window.matchMedia
+    || !window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   try{ window.scrollTo({top:0, left:0, behavior: doux ? "smooth" : "auto"}); }
   catch(e){ window.scrollTo(0,0); }
 }
@@ -3473,7 +3470,7 @@ const temoin=o=>`<div class="temoin"><div class="qui">${o.qui}</div><div class="
 function record(){ try{ return +(localStorage.getItem("pdp_pop_"+N.id)||0) }catch(e){ return 0 } }
 
 function rendreFin(){
-  remonter();
+  remonter(true);
   const f=E.f, rec=record();
   let titre,texte,tem="";
   if(N.fins[E.fini]){ titre=N.fins[E.fini].t; texte=N.fins[E.fini].x; }
@@ -4055,6 +4052,7 @@ function melanger(a){
 }
 
 function rendreTrace(){
+  remonter(true);
   if(!E.quiz) { E.quiz = questionsDeLaPartie(); E.rep = E.quiz.map(()=>null); E.corrige=false; }
   const rep = E.rep;
   const fait = rep.filter(x=>x!==null).length;
@@ -4331,6 +4329,7 @@ function telechargerTrace(){
    L'ÉCRAN DE TITRE
    ================================================================== */
 function titre(){
+  remonter(true);
   document.body.dataset.niveau="I";
   document.body.classList.add("surtitre");
   N = NIVEAUX.I;
@@ -4404,12 +4403,22 @@ window.addEventListener("beforeunload", ev=>{
 
 /* ---------- accueil ---------- */
 function accueil(){
+  remonter(true);
   document.body.dataset.niveau="I"; N=NIVEAUX.I; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
-  const carte=(id,dispo)=>{ const n=NIVEAUX[id]; if(!dispo)
-    return `<button class="niv" disabled><span class="ord">3e révolution industrielle</span>
-      <span class="lieu">La révolution numérique</span>
-      <span class="per">1970 — aujourd’hui</span>
-      <span class="rec">En préparation.</span></button>`;
+  const carte=(id,dispo)=>{
+    const n = NIVEAUX[id];
+    if(!dispo){
+      /* La troisième époque n'existe pas encore comme niveau : elle est
+         décrite à la main. Les autres se décrivent toutes seules. */
+      const o = n ? n.ord  : "3e révolution industrielle";
+      const l = n ? n.lieu : "La révolution numérique";
+      const p = n ? n.sous.replace(n.lieu+", ","") : "1970 — aujourd’hui";
+      return `<button class="niv" disabled>
+        <span class="ord">${o}</span>
+        <span class="lieu">${l}</span>
+        <span class="per">${p}</span>
+        <span class="rec">En préparation.</span></button>`;
+    }
     let r=0; try{ r=+(localStorage.getItem("pdp_pop_"+id)||0) }catch(e){}
     return `<button class="niv" onclick="menuNiveau('${id}')">
       <span class="ord">${n.ord}</span>
@@ -4474,7 +4483,7 @@ function accueil(){
       </div>
 
       <div class="separation"><span>Choisissez votre époque</span></div>
-      <div class="niveaux">${carte("I",1)}${carte("II",1)}${carte("III",0)}</div>
+      <div class="niveaux">${carte("I",1)}${carte("II",0)}${carte("III",0)}</div>
 
       <p class="note-menu">Les personnages qui vous parlent sont des figures composites.
       Les événements datés, eux, sont authentiques — le jeu cite ses sources.</p>
@@ -4483,6 +4492,7 @@ function accueil(){
 }
 
 function menuNiveau(id){
+  remonter(true);
   stopperMenu();
   document.body.classList.remove("surmenu");
   N=NIVEAUX[id]; document.body.dataset.niveau=id; peindreVille(); chercherVue(); try{ SON.ambiance("menu") }catch(e){}
@@ -4494,9 +4504,8 @@ function menuNiveau(id){
   </div>
   <div class="mission">
     <figure class="mission-illu mi-g">
-      <img src="img/niveau/${N.id}-gauche.jpg" alt="" loading="lazy"
+      <img src="img/niveau/${N.id}-gauche.jpg" alt="${esc(N.vues.g)}" loading="lazy"
            onerror="this.closest('figure').remove()">
-      <figcaption>${esc(N.vues.g)}</figcaption>
     </figure>
   <div class="role">
     <div class="r">${N.role}</div>
@@ -4506,9 +4515,8 @@ function menuNiveau(id){
     <p class="note-source">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
   </div>
     <figure class="mission-illu mi-d">
-      <img src="img/niveau/${N.id}-droite.jpg" alt="" loading="lazy"
+      <img src="img/niveau/${N.id}-droite.jpg" alt="${esc(N.vues.d)}" loading="lazy"
            onerror="this.closest('figure').remove()">
-      <figcaption>${esc(N.vues.d)}</figcaption>
     </figure>
   </div>
   <p class="mission-note">Ces deux vues sont des <strong>illustrations</strong>, pas des documents
