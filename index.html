@@ -1767,6 +1767,7 @@ const SON = {
       this.gainMus = this.ctx.createGain(); this.gainMus.gain.value=1;
       this.filtre.connect(this.gainMus); this.gainMus.connect(this.maitre);
       this.pret = true;
+      this.veiller();
     }catch(e){ this.pret=false; }
   },
 
@@ -1845,10 +1846,50 @@ const SON = {
     catch(e){ param.value = val; }
   },
 
+  /* Quelque chose joue-t-il, vraiment ? */
+  joue(){
+    return (this.lecteurs||[]).some(L => L && L.a && !L.a.paused && !L.a.ended);
+  },
+
+  /* Remettre l'ambiance en marche si elle s'est tue. Ne fait rien tant
+     que tout va bien : on peut donc l'appeler aussi souvent qu'on veut. */
+  relancer(){
+    if(!this.actif || !this.amb) return;
+    const b = BOUCLES[this.amb];
+    if(!b) return;
+    this.init();
+    if(!this.pret) return;
+    try{ if(this.ctx.state==="suspended") this.ctx.resume().catch(()=>{}); }catch(e){}
+    if(this.joue()) return;
+    this.actifL = 0;
+    this.demarrer(this.lecteur(0), b, true);
+    this.lecteur(1);
+    clearInterval(this.veille); this.veille = null;
+    this.surveiller(b);
+    this.lancerHorloge();
+  },
+
+  /* Le premier geste du joueur lève la règle de lecture automatique.
+     Ensuite, une veille toutes les quatre secondes rattrape ce qu'un
+     onglet endormi ou un refus de lecture aurait fait tomber. */
+  veiller(){
+    if(this.veilleGlobale) return;
+    const reprise = ()=>{ try{ this.relancer() }catch(e){} };
+    ["pointerdown","keydown","touchstart"].forEach(ev=>
+      document.addEventListener(ev, reprise, {capture:true, passive:true}));
+    document.addEventListener("visibilitychange", ()=>{
+      if(!document.hidden) reprise();
+    });
+    this.veilleGlobale = setInterval(reprise, 4000);
+  },
+
   /* ---------- l'ambiance --------------------------------------------- */
   ambiance(quoi){
     this.init();
-    if(this.amb===quoi) return;
+    /* Pas seulement « est-ce la même ambiance ? » mais « la même, et
+       elle joue vraiment ? ». Sans cela, une ambiance demandée avant
+       que le son soit prêt restait inscrite et bloquait les suivantes. */
+    if(this.amb===quoi && this.joue()) return;
     this.amb = quoi;
     const b = BOUCLES[quoi];
     /* hors d'une partie — menu, écran de fin — la tension retombe */
@@ -4461,7 +4502,7 @@ function titre(){
 
 function demarrer(){
   document.body.classList.remove("surtitre");
-  try{ SON.reveiller(); }catch(e){}
+  try{ SON.reveiller(); SON.relancer(); }catch(e){}
   accueil();
 }
 
