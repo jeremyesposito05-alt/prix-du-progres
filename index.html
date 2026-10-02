@@ -1700,6 +1700,47 @@ body.surmenu[data-decor-ecran="menu"] footer{color:var(--bs-doux)}
 body.surmenu[data-decor-ecran="menu"] footer .signature{color:var(--bs-doux)}
 body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 
+/* ---------- « ce dossier s'ouvre » --------------------------------
+   Seulement tant qu'aucun n'a été ouvert, et seulement les premiers
+   tours. Une invite qu'on ne peut pas manquer, qui s'efface dès
+   qu'elle a servi : on n'explique pas deux fois. */
+.d-enquete .cq-txt{flex:1 1 auto;min-width:0}
+.d-enquete .invite{
+  display:block; margin-top:4px; font-style:italic; font-size:12.5px;
+  line-height:1.45; color:var(--rge);
+}
+.d-enquete.guide{
+  border-color:var(--lai) !important;
+  box-shadow:0 10px 26px rgba(0,0,0,.5), 0 0 0 1px rgba(184,137,74,.5);
+}
+.d-enquete.guide .pli{
+  color:#2A1F12; background:linear-gradient(180deg,#E7C27A,var(--lai));
+  border-color:#6A4A22; font-weight:bold;
+  animation:pli-bat 1.8s ease-in-out infinite;
+}
+.d-enquete.guide .pli::before{content:"Ouvrir le rapport"}
+@keyframes pli-bat{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.07)}
+}
+@media(prefers-reduced-motion:reduce){ .d-enquete.guide .pli{animation:none} }
+
+/* ---------- le retour sur le jeu ---------------------------------- */
+.av-intro{margin:.2em 0 14px;font-size:13.5px;line-height:1.55;color:var(--enc2)}
+.av-intro b{color:var(--rge);font-variant-numeric:tabular-nums}
+.qz.av-q{margin:10px 0}
+.qz.av-q .qq{font-size:15px;margin-bottom:8px}
+.qz.av-q .qr{display:flex;flex-wrap:wrap;gap:7px}
+.qz.av-q .qr button{
+  font-size:13px; padding:6px 13px; border-radius:14px;
+  border:1px solid var(--fil); background:rgba(255,255,255,.45);
+  color:var(--enc2); cursor:pointer;
+}
+.qz.av-q .qr button:hover{border-color:var(--lai);color:var(--enc)}
+.qz.av-q .qr button.pris{
+  background:var(--lai); border-color:#6A4A22; color:#FFF4DE; font-weight:bold;
+}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2668,6 +2709,10 @@ function majVue(){
 function rendre(){
   remonter();
   const c=E.carte;
+  /* Personne n'a encore ouvert un dossier, et on est au début : on le
+     montre. Dès le premier ouvert, on se tait — et de toute façon on se
+     tait après le cinquième tour. */
+  const guide = ((E.lus||[]).length === 0) && E.tour < 5;
   let d=0; const D=()=>`style="--d:${(d+=.085).toFixed(3)}s"`;
   const trois=["a","b","c"].filter(k=>c[k]);
 
@@ -2682,9 +2727,11 @@ function rendre(){
       ${E.consq?`<div class="consq dossier d-decision" ${D()}>
           <span class="onglet">Rapport de décision</span>
           ${esc(E.consq)}<br><span class="ent">${esc(E.entassement||"")}</span></div>`:""}
-      ${c.f?`<details class="dossier d-enquete" ${D()}>
+      ${c.f?`<details class="dossier d-enquete ${guide?"guide":""}" ${D()}>
           <summary><span class="onglet">Rapport d’enquête</span>
-            Le bureau d’enquête a joint une note.
+            <span class="cq-txt">Le bureau d’enquête a joint une note.${
+              guide?`<i class="invite">Cliquez pour la lire : elle donne le fait historique,
+              les chiffres, et ce que le cours en dit.</i>`:""}</span>
             <span class="pli"></span></summary>
           <div class="corps">${illuDoc(c)}${corpsRapport(c)}</div></details>`:""}
       ${courrier(D())}
@@ -3722,6 +3769,56 @@ function poserDecor(ecran){
   })(0);
 }
 
+/* ==================================================================
+   LE RETOUR SUR LE JEU
+
+   Ce que l'élève pense du jeu part avec sa trace. Les questions sont
+   choisies pour qu'une réponse serve à décider quelque chose : si la
+   moitié d'une classe répond « souvent difficiles », on réécrit ; si
+   elle répond « trop longue », on coupe.
+   ================================================================== */
+const AVIS = [
+ {q:"Les textes du jeu étaient-ils clairs ?",
+  r:["Très clairs","Clairs dans l’ensemble","Parfois difficiles","Souvent difficiles"]},
+ {q:"Et la longueur de la partie ?",
+  r:["Trop courte","Juste comme il faut","Un peu longue","Trop longue"]},
+ {q:"Avez-vous compris pourquoi la partie s’est terminée ainsi ?",
+  r:["Oui, tout de suite","Oui, en lisant le verdict","Pas vraiment"]},
+ {q:"Qu’est-ce qui vous a le plus appris ?",
+  r:["Les affaires du jour","Les rapports d’enquête","Les plis du courrier","Le verdict final"]},
+ {q:"Avez-vous eu envie de recommencer une partie ?",
+  r:["Oui, tout de suite","Peut-être","Non"]},
+];
+
+function avis(i,j){ (E.av || (E.av = AVIS.map(()=>null)))[i] = j; rendreTrace(); }
+
+function blocAvis(){
+  const a = E.av || (E.av = AVIS.map(()=>null));
+  const faits = a.filter(x=>x!==null).length;
+  return `<div class="bilan">
+    <h2 style="margin-top:0">Votre avis sur le jeu</h2>
+    <p class="av-intro">Ces réponses ne sont pas notées. Elles servent à corriger le jeu
+    pour les classes suivantes — répondez franchement.
+    <b>${faits} sur ${AVIS.length}</b></p>
+    ${AVIS.map((x,i)=>`<div class="qz av-q">
+      <div class="qq">${esc(x.q)}</div>
+      <div class="qr">${x.r.map((t,j)=>`<button class="${a[i]===j?"pris":""}"
+        onclick="avis(${i},${j})">${esc(t)}</button>`).join("")}</div>
+    </div>`).join("")}
+    <label>Y a-t-il eu un moment où vous avez été perdu, ou bien où vous vous êtes ennuyé ?
+      Lequel&nbsp;?
+      <textarea id="av1" rows="2" placeholder="…"></textarea></label>
+    <label>Une chose à ajouter, à retirer, ou à corriger dans le jeu :
+      <textarea id="av2" rows="2" placeholder="…"></textarea></label>
+  </div>`;
+}
+
+/* Les réponses en clair, pour la trace écrite. */
+function avisLignes(){
+  const a = E.av || [];
+  return AVIS.map((x,i)=>[x.q, a[i]==null ? "sans réponse" : x.r[a[i]]]);
+}
+
 /* ---------- fins ---------- */
 const FINS_I={
  o:{t:"Les machines brisées",
@@ -4379,6 +4476,8 @@ function rendreTrace(){
         <input id="rnom" type="text" placeholder="Prénom et nom"></label>
     </div>
 
+    ${blocAvis()}
+
     <p class="centre" style="margin:22px 0 0">
       <button class="plein" onclick="telechargerTrace()">Télécharger (Word)</button>
       <button onclick="copierTrace()">Copier ma trace</button>
@@ -4404,8 +4503,8 @@ function rendreTrace(){
     </div>
   </div></div>`;
   /* on ne perd pas ce qui a déjà été écrit en cas de recalcul */
-  ["r1","r2","r3","rnom"].forEach(k=>{ const e=document.getElementById(k); if(e&&E["t_"+k]) e.value=E["t_"+k]; });
-  ["r1","r2","r3","rnom"].forEach(k=>{ const e=document.getElementById(k);
+  ["r1","r2","r3","rnom","av1","av2"].forEach(k=>{ const e=document.getElementById(k); if(e&&E["t_"+k]) e.value=E["t_"+k]; });
+  ["r1","r2","r3","rnom","av1","av2"].forEach(k=>{ const e=document.getElementById(k);
     if(e) e.addEventListener("input",()=>{ E["t_"+k]=e.value; rafraichirValidation(); }); });
   rafraichirValidation();
 }
@@ -4451,6 +4550,13 @@ function texteTrace(){
   L.push("      "+((E.t_r2||"").trim()||"…"));
   L.push("  Ce que cette partie m’apprend sur le progrès industriel :");
   L.push("      "+((E.t_r3||"").trim()||"…"));
+  L.push("");
+  L.push("MON AVIS SUR LE JEU");
+  avisLignes().forEach(p=>{ L.push("  "+p[0]); L.push("      "+p[1]); });
+  L.push("  Un moment où j’étais perdu ou ennuyé :");
+  L.push("      "+((E.t_av1||"").trim()||"…"));
+  L.push("  À ajouter, retirer ou corriger :");
+  L.push("      "+((E.t_av2||"").trim()||"…"));
   return L.join("\n");
 }
 
@@ -4578,6 +4684,15 @@ ${quiz}
   ${e((E.t_r2||"").trim())||"&nbsp;"}</div>
 <div class=refl><span class=k>Ce que cette partie m’apprend sur le progrès industriel</span>
   ${e((E.t_r3||"").trim())||"&nbsp;"}</div>
+
+<h2>Mon avis sur le jeu</h2>
+<table class=fiche>
+  ${avisLignes().map(p=>`<tr><td class=k>${e(p[0])}</td><td>${e(p[1])}</td></tr>`).join("")}
+</table>
+<div class=refl><span class=k>Un moment où j’étais perdu ou ennuyé</span>
+  ${e((E.t_av1||"").trim())||"&nbsp;"}</div>
+<div class=refl><span class=k>À ajouter, retirer ou corriger</span>
+  ${e((E.t_av2||"").trim())||"&nbsp;"}</div>
 
 <p class=pied>Collège Alpin Beau Soleil · Unité 1 — Quand l’innovation change la société · Grade 10.
 Les personnages du jeu sont des figures composites ; les événements datés sont authentiques et cités.<br>
