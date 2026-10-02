@@ -1821,6 +1821,13 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   .force .pourquoi::before{display:none}
 }
 
+/* ---------- le son coupé se voit --------------------------------- */
+#btson.muet{
+  color:var(--bs-orange,#CA5007); border-color:rgba(202,80,7,.7);
+  background:rgba(202,80,7,.14);
+}
+#btson.muet + #volson{opacity:.4}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2047,11 +2054,20 @@ const SON = {
   couper(v){
     this.actif = v;
     try{ localStorage.setItem("pdp_son", v?"1":"0") }catch(e){}
-    if(this.maitre) this.glisser(this.maitre.gain, v?this.vmax:0, .3);
+    /* On coupe d'un coup : un fondu laisse le temps à une autre rampe
+       de reprendre la main, et le joueur a cliqué pour que ça s'arrête
+       maintenant. On rétablit en douceur, en revanche. */
+    if(this.maitre){
+      if(v) this.glisser(this.maitre.gain, this.vmax, .3);
+      else try{ this.maitre.gain.cancelScheduledValues(this.ctx.currentTime);
+                this.maitre.gain.setValueAtTime(0, this.ctx.currentTime); }
+           catch(e){ this.maitre.gain.value = 0; }
+    }
     this.lecteurs.forEach(L=>{ if(!L) return;
       if(v){ if(L.a.src) L.a.play().catch(()=>{}) } else L.a.pause(); });
     const b=document.getElementById("btson");
-    if(b){ b.textContent = v?"♪":"♪̸"; b.title = v?"Couper le son":"Rétablir le son"; }
+    if(b){ b.textContent = v?"♪":"♪̸"; b.title = v?"Couper le son":"Rétablir le son";
+            b.classList.toggle("muet", !v); }
   },
 
   /* La réglette. Rétablit le son si on la remonte alors qu'il était coupé :
@@ -2084,7 +2100,18 @@ const SON = {
   /* Remettre l'ambiance en marche si elle s'est tue. Ne fait rien tant
      que tout va bien : on peut donc l'appeler aussi souvent qu'on veut. */
   relancer(){
-    if(!this.actif || !this.amb) return;
+    /* Le son est coupé : la veille ne se contente pas de ne rien faire,
+       elle s'assure qu'il l'est resté. C'est la même boucle qui répare
+       dans les deux sens. */
+    if(!this.actif){
+      try{ if(this.maitre && this.ctx){
+             this.maitre.gain.cancelScheduledValues(this.ctx.currentTime);
+             this.maitre.gain.setValueAtTime(0, this.ctx.currentTime); } }catch(e){}
+      (this.lecteurs||[]).forEach(L=>{ if(L && L.a && !L.a.paused){
+        try{ L.a.pause() }catch(e){} } });
+      return;
+    }
+    if(!this.amb) return;
     const b = BOUCLES[this.amb];
     if(!b) return;
     this.init();
@@ -2340,7 +2367,7 @@ try{ SON.actif = localStorage.getItem("pdp_son") !== "0";
 try{ const r=document.getElementById("volson");
      if(r) r.value = Math.round(SON.vmax*100);
      const b=document.getElementById("btson");
-     if(b && !SON.actif){ b.textContent="♪̸"; b.title="Rétablir le son"; } }catch(e){}
+     if(b && !SON.actif){ b.textContent="♪̸"; b.title="Rétablir le son"; b.classList.add("muet"); } }catch(e){}
 ["pointerdown","keydown"].forEach(ev=>
   document.addEventListener(ev, ()=>SON.reveiller(), {once:true}));
 
