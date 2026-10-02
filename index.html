@@ -2353,6 +2353,110 @@ const SON = {
     });
   },
 
+  /* Le tiroir du bureau d'enquête : du bois qui glisse sur du bois,
+     puis la butée. Grave, court, sans claquement sec. */
+  tiroir(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.01;
+    const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.bruit; s.loop=true;
+    f.type="lowpass"; f.frequency.setValueAtTime(380, t);
+    f.frequency.linearRampToValueAtTime(900, t+.3);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.05, t+.09);
+    g.gain.setValueAtTime(.05, t+.26);
+    g.gain.exponentialRampToValueAtTime(.001, t+.4);
+    s.connect(f); f.connect(g); g.connect(this.eff()); s.start(t); s.stop(t+.42);
+    /* la butée, quand le tiroir arrive au bout */
+    const o=c.createOscillator(), gb=c.createGain();
+    o.type="triangle"; o.frequency.setValueAtTime(150, t+.3);
+    o.frequency.exponentialRampToValueAtTime(82, t+.38);
+    gb.gain.setValueAtTime(0, t+.3);
+    gb.gain.linearRampToValueAtTime(.09, t+.31);
+    gb.gain.exponentialRampToValueAtTime(.001, t+.42);
+    o.connect(gb); gb.connect(this.eff()); o.start(t+.3); o.stop(t+.44);
+  },
+
+  /* L'enveloppe : le cachet casse, puis le papier se déchire. La
+     déchirure monte en fréquence — c'est ce qui la rend reconnaissable. */
+  enveloppe(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.01;
+    /* le cachet */
+    const o=c.createOscillator(), g0=c.createGain();
+    o.type="triangle"; o.frequency.setValueAtTime(420, t);
+    o.frequency.exponentialRampToValueAtTime(130, t+.07);
+    g0.gain.setValueAtTime(0, t);
+    g0.gain.linearRampToValueAtTime(.14, t+.006);
+    g0.gain.exponentialRampToValueAtTime(.001, t+.1);
+    o.connect(g0); g0.connect(this.eff()); o.start(t); o.stop(t+.12);
+    /* la déchirure */
+    const d=t+.1;
+    const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.bruit; s.loop=true;
+    f.type="bandpass"; f.Q.value=.9;
+    f.frequency.setValueAtTime(1600, d);
+    f.frequency.exponentialRampToValueAtTime(5200, d+.3);
+    g.gain.setValueAtTime(0, d);
+    g.gain.linearRampToValueAtTime(.055, d+.05);
+    g.gain.linearRampToValueAtTime(.035, d+.2);
+    g.gain.exponentialRampToValueAtTime(.001, d+.36);
+    s.connect(f); f.connect(g); g.connect(this.eff()); s.start(d); s.stop(d+.38);
+  },
+
+  /* Le coup du verdict : un seul, grave et long. Il tombe trois secondes
+     avant que la musique de fin s'installe. */
+  verdict(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.02;
+    const o=c.createOscillator(), o2=c.createOscillator(), g=c.createGain();
+    o.type="sine";  o.frequency.setValueAtTime(74, t);
+    o.frequency.exponentialRampToValueAtTime(44, t+1.6);
+    o2.type="sine"; o2.frequency.setValueAtTime(111, t);
+    o2.frequency.exponentialRampToValueAtTime(66, t+1.6);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.22, t+.04);
+    g.gain.exponentialRampToValueAtTime(.0008, t+2.6);
+    o.connect(g); o2.connect(g); g.connect(this.eff());
+    o.start(t); o2.start(t); o.stop(t+2.8); o2.stop(t+2.8);
+  },
+
+  /* Une force passe sous quinze. Le bandeau rouge, un élève qui lit ne
+     le voit pas : une note tenue, discrète, qui s'efface d'elle-même. */
+  alerte(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.02;
+    [466.2, 311.1].forEach((hz,i)=>{
+      const o=c.createOscillator(), g=c.createGain();
+      o.type="sine"; o.frequency.value=hz;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(i?.05:.07, t+.25);
+      g.gain.setValueAtTime(i?.05:.07, t+.7);
+      g.gain.exponentialRampToValueAtTime(.0008, t+2.1);
+      o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+2.2);
+    });
+  },
+
+  /* La correction du questionnaire : une note par réponse, dans l'ordre.
+     Claire quand elle est juste, sourde quand elle ne l'est pas. */
+  bilan(justes){
+    if(!this.pret || !justes || !justes.length) return;
+    const c=this.ctx, t0=c.currentTime+.12;
+    justes.forEach((ok,i)=>{
+      const t=t0+i*.15;
+      const o=c.createOscillator(), f=c.createBiquadFilter(), g=c.createGain();
+      o.type = ok ? "sine" : "triangle";
+      o.frequency.setValueAtTime(ok ? 784 : 174.6, t);
+      if(!ok) o.frequency.exponentialRampToValueAtTime(146.8, t+.2);
+      f.type="lowpass"; f.frequency.value = ok ? 6000 : 700;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(ok ? .1 : .085, t+.012);
+      g.gain.exponentialRampToValueAtTime(.001, t+(ok ? .34 : .28));
+      o.connect(f); f.connect(g); g.connect(this.eff());
+      o.start(t); o.stop(t+.4);
+    });
+  },
+
   /* ---------- la tension ---------------------------------------------- */
   majTension(){
     if(!this.pret) return;
@@ -2395,20 +2499,6 @@ const SON = {
     s.connect(f); f.connect(g); g.connect(this.eff()); s.start(t); s.stop(t+.22);
   },
 
-  /* Le cachet de cire qui casse : un claquement sec, puis le froissement
-     du papier qu'on déplie. */
-  sceau(){
-    if(!this.pret) return;
-    const c=this.ctx, t=c.currentTime+.01;
-    const o=c.createOscillator(), g=c.createGain();
-    o.type="triangle"; o.frequency.setValueAtTime(420, t);
-    o.frequency.exponentialRampToValueAtTime(130, t+.07);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(.16, t+.006);
-    g.gain.exponentialRampToValueAtTime(.001, t+.1);
-    o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+.12);
-    setTimeout(()=>this.papier(), 70);
-  },
 
   /* Un acteur qu'on interroge répond par une note : elle monte s'il a
      gagné, elle descend s'il a perdu, elle reste plate s'il n'a rien eu. */
@@ -2446,6 +2536,7 @@ const SON = {
   fin(cause){
     if(!this.pret) return;
     this.horlogeUrgence(false);
+    this.verdict();                  /* un seul coup, grave, sous le reste */
     const c=this.ctx, t=c.currentTime+.05;
     const freqs = cause==="verdict" ? [196, 261.6, 329.6] : [110, 146.8, 155.6];
     freqs.forEach((hz,i)=>{
@@ -3049,9 +3140,9 @@ document.addEventListener("toggle",e=>{
   /* un dossier qu'on déplie froisse, un pli qu'on décachette craque */
   if(t.open && t.classList){
     try{
-      if(t.classList.contains("courrier")) SON.sceau();
-      else if(t.classList.contains("d-enquete") || t.classList.contains("carnet")
-              || t.classList.contains("acteur")) SON.papier();
+      if(t.classList.contains("courrier")) SON.enveloppe();
+      else if(t.classList.contains("d-enquete")) SON.tiroir();
+      else if(t.classList.contains("carnet") || t.classList.contains("acteur")) SON.papier();
     }catch(e){}
   }
   if(t.classList&&t.classList.contains("courrier")&&t.open&&E){
@@ -3659,11 +3750,19 @@ function illuDoc(c){
 function appliquer(e){
   if(!e || !E) return;
   const frappees=[];
+  let bascule=false;
+  if(!E.alerte) E.alerte={};
   CLES.forEach(k=>{
     if(!e[k]) return;
+    const avant = E.f[k];
     E.f[k] = clamp(E.f[k] + e[k]);
     if(e[k] < 0) frappees.push(k);
+    /* La force vient de passer sous le seuil d'alarme : on le signale
+       une fois, et on réarme dès qu'elle repasse au-dessus. */
+    if(avant > 14 && E.f[k] <= 14 && !E.alerte[k]){ E.alerte[k]=true; bascule=true; }
+    if(E.f[k] > 18) E.alerte[k]=false;
   });
+  if(bascule) try{ SON.alerte() }catch(x){}
   E.secousse = frappees;
   if(frappees.length){ clearTimeout(SEC_T); SEC_T=null; }
 }
@@ -4967,7 +5066,11 @@ function rendreTrace(){
 }
 
 function repondre(i,j){ E.rep[i]=j; rendreTrace(); }
-function corriger(){ E.corrige=true; rendreTrace(); }
+function corriger(){
+  E.corrige=true;
+  try{ SON.bilan(E.quiz.map((q,i)=>E.rep[i]===q.b)) }catch(e){}
+  rendreTrace();
+}
 
 /* Le document à rendre : du texte simple, qui se colle partout. */
 function texteTrace(){
