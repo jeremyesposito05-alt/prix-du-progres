@@ -3955,7 +3955,7 @@ function ecrireMission(){
    En douceur, sauf si l'on a demandé moins d'animations. */
 function remonter(sec){
   /* tout changement d’écran arrête la machine à écrire : elle ne
-     reprendra que si un texte se remet à sécrire. */
+     reprendra que si un texte se remet à s’écrire. */
   try{ SON.frappe(false) }catch(e){}
   /* sec : d'un coup. On s'en sert quand l'écran change entièrement —
      glisser depuis le bas d'un menu n'aurait aucun sens. */
