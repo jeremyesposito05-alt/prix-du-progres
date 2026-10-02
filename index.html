@@ -2457,6 +2457,45 @@ const SON = {
     });
   },
 
+  /* La machine tape tant qu'un texte s'écrit. Irrégulière, discrète, et
+     toujours sous la musique : c'est une présence, pas un événement. */
+  frappe(marche){
+    if(!this.pret) return;
+    if(!marche){ if(this.dactylo){ clearInterval(this.dactylo); this.dactylo=null; } return; }
+    if(this.dactylo) return;
+    const clic = ()=>{
+      const c=this.ctx, t=c.currentTime+.005;
+      const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+      s.buffer=this.bruit; s.loop=true;
+      f.type="bandpass"; f.Q.value=2.2;
+      f.frequency.value = 1900 + Math.random()*1300;   /* chaque touche sonne un peu autrement */
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(.028 + Math.random()*.016, t+.003);
+      g.gain.exponentialRampToValueAtTime(.001, t+.035);
+      s.connect(f); f.connect(g); g.connect(this.eff()); s.start(t); s.stop(t+.05);
+    };
+    clic();
+    this.dactylo = setInterval(()=>{
+      clic();
+      /* une frappe sur six se double : c'est ce qui fait la main humaine */
+      if(Math.random() < .17) setTimeout(clic, 40 + Math.random()*30);
+    }, 115);
+  },
+
+  /* La sonnette du chariot, quand la ligne est finie. */
+  chariot(){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.01;
+    [2093, 3136].forEach((hz,i)=>{
+      const o=c.createOscillator(), g=c.createGain();
+      o.type="sine"; o.frequency.value=hz;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(i?.022:.05, t+.004);
+      g.gain.exponentialRampToValueAtTime(.0008, t+(i?.5:.8));
+      o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+.9);
+    });
+  },
+
   /* ---------- la tension ---------------------------------------------- */
   majTension(){
     if(!this.pret) return;
@@ -3342,10 +3381,13 @@ function ecrire(titre, expose, replique){
   /* Toute l'affaire s'écrit : le titre, puis l'exposé, puis la réplique.
      L'exposé défile vite — il fait près de quatre cents caractères — et
      un clic n'importe où pose l'ensemble d'un coup. */
+  try{ SON.frappe(true) }catch(e){}
+  const fini = ()=>{ try{ SON.frappe(false) }catch(e){} };
   E.machines=[ taper(t, titre, 15, ()=>{
-    if(!x || !E.ecrit.ex){ E.machines.push(taper(r, replique, 7)); return; }
+    try{ SON.chariot() }catch(e){}          /* le titre est posé */
+    if(!x || !E.ecrit.ex){ E.machines.push(taper(r, replique, 7, fini)); return; }
     E.machines.push(taper(x, E.ecrit.ex, 4, ()=>{
-      E.machines.push(taper(r, replique, 7));
+      E.machines.push(taper(r, replique, 7, fini));
     }));
   }) ];
 }
@@ -3362,6 +3404,7 @@ function taper(el, txt, ms, fin){
 function stopperMachines(){
   if(E && E.machines) E.machines.forEach(clearInterval);
   if(E) E.machines=[];
+  try{ SON.frappe(false) }catch(e){}
 }
 
 /* Un clic n'importe où pose le texte en entier. */
@@ -3911,6 +3954,9 @@ function ecrireMission(){
 /* On remonte au tableau : c'est là que se voit ce qu'on vient de faire.
    En douceur, sauf si l'on a demandé moins d'animations. */
 function remonter(sec){
+  /* tout changement d’écran arrête la machine à écrire : elle ne
+     reprendra que si un texte se remet à sécrire. */
+  try{ SON.frappe(false) }catch(e){}
   /* sec : d'un coup. On s'en sert quand l'écran change entièrement —
      glisser depuis le bas d'un menu n'aurait aucun sens. */
   const doux = !sec && (!window.matchMedia
