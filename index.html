@@ -2248,6 +2248,17 @@ const FORCES_I = {
      role:"L’**État** et les autorités de Londres. Longtemps absents de l’économie, ils commencent à intervenir : lois sur le travail des enfants, enquêtes sanitaires, maintien de l’ordre. Ils jugent ce que la ville laisse derrière elle. Perdre leur confiance, c’est risquer la mise sous tutelle."},
 };
 const CLES = ["i","o","m","p"];
+/* Les quatre rôles, indépendants de l'époque. Le tutoriel les présente
+   avant que le joueur ait choisi son siècle ; chaque niveau leur donne
+   ensuite ses propres noms — Industriels ou Actionnaires, Marchands ou
+   Clients, Parlement ou Opinion. */
+const ROLES = [
+  {k:"i", t:"ceux qui produisent"},
+  {k:"o", t:"ceux qui travaillent"},
+  {k:"m", t:"ceux qui achètent"},
+  {k:"p", t:"ceux qui font la loi"},
+];
+
 const CONDITIONS = ["Ressources","Savoirs techniques","Capitaux","Main-d’œuvre","Marchés","Transports","Organisation"];
 
 /* ==================================================================
@@ -4837,9 +4848,12 @@ function accueil(){
           <span class="num">2</span>
           <div>
             <h3>Quatre forces vous jugent</h3>
-            <div class="mini-forces">${CLES.map(k=>`<span title="${esc(NIVEAUX.I.forces[k].nom)}">
-              ${icone(k)}<i>${esc(NIVEAUX.I.forces[k].nom)}</i></span>`).join("")}</div>
-            <p>Chaque décision en contente une et en fâche une autre.
+            <div class="mini-forces">${ROLES.map(r=>`<span>
+              ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
+            <p>Les mêmes quatre rôles traversent les trois révolutions industrielles — seuls
+            les noms changent. <strong>Vous découvrirez les vôtres en choisissant votre
+            époque.</strong></p>
+            <p>Chaque décision en contente un et en fâche un autre.
             <strong>Aucune réponse ne plaît à tout le monde</strong> — c’est le sujet même du cours.</p>
           </div>
         </div>
