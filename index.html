@@ -1742,6 +1742,30 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   background:var(--lai); border-color:#6A4A22; color:#FFF4DE; font-weight:bold;
 }
 
+/* ---------- les quatre courbes de la trace ------------------------ */
+.cfo{display:block;width:100%;height:auto;margin:14px 0 4px}
+.cfo .g{stroke:rgba(90,70,45,.18);stroke-width:1}
+.cfo .zero{stroke:rgba(142,36,19,.45);stroke-width:1.4}
+.cfo .ax{fill:var(--enc2);font-size:11px;text-anchor:end;font-family:inherit}
+.cfo .ax.an{text-anchor:middle;letter-spacing:.06em}
+
+.cfo-leg{display:flex;flex-wrap:wrap;gap:8px 20px;margin:6px 0 2px}
+.cfo-l{display:flex;align-items:baseline;gap:7px;font-size:13px;color:var(--enc2)}
+.cfo-l i{width:14px;height:3px;border-radius:2px;flex:0 0 auto;align-self:center}
+.cfo-l b{color:var(--enc);font-weight:normal}
+.cfo-l em{font-style:normal;font-family:var(--serif);font-size:17px;color:var(--enc);
+  font-variant-numeric:tabular-nums}
+.cfo-l u{text-decoration:none;font-size:12px;font-variant-numeric:tabular-nums;opacity:.85}
+.cfo-l u.up{color:#3F6A2E} .cfo-l u.dn{color:var(--rge)}
+.cfo-note{font-size:12.5px;line-height:1.5;color:var(--enc2);font-style:italic;margin:4px 0 14px}
+
+/* ce qu'une décision a fait, en face d'elle */
+.carnet .efs{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:5px}
+.carnet .ef{font-size:11.5px;letter-spacing:.02em;padding:1px 7px;border-radius:10px;
+  border:1px solid var(--fil);background:rgba(255,255,255,.4);white-space:nowrap}
+.carnet .ef.up{color:#3F6A2E;border-color:rgba(78,122,58,.5)}
+.carnet .ef.dn{color:var(--rge);border-color:rgba(142,36,19,.45)}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2525,7 +2549,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:true,crLus:0,courbe:[{t:0,pop:N.pop0}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:true,crLus:0,courbe:[{t:0,pop:N.pop0}],releve:[{t:0,an:N.a0,i:60,o:60,m:60,p:60}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -2557,6 +2581,10 @@ function choisir(quel){
   const taux=1+.03+E.f.i/500+(r.pop||0);
   const avant=E.pop; E.pop=Math.round(E.pop*taux);
   (E.courbe||(E.courbe=[])).push({t:E.tour, pop:E.pop});
+  /* L'état des quatre forces après cette décision. C'est ce relevé qui
+     permettra, à la fin, de montrer qui a payé quoi et quand. */
+  (E.releve||(E.releve=[])).push({t:E.tour, an:(E.mode==="campagne"?AN(E.tour):null),
+    i:Math.round(E.f.i), o:Math.round(E.f.o), m:Math.round(E.f.m), p:Math.round(E.f.p)});
   /* L'entassement s'aggrave avec la TAILLE de la ville, pas seulement
      avec son rythme : loger 400 000 personnes est plus dur que d'en
      loger 40 000. Sans cela, il suffisait de ne jamais industrialiser
@@ -3831,6 +3859,83 @@ function avisLignes(){
   return AVIS.map((x,i)=>[x.q, a[i]==null ? "sans réponse" : x.r[a[i]]]);
 }
 
+/* ==================================================================
+   LES QUATRE COURBES
+
+   Une ligne par acteur, du premier tour au dernier. Ce n'est pas un
+   ornement : c'est la seule page du jeu où l'élève voit d'un regard que
+   sa décision du tour 7 a fait plonger les ouvriers, et que rien ne les
+   a relevés ensuite.
+   ================================================================== */
+const COUL_F = { i:"#8E5A1E", o:"#9A2A1E", m:"#2F6B5E", p:"#2E3E7A" };
+
+function courbesForces(){
+  const r = (E.releve||[]).filter(p=>p && isFinite(p.i));
+  if(r.length < 2) return "";
+  const L=760, H=210, mg=34, md=14, mh=14, mb=26;
+  const xb = Math.max(...r.map(p=>p.t)) || 1;
+  const px = t => mg + (L-mg-md) * (t/xb);
+  const py = v => (H-mb) - (H-mh-mb) * (v/100);
+
+  /* les repères : zéro, cinquante, cent */
+  const grille = [0,25,50,75,100].map(v=>`
+    <line x1="${mg}" y1="${py(v).toFixed(1)}" x2="${L-md}" y2="${py(v).toFixed(1)}"
+          class="${v===0?"zero":"g"}"></line>
+    <text x="${mg-6}" y="${(py(v)+4).toFixed(1)}" class="ax">${v}</text>`).join("");
+
+  const lignes = CLES.map(k=>{
+    const pts = r.map(p=>px(p.t).toFixed(1)+","+py(p[k]).toFixed(1)).join(" ");
+    const d = r[r.length-1];
+    return `<polyline points="${pts}" fill="none" stroke="${COUL_F[k]}"
+              stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"
+              vector-effect="non-scaling-stroke"></polyline>
+            <circle cx="${px(d.t).toFixed(1)}" cy="${py(d[k]).toFixed(1)}" r="3.4"
+              fill="${COUL_F[k]}" stroke="#FBF6E6" stroke-width="1.3"></circle>`;
+  }).join("");
+
+  /* les années, aux deux bouts et au milieu */
+  const an = r[0].an ? [r[0], r[Math.floor(r.length/2)], r[r.length-1]].map(p=>
+    `<text x="${px(p.t).toFixed(1)}" y="${H-7}" class="ax an">${p.an}</text>`).join("") : "";
+
+  return `<svg class="cfo" viewBox="0 0 ${L} ${H}" role="img"
+     aria-label="Évolution des quatre forces au fil de la partie">
+    ${grille}${lignes}${an}</svg>`;
+}
+
+function legendeForces(){
+  const r = E.releve||[], d = r[r.length-1] || {};
+  return `<div class="cfo-leg">${CLES.map(k=>{
+    const v = d[k]==null ? 60 : d[k], ecart = v - 60;
+    return `<span class="cfo-l">
+      <i style="background:${COUL_F[k]}"></i>
+      <b>${esc(N.forces[k].nom)}</b>
+      <em>${v}</em>
+      <u class="${ecart>0?"up":ecart<0?"dn":""}">${ecart>0?"+":""}${ecart}</u>
+    </span>`;
+  }).join("")}</div>`;
+}
+
+/* Ce qu'une décision a fait aux quatre forces, en clair. */
+function effetsLigne(e){
+  if(!e) return "";
+  const l = CLES.filter(k=>e[k]).map(k=>
+    `<span class="ef ${e[k]>0?"up":"dn"}">${esc(N.forces[k].nom)}&nbsp;${e[k]>0?"+":""}${e[k]}</span>`);
+  return l.length ? `<span class="efs">${l.join("")}</span>` : "";
+}
+
+/* Le même relevé en texte, pour la trace copiée. */
+function releveTexte(){
+  const r = E.releve||[];
+  if(r.length < 2) return [];
+  const L = ["", "L’ÉTAT DES QUATRE FORCES, DÉCISION APRÈS DÉCISION",
+    "  année   " + CLES.map(k=>N.forces[k].nom.padEnd(14)).join("")];
+  r.forEach(p=>{
+    L.push("  " + String(p.an||p.t).padEnd(8)
+      + CLES.map(k=>String(p[k]).padEnd(14)).join(""));
+  });
+  return L;
+}
+
 /* ---------- fins ---------- */
 const FINS_I={
  o:{t:"Les machines brisées",
@@ -4451,10 +4556,15 @@ function rendreTrace(){
       <h2 style="margin-top:0">Mon carnet de bord</h2>
       <p style="margin:.2em 0 .8em;font-size:14px;color:var(--enc2)">
         ${E.carnet.length} décision${E.carnet.length>1?"s":""} prise${E.carnet.length>1?"s":""}.</p>
+      ${courbesForces()}
+      ${legendeForces()}
+      <p class="cfo-note">Chaque force part de 60 sur 100. La courbe dit qui a payé vos
+      décisions, et à quel moment.</p>
       <ol class="carnet">${E.carnet.map(d=>`<li>
         ${d.an?`<span class="an">${d.an}</span>`:""}
         <span class="aff">${esc(d.t)}</span>
-        <span class="dec">${esc(d.q||"")}</span></li>`).join("")}</ol>
+        <span class="dec">${esc(d.q||"")}</span>
+        ${effetsLigne(d.e)}</li>`).join("")}</ol>
     </div>
 
     <div class="bilan">
@@ -4562,6 +4672,7 @@ function texteTrace(){
   L.push("      "+((E.t_r2||"").trim()||"…"));
   L.push("  Ce que cette partie m’apprend sur le progrès industriel :");
   L.push("      "+((E.t_r3||"").trim()||"…"));
+  releveTexte().forEach(x=>L.push(x));
   L.push("");
   L.push("MON AVIS SUR LE JEU");
   avisLignes().forEach(p=>{ L.push("  "+p[0]); L.push("      "+p[1]); });
@@ -4603,6 +4714,17 @@ function htmlTrace(){
       <td class=n>${i+1}</td>
       <td class=an>${d.an?e(d.an):""}</td>
       <td>${e(d.t)}<div class=dec>${e(d.q||"")}</div></td>
+      ${CLES.map(k=>{ const v=(d.e||{})[k]||0;
+        return `<td class="num ${v>0?"up":v<0?"dn":""}">${v?(v>0?"+":"")+v:"·"}</td>`;
+      }).join("")}
+    </tr>`).join("");
+
+  /* L'état après chaque décision : Word ne trace pas de courbe, mais un
+     tableau chiffré s'imprime, se corrige et se compare. */
+  const releve = (E.releve||[]).map(p=>`
+    <tr>
+      <td class=an>${p.an?e(p.an):e(String(p.t))}</td>
+      ${CLES.map(k=>`<td class=num>${p[k]}</td>`).join("")}
     </tr>`).join("");
 
   const quiz = !E.corrige ? "<p class=vide>Le questionnaire n’a pas été corrigé.</p>"
@@ -4656,6 +4778,10 @@ td.an{width:42pt;color:#CA5007;font-weight:bold}
 .refl{border:0.5pt solid #C9CBD2;padding:8pt 10pt;margin:7pt 0;min-height:30pt}
 .refl .k{color:#9C9895;font-size:10pt;display:block;margin-bottom:3pt}
 .vide{color:#9C9895;font-style:italic}
+td.num,th.num{text-align:center;width:38pt;font-size:9.5pt}
+td.num.up{color:#2F6B2B}
+td.num.dn{color:#8E2413}
+p.leg{font-size:9.5pt;color:#9C9895;margin:2pt 0 5pt;font-style:italic}
 .pied{margin-top:24pt;padding-top:6pt;border-top:0.5pt solid #C9CBD2;
       font-size:9pt;color:#9C9895}
 </style></head><body>
@@ -4679,9 +4805,18 @@ td.an{width:42pt;color:#CA5007;font-weight:bold}
 </table>
 
 <h2>Mon carnet de bord</h2>
+<p class=leg>Les quatre dernières colonnes disent ce que chaque décision a fait aux acteurs.</p>
 <table>
-  <tr><th class=n>N°</th><th class=an>Année</th><th>L’affaire, et ce que j’ai décidé</th></tr>
+  <tr><th class=n>N°</th><th class=an>Année</th><th>L’affaire, et ce que j’ai décidé</th>
+      ${CLES.map(k=>`<th class=num>${e(N.forces[k].nom.slice(0,4))}.</th>`).join("")}</tr>
   ${carnet}
+</table>
+
+<h2>L’état des quatre forces, décision après décision</h2>
+<p class=leg>Chacune part de 60 sur 100. Une force à zéro arrête la partie.</p>
+<table>
+  <tr><th class=an>Année</th>${CLES.map(k=>`<th class=num>${e(N.forces[k].nom)}</th>`).join("")}</tr>
+  ${releve}
 </table>
 
 <h2>Ce que j’ai retenu</h2>
