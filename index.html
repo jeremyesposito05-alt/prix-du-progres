@@ -1594,6 +1594,112 @@ body[data-decor="photo"] .courrier{
   box-shadow:0 14px 34px rgba(0,0,0,.6);
 }
 
+/* ==================================================================
+   LE MENU, AU JOUR
+
+   Une salle de classe claire : mur blanc, bois pâle, neige. Les fiches
+   crème d'un bureau de 1820 y disparaissaient. C'est aussi le seul
+   écran du jeu qui se passe aujourd'hui, à Beau Soleil — donc le seul
+   où la charte de l'école commande la gamme plutôt que la période.
+
+   Tout est conditionné à l'image réellement posée : si la salle manque
+   et qu'on retombe sur la pièce de Manchester, le thème sombre reprend.
+   ================================================================== */
+body.surmenu[data-decor-ecran="menu"]{
+  --bs-navy:#1A2047; --bs-mid:#14387F; --bs-vif:#0087CC;
+  --bs-gris:#2E3945; --bs-doux:#5E6B7A; --bs-filet:#D8DEE8;
+}
+/* la lumière de la salle ne doit pas être éteinte : le voile sombre du
+   décor devient un voile clair, juste assez pour calmer le sol */
+body.surmenu[data-decor-ecran="menu"] #decor::after{
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0) 0%, rgba(255,255,255,0) 34%,
+    rgba(255,255,255,.34) 62%, rgba(255,255,255,.62) 100%);
+}
+
+/* ---------- les titres ---------- */
+body.surmenu[data-decor-ecran="menu"] .menu-ecran .entete h1{
+  color:var(--bs-navy);
+  text-shadow:0 0 22px rgba(255,255,255,.95), 0 0 9px rgba(255,255,255,1),
+              0 1px 0 rgba(255,255,255,.9);
+}
+body.surmenu[data-decor-ecran="menu"] .menu-ecran .entete .surtitre-txt{
+  color:var(--bs-mid); font-weight:bold;
+  text-shadow:0 0 14px rgba(255,255,255,1), 0 0 6px rgba(255,255,255,1);
+}
+
+/* ---------- les quatre fiches ----------
+   Du papier posé bien droit sur une table d'école, plus un dossier
+   jeté sur un bureau : ni rotation, ni grain, ni ombre portée lourde. */
+body.surmenu[data-decor-ecran="menu"] .etape{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--bs-filet); border-radius:6px;
+  color:var(--bs-gris);
+  box-shadow:0 6px 18px rgba(26,32,71,.1), 0 1px 3px rgba(26,32,71,.08);
+  transform:none;
+}
+body.surmenu[data-decor-ecran="menu"] .etape:hover{
+  box-shadow:0 10px 26px rgba(26,32,71,.14);
+}
+body.surmenu[data-decor-ecran="menu"] .etape .num{
+  color:#fff; background:var(--bs-navy);
+  box-shadow:0 2px 6px rgba(26,32,71,.3); border:none;
+}
+body.surmenu[data-decor-ecran="menu"] .etape h3{color:var(--bs-navy)}
+body.surmenu[data-decor-ecran="menu"] .etape p{color:var(--bs-gris)}
+body.surmenu[data-decor-ecran="menu"] .etape p strong{color:var(--bs-navy)}
+body.surmenu[data-decor-ecran="menu"] .mini-forces svg{fill:var(--bs-mid)}
+body.surmenu[data-decor-ecran="menu"] .mini-forces i{color:var(--bs-mid)}
+
+/* ---------- le filet qui sépare ---------- */
+body.surmenu[data-decor-ecran="menu"] .separation::before{
+  background:linear-gradient(90deg,transparent,
+    rgba(243,190,49,.9) 25%, rgba(243,190,49,.9) 75%, transparent);
+}
+body.surmenu[data-decor-ecran="menu"] .separation span{
+  color:var(--bs-navy); text-shadow:none;
+}
+body.surmenu[data-decor-ecran="menu"] .separation span::before{
+  background:radial-gradient(ellipse at center,
+    rgba(255,255,255,.95) 40%, rgba(255,255,255,0) 78%);
+}
+
+/* ---------- les trois époques ----------
+   Un filet d'or en tête, qui passe au bleu vif quand on les survole :
+   la seule couleur qui dit « on peut cliquer ». */
+body.surmenu[data-decor-ecran="menu"] .niv{
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid var(--bs-filet); border-top:3px solid var(--bs-gold);
+  border-radius:6px; color:var(--bs-gris) !important; transform:none;
+  box-shadow:0 6px 18px rgba(26,32,71,.1);
+}
+body.surmenu[data-decor-ecran="menu"] .niv:hover:not([disabled]){
+  border-color:var(--bs-vif); border-top-color:var(--bs-vif);
+  transform:translateY(-3px);
+  box-shadow:0 14px 30px rgba(20,56,127,.2);
+}
+body.surmenu[data-decor-ecran="menu"] .niv .ord{color:var(--bs-mid);font-weight:bold}
+body.surmenu[data-decor-ecran="menu"] .niv .lieu{color:var(--bs-navy)}
+body.surmenu[data-decor-ecran="menu"] .niv .per{color:var(--bs-doux)}
+body.surmenu[data-decor-ecran="menu"] .niv .rec{color:var(--bs-doux)}
+body.surmenu[data-decor-ecran="menu"] .niv[disabled]{
+  opacity:1; background:rgba(255,255,255,.62) !important;
+  border-top-color:var(--bs-filet); border-style:solid;
+  box-shadow:none; color:#8A94A3 !important;
+}
+body.surmenu[data-decor-ecran="menu"] .niv[disabled] .ord,
+body.surmenu[data-decor-ecran="menu"] .niv[disabled] .lieu,
+body.surmenu[data-decor-ecran="menu"] .niv[disabled] .per,
+body.surmenu[data-decor-ecran="menu"] .niv[disabled] .rec{color:#99A3B2}
+
+/* ---------- les mentions et le pied ---------- */
+body.surmenu[data-decor-ecran="menu"] .note-menu{
+  color:var(--bs-doux); text-shadow:none;
+}
+body.surmenu[data-decor-ecran="menu"] footer{color:var(--bs-doux)}
+body.surmenu[data-decor-ecran="menu"] footer .signature{color:var(--bs-doux)}
+body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -3606,7 +3712,11 @@ function poserDecor(ecran){
     if(i >= voulu.length){ document.body.dataset.decor = "dessin"; return; }
     const src = voulu[i], im = new Image();
     im.onload  = ()=>{ el.style.backgroundImage = `url("${src}")`;
-                       document.body.dataset.decor = "photo"; };
+                       document.body.dataset.decor = "photo";
+                       /* la salle de classe appelle un thème clair ; la
+                          pièce de Manchester, non. */
+                       document.body.dataset.decorEcran =
+                         (src === "img/decor/menu.jpg") ? "menu" : "bureau"; };
     im.onerror = ()=>essayer(i+1);
     im.src = src;
   })(0);
