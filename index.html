@@ -325,7 +325,9 @@ body[data-niveau="II"]{
 }
 .force svg{fill:var(--enc2)}
 .force .nom{color:var(--enc2)}
-.force .nom b{color:var(--enc)}
+/* Le score ne doit pas se lire avant le nom : c'est la jauge qui dit
+   l'état, et le mot « fragile » qui alerte. */
+.force .nom b{color:var(--enc2);font-weight:normal;font-size:.92em;opacity:.75}
 .force .mini{background:rgba(80,62,42,.22);box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
 .force.danger{border-color:var(--rge)}
 
@@ -1828,6 +1830,21 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 }
 #btson.muet + #volson{opacity:.4}
 
+/* ---------- l'humeur des acteurs ---------------------------------- */
+.force .delta{
+  margin-top:6px; font-size:12px; letter-spacing:.04em; line-height:1.2;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+.force .delta .fl{font-size:9px;letter-spacing:-.5px}
+.force .delta.up{color:#3F6A2E}
+.force .delta.dn{color:var(--rge)}
+
+.pourquoi .bt{font-family:var(--serif);font-size:17px;color:var(--enc2);margin-bottom:8px}
+.pourquoi .bt b{font-weight:normal;color:var(--enc)}
+.pourquoi .bt b.up{color:#3F6A2E} .pourquoi .bt b.dn{color:var(--rge)}
+.pourquoi .bp{color:var(--enc);font-size:13.5px}
+.pourquoi .bv{font-size:12.5px;opacity:.85}
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -2378,12 +2395,20 @@ try{ const r=document.getElementById("volson");
    ================================================================== */
 const FORCES_I = {
   i:{nom:"Industriels", ic:"ic-i", veut:"des machines, du charbon, des bras",
+     pourquoi:{plus:"Vous venez de leur donner de quoi produire davantage, ou de leur épargner une dépense.",
+               moins:"Vous venez de leur imposer une dépense ou une contrainte : c’est autant de profit en moins."},
      role:"Les **fabricants** qui possèdent les filatures. Ce sont eux qui investissent les **capitaux**, achètent les machines et embauchent. Sans eux, pas d’industrie — mais ils cherchent le profit, et chaque dépense qu’on leur impose le réduit. Ils quitteront la ville pour une autre si elle devient trop coûteuse."},
   o:{nom:"Ouvriers",    ic:"ic-o", veut:"un salaire, un toit, des heures vivables",
+     pourquoi:{plus:"Vous venez d’alléger leur peine, ou d’assurer leur pain.",
+               moins:"Vous venez d’alourdir leur journée, ou de les laisser payer à votre place."},
      role:"La **main-d’œuvre**, venue des campagnes par l’**exode rural**. C’est l’une des conditions de la révolution industrielle : sans bras, les machines ne tournent pas. Ces hommes, ces femmes et ces enfants n’ont que leur travail pour vivre. Épuisés ou affamés, ils cessent de venir — et tout s’arrête."},
   m:{nom:"Marchands",   ic:"ic-m", veut:"des canaux, des rails, des débouchés",
+     pourquoi:{plus:"Vous venez de faire circuler les marchandises, et donc l’argent.",
+               moins:"Cet argent-là ne circule pas : il ne leur rapporte rien, et il manque ailleurs."},
      role:"Les **négociants** qui apportent le coton brut et revendent le fil dans le monde entier. Ils représentent les **marchés** et les **transports**, deux autres conditions de l’industrialisation. Produire en masse n’a de sens que si l’on peut vendre en masse : s’ils se détournent, la production ne sert plus à rien."},
   p:{nom:"Parlement",   ic:"ic-p", veut:"l’ordre public et la salubrité",
+     pourquoi:{plus:"Vous allez dans le sens de l’ordre et de la salubrité — ce que Londres réclame.",
+               moins:"Londres n’aimera pas : vous laissez la ville se dégrader, ou vous passez outre la loi."},
      role:"L’**État** et les autorités de Londres. Longtemps absents de l’économie, ils commencent à intervenir : lois sur le travail des enfants, enquêtes sanitaires, maintien de l’ordre. Ils jugent ce que la ville laisse derrière elle. Perdre leur confiance, c’est risquer la mise sous tutelle."},
 };
 const CLES = ["i","o","m","p"];
@@ -2768,7 +2793,8 @@ function barresForces(){
         loading="lazy" onerror="this.remove()">${icone(k)}</span>
       <div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
       <div class="mini"><i style="width:${v}%;background:${col}"></i></div>
-      ${dv?`<div class="delta ${dv>0?"up":"dn"}">${dv>0?"+":""}${dv}</div>`:""}
+      ${(()=>{ const h=humeur(dv); return h
+        ? `<div class="delta ${h.sens}"><span class="fl">${h.fl}</span>${h.mot}</div>` : ""; })()}
       ${mot?`<div class="etat">${mot}</div>`:""}
       ${bul}</div>`;
   }).join("")}</div>`;
@@ -4104,11 +4130,14 @@ function bulleForce(k){
   const recit = (k === plusRemue() && E.consq) ? `<p class="bq">${esc(E.consq)}</p>` : "";
   const ent   = (k === "o" && E.entassement) ? `<p class="bent">${esc(E.entassement)}</p>` : "";
   if(!v && !recit && !ent) return "";
+  const h = humeur(v);
+  const logique = (N.forces[k].pourquoi || {})[v>0?"plus":"moins"] || "";
   return `<div class="pourquoi">
-    <div class="bt">${v>0?`<b class="up">+${v}</b>`:v<0?`<b class="dn">${v}</b>`:`<b>0</b>`}
-      ${esc(N.forces[k].nom)}</div>
-    <p class="bd">Votre décision : ${esc(d.q||"")}</p>
-    <p class="bv">Ce qu’ils veulent : ${esc(N.forces[k].veut)}.</p>
+    <div class="bt"><b class="${h?h.sens:""}">${esc(N.forces[k].nom)}</b>${
+      h?` — ${h.mot.toLowerCase()}`:""}</div>
+    <p class="bd">${esc(d.q||"")}</p>
+    ${logique?`<p class="bp">${esc(logique)}</p>`:""}
+    <p class="bv">Ce qu’ils attendent de vous : ${esc(N.forces[k].veut)}.</p>
     ${recit}${ent}
   </div>`;
 }
@@ -4124,6 +4153,20 @@ function bulle(el, k){
     const d = dernierChoix();
     try{ SON.jeton(d && d.e ? (d.e[k]||0) : 0) }catch(e){}
   }
+}
+
+/* Une décision ne vaut pas « moins neuf » : elle contrarie, ou elle
+   contente. Le chiffre reste dans la trace écrite, où il sert à
+   corriger ; sur le bureau, il laisse place au mot. */
+function humeur(v){
+  if(!v) return null;
+  const a = Math.abs(v);
+  return {
+    mot: v > 0 ? (a>=10 ? "Très satisfaits" : a>=5 ? "Satisfaits" : "Plutôt contents")
+               : (a>=10 ? "Très mécontents" : a>=5 ? "Mécontents"  : "Contrariés"),
+    sens: v > 0 ? "up" : "dn",
+    fl: (v>0?"▲":"▼").repeat(a<=4 ? 1 : a<=9 ? 2 : 3)
+  };
 }
 
 /* ---------- fins ---------- */
@@ -4224,12 +4267,20 @@ function VERDICT_I(f){
    ================================================================== */
 const FORCES_II = {
   i:{nom:"Actionnaires", ic:"ic2-i", veut:"du rendement, des dividendes, une usine qui ne s’arrête jamais",
+     pourquoi:{plus:"Vous venez d’augmenter le rendement, ou d’épargner une dépense : le dividende suivra.",
+               moins:"Vous venez de grever les comptes : c’est autant de moins pour les dividendes."},
      role:"Ceux qui possèdent l’entreprise et ont avancé les **capitaux**. Ils attendent des **dividendes**, c’est-à-dire une part des bénéfices. L’arrêt **Dodge contre Ford** de 1919 a établi en justice qu’une société est dirigée d’abord pour le profit de ses propriétaires. Ils peuvent vous démettre."},
   o:{nom:"Ouvriers",     ic:"ic2-o", veut:"une cadence tenable, un salaire, le droit de s’organiser",
+     pourquoi:{plus:"Vous venez d’alléger la cadence, ou d’améliorer leur sort.",
+               moins:"Vous venez de resserrer la cadence, ou de rogner ce qu’ils avaient."},
      role:"Les hommes de la **chaîne de montage**. La **division du travail** les a privés de leur métier : chacun répète un geste de quelques secondes. Ils sont donc remplaçables un à un — mais si tous s’arrêtent, la chaîne entière s’arrête avec eux. Leurs syndicats ne sont pas encore reconnus."},
   m:{nom:"Clients",      ic:"ic2-m", veut:"une voiture fiable, bon marché, qu’on ait envie d’acheter",
+     pourquoi:{plus:"La voiture devient plus fiable, moins chère, ou plus désirable.",
+               moins:"Le client n’y gagne rien : il ira regarder chez le concurrent."},
      role:"Le **marché de masse**, nouveauté de cette époque : l’automobile cesse d’être un luxe. La **production de masse** n’a de sens que si la **consommation de masse** suit — d’où le salaire élevé, le crédit et la publicité. Un client qui préfère la marque d’en face vous ruine plus sûrement qu’une grève."},
   p:{nom:"Opinion",      ic:"ic2-p", veut:"des comptes, de la décence — et bientôt des lois",
+     pourquoi:{plus:"La presse et les élus y verront une entreprise responsable.",
+               moins:"Cela se saura — et ce qui se sait finit dans les journaux, puis au tribunal."},
      role:"La presse, les élus, les tribunaux. Une entreprise devenue aussi grande qu’une ville relève désormais du débat public : sécurité, salaires, discrimination à l’embauche. Ce qui se passe derrière les grilles finit toujours par sortir, et l’**État** finit par légiférer."},
 };
 
@@ -4676,7 +4727,7 @@ const NIVEAUX = {
      vues:{g:"La ville qu’on montre : les quais, le coton, les trains.",
            d:"La même ville deux rues plus loin : la fumée, les courées, les enfants."},
      reel:"Vous partiez de 36 267 habitants en 1780. Le vrai Manchester en comptait <b>303 382</b> au recensement de 1851 : la ville a été multipliée par huit en deux générations.",
- croissance:(a,b,u)=>`La population passe de ${fmt(a)} à ${fmt(b)} habitants. Les logements ne suivent pas : les ouvriers perdent ${u.toFixed(1)} points.`,
+ croissance:(a,b,u)=>`La population passe de ${fmt(a)} à ${fmt(b)} habitants. Les logements ne suivent jamais le rythme des usines — et ce sont les ouvriers qui s’entassent.`,
  impatience:"Les marchands, eux, commencent à regarder vers Leeds.",
      lecons:[
       "Une invention ne devient une révolution industrielle que si <strong>plusieurs conditions se combinent</strong> : ressources, savoirs, capitaux, main-d’œuvre, marchés, transports, organisation du travail.",
@@ -4695,7 +4746,7 @@ const NIVEAUX = {
      vues:{g:"L’usine qu’on fait visiter : la chaîne, les voitures, le salaire.",
            d:"Ce que la chaîne laisse : la cadence, l’usure, puis le chômage."},
      reel:"Vous partiez de 10 600 voitures par an. Entre 1908 et 1927, Ford a produit en tout un peu plus de <b>15 millions</b> de Ford T — près de deux millions pour la seule année 1923.",
- croissance:(a,b,u)=>`La production passe de ${fmt(a)} à ${fmt(b)} voitures par an. La chaîne suit le rythme, les hommes moins : les ouvriers perdent ${u.toFixed(1)} points.`,
+ croissance:(a,b,u)=>`La production passe de ${fmt(a)} à ${fmt(b)} voitures par an. La chaîne, elle, suit le rythme ; les hommes beaucoup moins.`,
  impatience:"Les clients, eux, commencent à regarder chez General Motors.",
      lecons:[
       "La deuxième révolution industrielle n’invente pas l’automobile : elle invente <strong>la façon de la fabriquer</strong>. Chaîne mobile, pièces interchangeables, gestes chronométrés, électricité.",
