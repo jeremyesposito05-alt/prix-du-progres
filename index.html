@@ -1120,7 +1120,7 @@ details.acteur[open] .pli::after{content:" ▲"}
    C'est le seul moment où l'on s'adresse au joueur avant la partie :
    le texte se centre, la justification est tenue courte pour que les
    lignes restent lisibles, et tout s'écrit à la machine. */
-.mission > .role{text-align:center;margin:0}
+.mission > .role{text-align:center;margin:0;grid-column:2}
 .mission > .role > *{max-width:72ch;margin-left:auto;margin-right:auto}
 .mission > .role .r-qui{margin-top:.3em;margin-bottom:.3em}
 .mission > .role .r-but{margin-top:.6em;margin-bottom:0}
@@ -1257,10 +1257,11 @@ details.acteur[open] .pli::after{content:" ▲"}
    place — Detroit n'a pas encore les siennes. */
 .mission{
   display:grid; gap:18px; align-items:stretch; margin:18px 0 0;
-  grid-template-columns:minmax(120px,1fr) minmax(0,3.2fr) minmax(120px,1fr);
+  grid-template-columns:auto minmax(0,1fr) auto;
 }
 .mission-illu{
   margin:0; display:flex; flex-direction:column; min-height:0;
+  width:clamp(118px, 17vw, 268px);
   border:1px solid var(--fil); border-radius:2px; overflow:hidden;
   background:var(--pap2); box-shadow:0 12px 30px rgba(0,0,0,.5);
 }
@@ -1272,6 +1273,7 @@ details.acteur[open] .pli::after{content:" ▲"}
 .mi-g{border-right:3px solid var(--lai)}
 .mi-d{border-left:3px solid var(--rge)}
 
+.mission:not(:has(.mission-illu)) + .mission-note{display:none}
 .mission-note{
   text-align:center; font-size:12.5px; line-height:1.5; font-style:italic;
   color:#9C8A70; margin:10px 0 0;
@@ -1282,6 +1284,7 @@ details.acteur[open] .pli::after{content:" ▲"}
    le contraste tient, le texte garde toute la largeur */
 @media(max-width:980px){
   .mission{grid-template-columns:1fr 1fr}
+  .mission-illu{width:auto}
   .mission > .role{grid-column:1 / -1; order:3}
   .mission-illu{max-height:230px}
   .mission-illu img{min-height:120px}
