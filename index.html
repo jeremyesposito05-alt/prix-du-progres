@@ -1828,7 +1828,7 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   color:var(--bs-orange,#CA5007); border-color:rgba(202,80,7,.7);
   background:rgba(202,80,7,.14);
 }
-#btson.muet + #volson{opacity:.4}
+#btson.muet ~ .regl{opacity:.4}
 
 /* ---------- l'humeur des acteurs ---------------------------------- */
 .force .delta{
@@ -1844,6 +1844,35 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .pourquoi .bt b.up{color:#3F6A2E} .pourquoi .bt b.dn{color:var(--rge)}
 .pourquoi .bp{color:var(--enc);font-size:13.5px}
 .pourquoi .bv{font-size:12.5px;opacity:.85}
+
+/* ---------- deux réglettes dans le bandeau ------------------------ */
+.son-reglage .regl{display:flex;align-items:center;gap:6px}
+.son-reglage .regl i{
+  font-style:normal; font-size:8.5px; letter-spacing:.11em;
+  text-transform:uppercase; color:rgba(255,255,255,.52); white-space:nowrap;
+}
+#voleff{
+  -webkit-appearance:none; appearance:none; width:62px; height:16px;
+  background:transparent; cursor:pointer; margin:0; padding:0; border:none;
+}
+#voleff::-webkit-slider-runnable-track{height:4px;border-radius:2px;
+  background:linear-gradient(90deg, var(--bs-gold), rgba(255,255,255,.28))}
+#voleff::-moz-range-track{height:4px;border-radius:2px;
+  background:linear-gradient(90deg, var(--bs-gold), rgba(255,255,255,.28))}
+#voleff::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:13px; height:13px; margin-top:-4.5px;
+  border-radius:50%; background:#fff; border:1px solid rgba(0,0,0,.35);
+  box-shadow:0 1px 4px rgba(0,0,0,.5);
+}
+#voleff::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#fff;
+  border:1px solid rgba(0,0,0,.35);box-shadow:0 1px 4px rgba(0,0,0,.5)}
+#voleff:hover::-webkit-slider-thumb{background:var(--bs-gold)}
+#voleff:hover::-moz-range-thumb{background:var(--bs-gold)}
+
+/* la place manque avant tout sur un téléphone : on garde la musique,
+   les bruitages gardent leur réglage retenu */
+@media(max-width:900px){ .son-reglage .regl i{display:none} }
+@media(max-width:700px){ .son-reglage .regl:last-child{display:none} }
 
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
@@ -1954,9 +1983,14 @@ body[data-niveau="II"] .question{color:#D9E3ED}
   <span class="ecole">COLLÈGE ALPIN BEAU SOLEIL · G10</span>
   <span class="son-reglage">
     <button id="btson" onclick="SON.couper(!SON.actif)" title="Couper le son">♪</button>
-    <input id="volson" type="range" min="0" max="100" step="1" value="85"
-           aria-label="Volume" title="Volume"
-           oninput="SON.volume(this.value/100)">
+    <span class="regl"><i>Musique</i>
+      <input id="volson" type="range" min="0" max="100" step="1" value="85"
+             aria-label="Volume de la musique" title="Volume de la musique"
+             oninput="SON.volume(this.value/100)"></span>
+    <span class="regl"><i>Bruitages</i>
+      <input id="voleff" type="range" min="0" max="100" step="1" value="90"
+             aria-label="Volume des bruitages" title="Volume des bruitages"
+             oninput="SON.bruitage(this.value/100)"></span>
   </span>
 </header>
 
@@ -1996,7 +2030,9 @@ const BOUCLES = {
 const CROISE = 2.5;   // secondes de fondu entre les deux lecteurs
 
 const SON = {
-  ctx:null, pret:false, actif:true, amb:null, vmax:.85,
+  ctx:null, pret:false, actif:true, amb:null,
+  /* deux réglages distincts : la musique de fond, et ce qui réagit */
+  vmus:.85, veff:.9, gainMusU:null, gainEff:null,
   maitre:null, bruit:null, tension:0, tic:null,
   lecteurs:[], actifL:0, filtre:null, gainMus:null, veille:null, vmix:.55,
   horloge:null, prochain:0, battue:0,
@@ -2009,7 +2045,7 @@ const SON = {
       const AC = window.AudioContext||window.webkitAudioContext;
       this.ctx = new AC();
       this.maitre = this.ctx.createGain();
-      this.maitre.gain.value = this.actif ? this.vmax : 0;
+      this.maitre.gain.value = this.actif ? 1 : 0;
       this.maitre.connect(this.ctx.destination);
       const n = this.ctx.sampleRate*2;
       this.bruit = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
@@ -2019,7 +2055,14 @@ const SON = {
       this.filtre = this.ctx.createBiquadFilter();
       this.filtre.type="lowpass"; this.filtre.frequency.value=1600;
       this.gainMus = this.ctx.createGain(); this.gainMus.gain.value=1;
-      this.filtre.connect(this.gainMus); this.gainMus.connect(this.maitre);
+      /* La musique : filtre de tension, gain de tension, puis le volume
+         choisi par le joueur. Les bruitages : leur propre volume. Les
+         deux se rejoignent sous l'interrupteur. */
+      this.gainMusU = this.ctx.createGain(); this.gainMusU.gain.value = this.vmus;
+      this.gainEff  = this.ctx.createGain(); this.gainEff.gain.value  = this.veff;
+      this.filtre.connect(this.gainMus); this.gainMus.connect(this.gainMusU);
+      this.gainMusU.connect(this.maitre);
+      this.gainEff.connect(this.maitre);
       this.pret = true;
       this.veiller();
     }catch(e){ this.pret=false; }
@@ -2075,7 +2118,7 @@ const SON = {
        de reprendre la main, et le joueur a cliqué pour que ça s'arrête
        maintenant. On rétablit en douceur, en revanche. */
     if(this.maitre){
-      if(v) this.glisser(this.maitre.gain, this.vmax, .3);
+      if(v) this.glisser(this.maitre.gain, 1, .3);
       else try{ this.maitre.gain.cancelScheduledValues(this.ctx.currentTime);
                 this.maitre.gain.setValueAtTime(0, this.ctx.currentTime); }
            catch(e){ this.maitre.gain.value = 0; }
@@ -2090,10 +2133,19 @@ const SON = {
   /* La réglette. Rétablit le son si on la remonte alors qu'il était coupé :
      personne ne comprendrait qu'on pousse le volume sans rien entendre. */
   volume(v){
-    this.vmax = Math.max(0, Math.min(1, v));
-    try{ localStorage.setItem("pdp_vol", this.vmax.toFixed(2)) }catch(e){}
-    if(this.vmax > 0 && !this.actif){ this.couper(true); return; }
-    if(this.maitre) this.glisser(this.maitre.gain, this.actif ? this.vmax : 0, .12);
+    this.vmus = Math.max(0, Math.min(1, v));
+    try{ localStorage.setItem("pdp_vol", this.vmus.toFixed(2)) }catch(e){}
+    if(this.vmus > 0 && !this.actif){ this.couper(true); }
+    if(this.gainMusU) this.glisser(this.gainMusU.gain, this.vmus, .12);
+  },
+
+  /* Les bruitages : le même geste, l'autre chemin. */
+  bruitage(v){
+    this.veff = Math.max(0, Math.min(1, v));
+    try{ localStorage.setItem("pdp_eff", this.veff.toFixed(2)) }catch(e){}
+    if(this.veff > 0 && !this.actif){ this.couper(true); }
+    if(this.gainEff) this.glisser(this.gainEff.gain, this.veff, .12);
+    this.papier();                 /* on entend tout de suite ce qu'on règle */
   },
 
   glisser(param, val, t){
@@ -2156,6 +2208,10 @@ const SON = {
     });
     this.veilleGlobale = setInterval(reprise, 4000);
   },
+
+  /* Où brancher un bruitage. Avant l'initialisation, on retombe sur
+     l'interrupteur : rien ne casse si le son n'est pas encore prêt. */
+  eff(){ return this.gainEff || this.maitre; },
 
   /* ---------- l'ambiance --------------------------------------------- */
   ambiance(quoi){
@@ -2257,7 +2313,7 @@ const SON = {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime((fort?.17:.10)*k, t+.012);
     g.gain.exponentialRampToValueAtTime(.001, t+.22);
-    o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.26);
+    o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+.26);
   },
 
   chaine(t, fort, k){
@@ -2267,7 +2323,34 @@ const SON = {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime((fort?.06:.035)*k, t+.004);
     g.gain.exponentialRampToValueAtTime(.001, t+(fort?.10:.05));
-    s.connect(f); f.connect(g); g.connect(this.maitre); s.start(t); s.stop(t+.14);
+    s.connect(f); f.connect(g); g.connect(this.eff()); s.start(t); s.stop(t+.14);
+  },
+
+  /* « À cause de votre choix d'il y a quatre tours. » C'est le moment
+     où le jeu referme une boucle, et il arrivait en silence. Trois
+     notes d'un même accord, qui montent lentement et s'éteignent en
+     trois secondes, posées sous la musique. Rien de perçant : des
+     sinusoïdes filtrées, une attaque d'une demi-seconde, et un volume
+     qui reste sous celui de la musique. */
+  germe(bon){
+    if(!this.pret) return;
+    const c=this.ctx, t=c.currentTime+.02;
+    const f=c.createBiquadFilter(), g=c.createGain();
+    f.type="lowpass"; f.frequency.value=1500; f.Q.value=.6;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.075, t+.55);     /* la nappe se lève */
+    g.gain.setValueAtTime(.075, t+1.5);
+    g.gain.exponentialRampToValueAtTime(.0008, t+3.2);
+    f.connect(g); g.connect(this.eff());
+    /* majeur quand la graine est heureuse, mineur quand elle l'est moins :
+       l'oreille sait avant d'avoir lu. */
+    const r = bon ? [1, 1.25, 1.5] : [1, 1.2, 1.5];
+    r.forEach((x,i)=>{
+      const o=c.createOscillator();
+      o.type = i ? "sine" : "triangle";
+      o.frequency.setValueAtTime(174.6*x, t);
+      o.connect(f); o.start(t+i*.11); o.stop(t+3.3);
+    });
   },
 
   /* ---------- la tension ---------------------------------------------- */
@@ -2293,7 +2376,7 @@ const SON = {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(.38, t+.02);
     g.gain.exponentialRampToValueAtTime(.001, t+1.1);
-    o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+1.2);
+    o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+1.2);
     if(this.gainMus){
       this.glisser(this.gainMus.gain, .35, .2);
       setTimeout(()=>this.majTension(), 1100);
@@ -2309,7 +2392,7 @@ const SON = {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(.04, t+.03);
     g.gain.exponentialRampToValueAtTime(.001, t+.19);
-    s.connect(f); f.connect(g); g.connect(this.maitre); s.start(t); s.stop(t+.22);
+    s.connect(f); f.connect(g); g.connect(this.eff()); s.start(t); s.stop(t+.22);
   },
 
   /* Le cachet de cire qui casse : un claquement sec, puis le froissement
@@ -2323,7 +2406,7 @@ const SON = {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(.16, t+.006);
     g.gain.exponentialRampToValueAtTime(.001, t+.1);
-    o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.12);
+    o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+.12);
     setTimeout(()=>this.papier(), 70);
   },
 
@@ -2341,7 +2424,7 @@ const SON = {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(.09, t+.012);
     g.gain.exponentialRampToValueAtTime(.001, t+.26);
-    o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.28);
+    o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+.28);
   },
 
   horlogeUrgence(marche){
@@ -2356,7 +2439,7 @@ const SON = {
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(.06, t+.004);
       g.gain.exponentialRampToValueAtTime(.001, t+.05);
-      o.connect(g); g.connect(this.maitre); o.start(t); o.stop(t+.07);
+      o.connect(g); g.connect(this.eff()); o.start(t); o.stop(t+.07);
     }, 500);
   },
 
@@ -2371,7 +2454,7 @@ const SON = {
       g.gain.setValueAtTime(0, t+i*.09);
       g.gain.linearRampToValueAtTime(.15, t+i*.09+.03);
       g.gain.exponentialRampToValueAtTime(.001, t+i*.09+2.6);
-      o.connect(g); g.connect(this.maitre); o.start(t+i*.09); o.stop(t+i*.09+2.8);
+      o.connect(g); g.connect(this.eff()); o.start(t+i*.09); o.stop(t+i*.09+2.8);
     });
     /* la musique baisse mais ne s'arrête pas : on lit encore le verdict */
     if(this.gainMus) this.glisser(this.gainMus.gain, .45, 1.5);
@@ -2380,9 +2463,13 @@ const SON = {
 
 try{ SON.actif = localStorage.getItem("pdp_son") !== "0";
      const v = parseFloat(localStorage.getItem("pdp_vol"));
-     if(!isNaN(v)) SON.vmax = Math.max(0, Math.min(1, v)); }catch(e){}
+     if(!isNaN(v)) SON.vmus = Math.max(0, Math.min(1, v));
+     const w = parseFloat(localStorage.getItem("pdp_eff"));
+     if(!isNaN(w)) SON.veff = Math.max(0, Math.min(1, w)); }catch(e){}
 try{ const r=document.getElementById("volson");
-     if(r) r.value = Math.round(SON.vmax*100);
+     if(r) r.value = Math.round(SON.vmus*100);
+     const r2=document.getElementById("voleff");
+     if(r2) r2.value = Math.round(SON.veff*100);
      const b=document.getElementById("btson");
      if(b && !SON.actif){ b.textContent="♪̸"; b.title="Rétablir le son"; b.classList.add("muet"); } }catch(e){}
 ["pointerdown","keydown"].forEach(ev=>
@@ -3209,6 +3296,9 @@ function graineMure(){
 }
 
 function germer(gr){
+  /* heureuse ou non : la somme de ce qu'elle apporte aux quatre forces */
+  try{ const e=(gr.s&&gr.s.e)||{};
+       SON.germe(CLES.reduce((n,k)=>n+(e[k]||0),0) >= 0); }catch(e){}
   E.evEnCours = null;
   E.graineEnCours = gr;
   appliquer(gr.s.e);
