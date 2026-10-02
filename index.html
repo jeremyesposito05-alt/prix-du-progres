@@ -1706,22 +1706,23 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    qu'elle a servi : on n'explique pas deux fois. */
 .d-enquete .cq-txt{flex:1 1 auto;min-width:0}
 .d-enquete .invite{
-  display:block; margin-top:4px; font-style:italic; font-size:12.5px;
-  line-height:1.45; color:var(--rge);
+  display:block; margin-top:2px; font-style:italic; font-size:12px;
+  line-height:1.35; color:var(--rge);
 }
 .d-enquete.guide{
   border-color:var(--lai) !important;
   box-shadow:0 10px 26px rgba(0,0,0,.5), 0 0 0 1px rgba(184,137,74,.5);
 }
+/* on ne change que la couleur : la pastille garde sa taille, son
+   libellé et sa place, sinon elle pousse tout le dossier */
 .d-enquete.guide .pli{
   color:#2A1F12; background:linear-gradient(180deg,#E7C27A,var(--lai));
-  border-color:#6A4A22; font-weight:bold;
-  animation:pli-bat 1.8s ease-in-out infinite;
+  border-color:#6A4A22;
+  animation:pli-bat 2.2s ease-in-out infinite;
 }
-.d-enquete.guide .pli::before{content:"Ouvrir le rapport"}
 @keyframes pli-bat{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.07)}
+  0%,100%{opacity:1}
+  50%{opacity:.72}
 }
 @media(prefers-reduced-motion:reduce){ .d-enquete.guide .pli{animation:none} }
 
@@ -2723,7 +2724,8 @@ function rendre(){
   /* Personne n'a encore ouvert un dossier, et on est au début : on le
      montre. Dès le premier ouvert, on se tait — et de toute façon on se
      tait après le cinquième tour. */
-  const guide = ((E.lus||[]).length === 0) && E.tour < 5;
+  const guide  = ((E.lus||[]).length === 0) && E.tour < 5;
+  const invite = guide && E.tour === 0;     /* la phrase, une seule fois */
   let d=0; const D=()=>`style="--d:${(d+=.085).toFixed(3)}s"`;
   const trois=["a","b","c"].filter(k=>c[k]);
 
@@ -2741,8 +2743,7 @@ function rendre(){
       ${c.f?`<details class="dossier d-enquete ${guide?"guide":""}" ${D()}>
           <summary><span class="onglet">Rapport d’enquête</span>
             <span class="cq-txt">Le bureau d’enquête a joint une note.${
-              guide?`<i class="invite">Cliquez pour la lire : elle donne le fait historique,
-              les chiffres, et ce que le cours en dit.</i>`:""}</span>
+              invite?`<i class="invite">Le fait historique est dedans.</i>`:""}</span>
             <span class="pli"></span></summary>
           <div class="corps">${illuDoc(c)}${corpsRapport(c)}</div></details>`:""}
       ${courrier(D())}
