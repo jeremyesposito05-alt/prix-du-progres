@@ -1874,6 +1874,18 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 @media(max-width:900px){ .son-reglage .regl i{display:none} }
 @media(max-width:700px){ .son-reglage .regl:last-child{display:none} }
 
+/* Le but du jeu, dit avant tout le reste : les eleves lisaient cinq
+   points sans trouver l'objectif, parce qu'il n'etait ecrit nulle part. */
+.but-jeu{
+  margin:0 0 20px; padding:12px 16px; text-align:center;
+  font-family:var(--serif); font-size:16.5px; line-height:1.45;
+  color:var(--enc); background:rgba(243,190,49,.13);
+  border-top:1px solid rgba(243,190,49,.5);
+  border-bottom:1px solid rgba(243,190,49,.5);
+}
+.but-jeu strong{color:var(--enc)}
+@media(max-width:600px){ .but-jeu{font-size:15px;padding:10px 12px} }
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -5473,52 +5485,30 @@ function accueil(){
         <h1>Comment on joue</h1>
       </div>
 
+      <p class="but-jeu">Votre but : <strong>conduire votre ville — ou votre usine — jusqu’au bout de la période sans qu’aucun des quatre groupes ne vous abandonne.</strong></p>
+
       <div class="etapes">
         <div class="etape">
           <span class="num">1</span>
           <div>
-            <h3>Vous êtes celui qui tranche</h3>
-            <p>Ni le patron, ni l’ouvrier, ni le député. Chaque affaire vous arrive par
-            quelqu’un qui vient plaider sa cause — et vous devez répondre.</p>
+            <h3>Une situation, trois réponses</h3>
+            <p>Quelqu’un vient vous demander de décider. Vous choisissez. <strong>Aucune réponse n’est bonne pour tout le monde</strong> : c’est le sujet du cours.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">2</span>
           <div>
-            <h3>Quatre forces vous jugent</h3>
+            <h3>Quatre groupes, jamais d’accord</h3>
             <div class="mini-forces">${ROLES.map(r=>`<span>
               ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
-            <p>Les mêmes quatre rôles traversent les trois révolutions industrielles — seuls
-            les noms changent. <strong>Vous découvrirez les vôtres en choisissant votre
-            époque.</strong></p>
-            <p>Chaque décision en contente un et en fâche un autre.
-            <strong>Aucune réponse ne plaît à tout le monde</strong> — c’est le sujet même du cours.</p>
+            <p>Chaque décision en contente un et en fâche un autre. Si l’un d’eux vous lâche tout à fait, <strong>la partie s’arrête</strong>. Vous êtes prévenu bien avant.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">3</span>
           <div>
-            <h3>Si l’une tombe à zéro, tout s’arrête</h3>
-            <p>Vous êtes prévenu bien avant. Menez votre ville — ou votre usine — jusqu’au bout
-            de la période, et découvrez quel monde vous aurez bâti.</p>
-          </div>
-        </div>
-        <div class="etape">
-          <span class="num">4</span>
-          <div>
-            <h3>Ouvrez les dossiers</h3>
-            <p>Sous chaque affaire, le bureau d’enquête joint un <strong>rapport</strong> : le
-            fait historique, les chiffres, ce que le cours en dit. Il se déplie d’un clic.
-            <strong>Décider sans le lire finit par se savoir</strong> — et les questions de fin
-            porteront sur ce que vous aurez rencontré.</p>
-          </div>
-        </div>
-        <div class="etape">
-          <span class="num">5</span>
-          <div>
-            <h3>Rien ne se perd</h3>
-            <p>À la fin, vous emportez votre carnet de décisions, un questionnaire noté sur ce que
-            vous avez rencontré, et votre propre réflexion sur la partie.</p>
+            <h3>À la fin, vous rendez votre travail</h3>
+            <p>Vos décisions, huit questions sur ce que vous avez vu, et ce que vous en pensez.</p>
           </div>
         </div>
       </div>

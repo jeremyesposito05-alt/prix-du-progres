@@ -1874,6 +1874,18 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 @media(max-width:900px){ .son-reglage .regl i{display:none} }
 @media(max-width:700px){ .son-reglage .regl:last-child{display:none} }
 
+/* Le but du jeu, dit avant tout le reste : les eleves lisaient cinq
+   points sans trouver l'objectif, parce qu'il n'etait ecrit nulle part. */
+.but-jeu{
+  margin:0 0 20px; padding:12px 16px; text-align:center;
+  font-family:var(--serif); font-size:16.5px; line-height:1.45;
+  color:var(--enc); background:rgba(243,190,49,.13);
+  border-top:1px solid rgba(243,190,49,.5);
+  border-bottom:1px solid rgba(243,190,49,.5);
+}
+.but-jeu strong{color:var(--enc)}
+@media(max-width:600px){ .but-jeu{font-size:15px;padding:10px 12px} }
+
 /* l'ordre du jour : on lit, puis on tranche. La question marque la bascule. */
 .question{grid-column:1 / -1;text-align:center;margin:18px 0 -2px;
   font-family:var(--serif);font-size:clamp(19px,2.4vw,25px);color:#E8D8BC;
@@ -5478,45 +5490,30 @@ function accueil(){
         <h1>How to play</h1>
       </div>
 
+      <p class="but-jeu">Your aim: <strong>lead your city — or your factory — to the end of the period without any of the four groups abandoning you.</strong></p>
+
       <div class="etapes">
         <div class="etape">
           <span class="num">1</span>
           <div>
-            <h3>You are the one who decides</h3>
-            <p>Neither the owner, nor the worker, nor the MP. Each case comes to you through someone pleading their cause, and you must answer.</p>
+            <h3>One situation, three answers</h3>
+            <p>Someone comes to you for a decision. You choose. <strong>No answer is good for everyone</strong>: that is what this unit is about.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">2</span>
           <div>
-            <h3>Four forces judge you</h3>
+            <h3>Four groups, never in agreement</h3>
             <div class="mini-forces">${ROLES.map(r=>`<span>
               ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
-            <p>The same four roles run through the three industrial revolutions, only the names change. <strong>You will discover yours when you choose your era.</strong></p>
-            <p>Every decision pleases one and angers another.
-            <strong>No answer pleases everyone</strong> — that is the very subject of the course.</p>
+            <p>Every decision pleases one and angers another. If one of them gives up on you completely, <strong>the game ends</strong>. You are warned well in advance.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">3</span>
           <div>
-            <h3>If one falls to zero, everything stops</h3>
-            <p>You are warned well in advance. Lead your city, or your factory, to the end of the period, and discover what kind of world you have built.</p>
-          </div>
-        </div>
-        <div class="etape">
-          <span class="num">4</span>
-          <div>
-            <h3>Open the files</h3>
-            <p>Under each case, the inquiry office includes a <strong>report</strong> : the historical fact, the figures, what the course says about it. It opens with one click.
-            <strong>Deciding without reading it eventually shows</strong> — and the final questions will be based on what you encountered.</p>
-          </div>
-        </div>
-        <div class="etape">
-          <span class="num">5</span>
-          <div>
-            <h3>Nothing is lost</h3>
-            <p>At the end, you take away your decision log, a marked quiz on what you encountered, and your own reflection on the game.</p>
+            <h3>At the end, you hand in your work</h3>
+            <p>Your decisions, eight questions on what you saw, and what you make of it.</p>
           </div>
         </div>
       </div>
