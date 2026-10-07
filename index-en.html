@@ -5021,7 +5021,19 @@ function questionsDeLaPartie(){
     lot = lot.concat(reste.slice(0, 8-lot.length));
   }
   melanger(lot);
-  return lot.slice(0, 8);
+
+  /* LES REPONSES ELLES-MEMES. Les questions ont ete ecrites avec la
+     bonne reponse en premier — b:0 partout. Sans ce melange, un eleve
+     qui l'a remarque repond juste huit fois sur huit sans rien savoir.
+     On rend une COPIE de chaque question : « N.quiz » est partage entre
+     les parties, et melanger l'original le melangerait a nouveau a la
+     partie suivante, jusqu'a ce que « b » ne designe plus rien. */
+  return lot.slice(0, 8).map(q => {
+    const juste = q.r[q.b];
+    const r = q.r.slice();
+    melanger(r);
+    return Object.assign({}, q, { r, b: r.indexOf(juste) });
+  });
 }
 
 function melanger(a){
