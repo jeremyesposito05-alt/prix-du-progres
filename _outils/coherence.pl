@@ -19,7 +19,7 @@ use strict; use warnings; use utf8;
 binmode(STDOUT, ":encoding(UTF-8)");
 
 my $dos = shift or die "usage: coherence.pl <dossier>\n";
-my (%notion, %romain, %recurrent);
+my (%notion, %romain, %meme, %guillemet);
 
 # les mots qui reviennent partout sans etre des notions du cours
 my %veille = (
@@ -57,6 +57,16 @@ for my $f (sort glob("$dos/[0-9]*.md")){
     push @{ $romain{"$court n°$num"} }, $1
       if $en =~ /(\d+\s+h\s+\d+)/;
 
+    # LE MEME FRANCAIS, DEUX ANGLAIS. Le jeu repete ses repliques : la
+    # presentation d un personnage revient a chaque affaire ou il parle,
+    # et ces occurrences tombent dans des fichiers differents, donc dans
+    # des conversations differentes. Rien ne les accorde — sauf ceci.
+    push @{ $meme{$fr}{$en} }, "$court n°$num";
+
+    # le style des citations : chevrons francais ou apostrophes anglaises
+    $guillemet{$court}{chevrons}++  if $en =~ /[«»]/;
+    $guillemet{$court}{anglaises}++ if $en =~ /^'.*'$/;
+
     undef $fr;
   }
   close $h;
@@ -80,6 +90,30 @@ if(%romain){
   print "\nCE QUI RESTE ECRIT A LA FRANCAISE — siecle romain, duree en « h »\n";
   for my $o (sort keys %romain){ $souci++;
     printf "  %-16s %s\n", $o, join(", ", @{$romain{$o}}) }
+}
+
+my @divergents = grep { keys %{$meme{$_}} > 1 } keys %meme;
+if(@divergents){
+  print "\nLE MEME FRANCAIS RENDU DE DEUX FACONS\n";
+  for my $fr (sort @divergents){
+    $souci++;
+    print "  ", (length($fr) > 62 ? substr($fr, 0, 59)."..." : $fr), "\n";
+    for my $en (sort keys %{$meme{$fr}}){
+      printf "       %-64s %s\n",
+             (length($en) > 64 ? substr($en,0,61)."..." : $en),
+             join(", ", @{$meme{$fr}{$en}});
+    }
+  }
+}
+
+print "\nLE STYLE DES CITATIONS\n";
+for my $f (sort keys %guillemet){
+  my $c = $guillemet{$f}{chevrons}  || 0;
+  my $a = $guillemet{$f}{anglaises} || 0;
+  next unless $c || $a;
+  $souci++ if $c && $a;
+  printf "  %-8s %3d en chevrons, %3d en apostrophes%s\n", $f, $c, $a,
+         ($c && $a) ? "   <-- les deux dans le meme fichier" : "";
 }
 
 printf "\n  ---- %s\n", $souci ? "$souci point(s) à reprendre" : "tout s accorde";
