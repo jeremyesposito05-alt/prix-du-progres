@@ -52,6 +52,11 @@ for my $f (sort glob("$dos/[0-9]*.md")){
     push @{ $romain{"$court n°$num"} }, $1
       if $en =~ /\b([IVXL]{2,}(?:ᵉ|e|th)?)\s+(?:century|siècle)/;
 
+    # « 12 h 30 » est une duree a la francaise. L anglais n ecrit pas une
+    # duree ainsi, et ici c en est une : le temps de montage d un chassis.
+    push @{ $romain{"$court n°$num"} }, $1
+      if $en =~ /(\d+\s+h\s+\d+)/;
+
     undef $fr;
   }
   close $h;
@@ -72,7 +77,7 @@ for my $n (sort keys %notion){
 printf "  %d notion(s) relevée(s)\n", scalar(keys %notion);
 
 if(%romain){
-  print "\nLE SIECLE EN CHIFFRES ROMAINS — ne se dit pas en anglais\n";
+  print "\nCE QUI RESTE ECRIT A LA FRANCAISE — siecle romain, duree en « h »\n";
   for my $o (sort keys %romain){ $souci++;
     printf "  %-16s %s\n", $o, join(", ", @{$romain{$o}}) }
 }
