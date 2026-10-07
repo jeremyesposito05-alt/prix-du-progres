@@ -20,13 +20,25 @@ my ($src, $dos, $out) = @ARGV;
 $src && $dos && $out or die "usage: reinjecter.pl <jeu.html> <dossier> <sortie.html>\n";
 
 # ---- ce que l'extraction avait relevé -------------------------------------
+# Les textes du balisage peuvent contenir un retour à la ligne, qu'un
+# fichier à colonnes tabulées ne sait pas porter : l'extraction les
+# échappe, on les rétablit ici. Les données du jeu n'en contiennent aucun,
+# ni aucun antislash, donc cela ne change rien pour elles.
+my $AS = chr(92);
+sub desechapper {
+  my ($t) = @_;
+  $t =~ s/\Q$AS\E(.)/$1 eq "n" ? "\n" : $1 eq "t" ? "\t" : $1/ge;
+  return $t;
+}
+
 my @lot;
 open(my $m, "<:encoding(UTF-8)", "$dos/source.tsv") or die "$dos/source.tsv: $!";
 while(<$m>){
   next if /^#/; chomp; next unless length;
   my ($n, $deb, $len, $champ, $fr) = split /\t/, $_, 5;
   next unless defined $fr;
-  push @lot, { n=>$n+0, deb=>$deb+0, len=>$len+0, champ=>$champ, fr=>$fr };
+  push @lot, { n=>$n+0, deb=>$deb+0, len=>$len+0, champ=>$champ,
+               fr=>desechapper($fr) };
 }
 close $m;
 @lot or die "ARRET : source.tsv est vide\n";
@@ -61,6 +73,13 @@ for my $e (@lot){
     if !defined $v || $v ne $e->{fr};
   push @ecarts, "n°$e->{n} : la traduction contient un guillemet droit"
     if defined $en{$e->{n}} && $en{$e->{n}} =~ /"/;
+  # Un texte d'interface est recollé dans du balisage : un chevron ou une
+  # esperluette y ouvrirait une balise ou une entité. Les données du jeu,
+  # elles, portent légitimement des <strong>.
+  push @ecarts, "n°$e->{n} ($e->{champ}) : la traduction contient < > ou &"
+    if defined $en{$e->{n}}
+    && $e->{champ} =~ /^(?:texte|gabarit|title|aria-label|placeholder|alt)$/
+    && $en{$e->{n}} =~ /[<>&]/;
 }
 for my $n (sort { $a <=> $b } keys %en){
   push @ecarts, "n°$n : traduit mais inconnu de source.tsv"
