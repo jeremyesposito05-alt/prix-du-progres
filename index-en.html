@@ -5493,27 +5493,24 @@ function accueil(){
       <p class="but-jeu">Your aim: <strong>lead your city — or your factory — to the end of the period without any of the four groups abandoning you.</strong></p>
 
       <div class="etapes">
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">1</span>
           <div>
-            <h3>One situation, three answers</h3>
-            <p>Someone comes to you for a decision. You choose. <strong>No answer is good for everyone</strong>: that is what this unit is about.</p>
+            <p>A situation lands on your desk. Someone comes to plead their case, and you have <strong>three possible answers</strong>.</p>
           </div>
         </div>
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">2</span>
           <div>
-            <h3>Four groups, never in agreement</h3>
             <div class="mini-forces">${ROLES.map(r=>`<span>
               ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
-            <p>Every decision pleases one and angers another. If one of them gives up on you completely, <strong>the game ends</strong>. You are warned well in advance.</p>
+            <p>You choose. Every answer <strong>pleases one group and angers another</strong>: none of them pleases everyone.</p>
           </div>
         </div>
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">3</span>
           <div>
-            <h3>At the end, you hand in your work</h3>
-            <p>Your decisions, eight questions on what you saw, and what you make of it.</p>
+            <p>If one group gives up on you completely, <strong>the game ends</strong>. Otherwise you reach the end, and you discover what you have built.</p>
           </div>
         </div>
       </div>

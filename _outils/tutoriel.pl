@@ -55,37 +55,37 @@ my $avant = length $txt;
 # ---- le nouveau bloc --------------------------------------------------
 my ($sur, $titre, $but, @pts);
 
+# TROIS PHASES, SANS TITRE. Les titres etaient une redondance : chacun
+# annoncait ce que la phrase disait juste apres, et il fallait les lire
+# deux fois pour comprendre une chose simple. On garde le numero, qui
+# suffit a marquer l'etape, et la phrase, qui porte tout.
 if($lg eq "fr"){
   $sur   = "Avant de commencer";
   $titre = "Comment on joue";
-  $but   = "Votre but : <strong>conduire la ville jusqu\x{2019}au bout de la p\x{E9}riode sans "
-         . "qu\x{2019}aucun des quatre groupes ne vous abandonne.</strong>";
+  $but   = "Votre but : <strong>conduire votre ville \x{2014} ou votre usine \x{2014} "
+         . "jusqu\x{2019}au bout de la p\x{E9}riode sans qu\x{2019}aucun des quatre groupes "
+         . "ne vous abandonne.</strong>";
   @pts = (
-    [ "Une situation, trois r\x{E9}ponses",
-      "Quelqu\x{2019}un vient vous demander de d\x{E9}cider. Vous choisissez. "
-      . "<strong>Aucune r\x{E9}ponse n\x{2019}est bonne pour tout le monde</strong> : "
-      . "c\x{2019}est le sujet du cours.", 0 ],
-    [ "Quatre groupes, jamais d\x{2019}accord",
-      "Chaque d\x{E9}cision en contente un et en f\x{E2}che un autre. Si l\x{2019}un d\x{2019}eux "
-      . "vous l\x{E2}che tout \x{E0} fait, <strong>la partie s\x{2019}arr\x{EA}te</strong>. "
-      . "Vous \x{EA}tes pr\x{E9}venu bien avant.", 1 ],
-    [ "\x{C0} la fin, vous rendez votre travail",
-      "Vos d\x{E9}cisions, huit questions sur ce que vous avez vu, et ce que vous en pensez.", 0 ],
+    [ "", "Une situation arrive sur votre bureau. Quelqu\x{2019}un vient plaider sa cause, "
+      . "et vous avez <strong>trois r\x{E9}ponses possibles</strong>.", 0 ],
+    [ "", "Vous choisissez. Chaque r\x{E9}ponse <strong>contente un groupe et en f\x{E2}che "
+      . "un autre</strong> : aucune ne plaît \x{E0} tout le monde.", 1 ],
+    [ "", "Si un groupe vous l\x{E2}che tout \x{E0} fait, <strong>la partie "
+      . "s\x{2019}arr\x{EA}te</strong>. Sinon vous allez au bout, et vous d\x{E9}couvrez ce que "
+      . "vous avez b\x{E2}ti.", 0 ],
   );
 } else {
   $sur   = "Before you begin";
   $titre = "How to play";
-  $but   = "Your aim: <strong>lead the city to the end of the period without any of the four "
-         . "groups abandoning you.</strong>";
+  $but   = "Your aim: <strong>lead your city \x{2014} or your factory \x{2014} to the end of "
+         . "the period without any of the four groups abandoning you.</strong>";
   @pts = (
-    [ "One situation, three answers",
-      "Someone comes to you for a decision. You choose. <strong>No answer is good for "
-      . "everyone</strong>: that is what this unit is about.", 0 ],
-    [ "Four groups, never in agreement",
-      "Every decision pleases one and angers another. If one of them gives up on you "
-      . "completely, <strong>the game ends</strong>. You are warned well in advance.", 1 ],
-    [ "At the end, you hand in your work",
-      "Your decisions, eight questions on what you saw, and what you make of it.", 0 ],
+    [ "", "A situation lands on your desk. Someone comes to plead their case, and you have "
+      . "<strong>three possible answers</strong>.", 0 ],
+    [ "", "You choose. Every answer <strong>pleases one group and angers another</strong>: "
+      . "none of them pleases everyone.", 1 ],
+    [ "", "If one group gives up on you completely, <strong>the game ends</strong>. "
+      . "Otherwise you reach the end, and you discover what you have built.", 0 ],
   );
 }
 
@@ -108,12 +108,12 @@ for my $p (@pts){
     ? "            <div class=\"mini-forces\">\${ROLES.map(r=>`<span>\n"
       . "              \${icone(r.k)}<i>\${esc(r.t)}</i></span>`).join(\"\")}</div>\n"
     : "";
+  my $h3 = length($t) ? "            <h3>$t</h3>\n" : "";
   $neuf .= <<"PT";
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">$n</span>
           <div>
-            <h3>$t</h3>
-$mini            <p>$corps</p>
+$h3$mini            <p>$corps</p>
           </div>
         </div>
 PT
@@ -137,6 +137,13 @@ unless($s =~ /\.but-jeu\s*\{/){
 }
 .but-jeu strong{color:var(--enc)}
 @media(max-width:600px){ .but-jeu{font-size:15px;padding:10px 12px} }
+
+/* Sans titre, la phrase porte tout : elle a droit a un corps plus grand
+   et a plus d'air que le paragraphe d'explication qu'elle remplace. */
+.etape.sans-titre > div > p{
+  margin:0; font-size:15.5px; line-height:1.5; color:var(--enc);
+}
+.etape.sans-titre{align-items:center}
 CSS
   my $ancre = "\n/* l'ordre du jour";
   index($s, $ancre) >= 0 or die "ARRET - $f : ancrage CSS introuvable\n";

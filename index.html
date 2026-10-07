@@ -5488,27 +5488,24 @@ function accueil(){
       <p class="but-jeu">Votre but : <strong>conduire votre ville — ou votre usine — jusqu’au bout de la période sans qu’aucun des quatre groupes ne vous abandonne.</strong></p>
 
       <div class="etapes">
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">1</span>
           <div>
-            <h3>Une situation, trois réponses</h3>
-            <p>Quelqu’un vient vous demander de décider. Vous choisissez. <strong>Aucune réponse n’est bonne pour tout le monde</strong> : c’est le sujet du cours.</p>
+            <p>Une situation arrive sur votre bureau. Quelqu’un vient plaider sa cause, et vous avez <strong>trois réponses possibles</strong>.</p>
           </div>
         </div>
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">2</span>
           <div>
-            <h3>Quatre groupes, jamais d’accord</h3>
             <div class="mini-forces">${ROLES.map(r=>`<span>
               ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
-            <p>Chaque décision en contente un et en fâche un autre. Si l’un d’eux vous lâche tout à fait, <strong>la partie s’arrête</strong>. Vous êtes prévenu bien avant.</p>
+            <p>Vous choisissez. Chaque réponse <strong>contente un groupe et en fâche un autre</strong> : aucune ne plaît à tout le monde.</p>
           </div>
         </div>
-        <div class="etape">
+        <div class="etape sans-titre">
           <span class="num">3</span>
           <div>
-            <h3>À la fin, vous rendez votre travail</h3>
-            <p>Vos décisions, huit questions sur ce que vous avez vu, et ce que vous en pensez.</p>
+            <p>Si un groupe vous lâche tout à fait, <strong>la partie s’arrête</strong>. Sinon vous allez au bout, et vous découvrez ce que vous avez bâti.</p>
           </div>
         </div>
       </div>
