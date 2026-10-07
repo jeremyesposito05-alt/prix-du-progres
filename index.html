@@ -2641,6 +2641,12 @@ const ROLES = [
 ];
 
 const CONDITIONS = ["Ressources","Savoirs techniques","Capitaux","Main-d’œuvre","Marchés","Transports","Organisation"];
+/* Le libelle affiche d'une condition. En francais il est identique a la
+   cle : la table reste vide, et condNom retombe sur la cle. C'est la
+   version anglaise qui la remplit. */
+const COND_NOM = {};
+const condNom = k => COND_NOM[k] || k;
+const condListe = a => a.map(condNom).join(", ");
 
 /* ==================================================================
    LE JEU DE CARTES
@@ -4053,12 +4059,12 @@ function blocChiffres(){
       société dans l’industrie ; il en manque une, et les machines restent des
       curiosités. Chacune s’obtient en prenant la décision qui l’apporte.</p>
       <span class="cond fin-cond">${CONDITIONS.map(x=>
-        `<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
+        `<span class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</span>`).join("")}</span>
       <p class="fin-manque">${
         manque.length === 0 ? "Vous les avez toutes réunies."
         : manque.length === CONDITIONS.length
           ? "Vous n’en avez réuni aucune : la ville n’a jamais vraiment basculé."
-          : `Il vous manquait : ${manque.join(", ").toLowerCase()}.`}</p>
+          : `Il vous manquait : ${condListe(manque).toLowerCase()}.`}</p>
     </div>
 
   </div>`;
@@ -4144,7 +4150,7 @@ function carnet(d){
       <div class="cn-jauge"><i style="width:${
         Math.round(100*E.acquis.length/CONDITIONS.length)}%"></i></div>
       <ul class="cn-cond">${CONDITIONS.map(x=>
-        `<li class="${E.acquis.includes(x)?"ok":""}">${x}</li>`).join("")}</ul>
+        `<li class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</li>`).join("")}</ul>
 
     </div>
   </details>`;
@@ -4739,7 +4745,7 @@ const CARTES_II = [
  ex:"Un règlement affiché la semaine dernière interdit de s’asseoir, de siffler et de parler à son voisin pendant le travail. Deux ouvriers ont déjà été sanctionnés pour s’être adressé la parole à leur poste. Les ouvriers ont mis au point une façon de se parler sans remuer les lèvres. L’ouvrière qui vient vous voir parle au nom de toute sa ligne.",
  f:"Le règlement d’atelier interdisait de s’asseoir, de siffler, de parler à son voisin : la discipline fait partie de l’**organisation du travail** au même titre que la cadence. Les ouvriers de Ford avaient mis au point une façon de parler sans remuer les lèvres, qu’ils appelaient entre eux le « murmure de Ford ». Le contrôle des corps est l’un des aspects du fordisme que Gramsci souligne : l’usine prétend régler jusqu’à la façon de se tenir.",
  a:{q:"« Maintenons l’interdiction de parler. »", e:{i:7,o:-11,p:-5}, suite:{dans:3, t:"La ligne 7 s’est arrêtée d’elle-même", x:"Aucun mot d’ordre, aucun meneur : les hommes ont simplement croisé les bras vingt minutes. On les a remis au travail, mais chacun a compris que cela pouvait recommencer n’importe quand.", e:{i:-6,o:-4,p:-3}},
-    c:"Le règlement tient. On apprend à parler sans remuer les lèvres — les ouvriers appellent cela le fordisme."},
+    c:"Le règlement tient. On apprend à parler sans remuer les lèvres — les ouvriers appellent cela le murmure de Ford."},
  b:{q:"« Levons l’interdiction de parler. »", e:{o:10,p:4,i:-8,m:-2},
     c:"Le bruit revient dans l’atelier. Les contremaîtres jurent que le rendement va tomber. Il ne tombe pas."},
  c:{q:"« N’imposons le silence qu’aux postes dangereux. »", e:{o:2,i:-4,p:1},
@@ -5132,7 +5138,7 @@ function texteTrace(){
   L.push("  Décisions prises : "+E.carnet.length);
   L.push("  "+N.unite+" finale : "+fmt(E.pop));
   L.push("  Conditions réunies : "+E.acquis.length+" / "+CONDITIONS.length
-    +(E.acquis.length?"  ("+E.acquis.join(", ")+")":""));
+    +(E.acquis.length?"  ("+condListe(E.acquis)+")":""));
   L.push("  Rapports d’enquête consultés : "+((E.lus&&E.lus.length)||0)+" sur "+E.carnet.length);
   L.push("");
   L.push("MON CARNET DE BORD");
@@ -5284,7 +5290,7 @@ p.leg{font-size:9.5pt;color:#9C9895;margin:2pt 0 5pt;font-style:italic}
   <tr><td class=k>Décisions prises</td><td>${E.carnet.length}</td></tr>
   <tr><td class=k>${e(N.unite)} finale</td><td>${e(fmt(E.pop))} ${e(N.unite2)}</td></tr>
   <tr><td class=k>Conditions réunies</td><td>${E.acquis.length} sur ${CONDITIONS.length}${
-      E.acquis.length?" — "+e(E.acquis.join(", ")):""}</td></tr>
+      E.acquis.length?" — "+e(condListe(E.acquis)):""}</td></tr>
   <tr><td class=k>Rapports d’enquête consultés</td><td>${(E.lus&&E.lus.length)||0} sur ${E.carnet.length}</td></tr>
 </table>
 

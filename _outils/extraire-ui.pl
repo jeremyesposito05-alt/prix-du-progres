@@ -107,11 +107,26 @@ sub prendre {
 # le fichier entier, pour que les positions restent absolues.
 sub balayer {
   my ($bout, $base, $ou) = @_;
-  while($bout =~ />([^<>]+)</g){
+  # Tout ce qui n'est ni « < » ni « > » forme un segment. Il est du
+  # texte affiche si ce qui le precede est « > » ou le debut du morceau,
+  # et de l'interieur de balise si c'est « < ».
+  #
+  # Premiere version, on exigeait « >texte< ». Or dans un gabarit un
+  # morceau fixe peut commencer ou finir sans balise :
+  #   `<p>Vous allez perdre ${f} a zero, la partie s'arrete.</p>`
+  # coupe en « <p>Vous allez perdre » et « a zero, la partie s'arrete.</p> ».
+  # « Vous allez perdre » n'a pas de « < » apres lui, et « a zero… » pas
+  # de « > » avant : seize phrases restaient en francais.
+  while($bout =~ /([^<>]+)/g){
     my ($brut, $i) = ($1, $-[1]);
+    my $avant = $i > 0 ? substr($bout, $i-1, 1) : "";
+    next if $avant eq "<";                 # l'interieur d'une balise
     my ($g) = $brut =~ /^(\s*)/;
     my $t = $brut; $t =~ s/^\s+//; $t =~ s/\s+$//;
     next unless length $t;
+    # Un morceau en tete peut etre un reste d'attribut — « " class=" » —
+    # quand le gabarit a ete coupe au milieu d'une balise.
+    next if $avant eq "" && $t =~ /["=]/;
     prendre($ou, $t, $base + $i + length($g));
   }
   while($bout =~ /\b(title|aria-label|placeholder|alt)\s*=\s*"([^"]*)"/g){

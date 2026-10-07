@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Le prix du progrès</title>
+<title>The price of progress</title>
 <style>
 /* ===================================================================
    LE PRIX DU PROGRÈS — Collège Alpin Beau Soleil — Unité 1, G10
@@ -1979,24 +1979,24 @@ body[data-niveau="II"] .question{color:#D9E3ED}
 <header>
   <span class="marque"><img src="img/blason-bs.png" alt="Collège Alpin Beau Soleil"
         onerror="this.remove()"><svg class="blason" viewBox="0 0 363.47 342.95" aria-hidden="true"><path fill="#fff" d="M178.31,343c-37.76,0-75.1-16.58-105.13-46.69C46,269,29.19,234.7,29.27,206.69l.58-145.8C29.41,28.34,22.36,17.23,7.72,6L0,0H363.47L352.9,6.18C336,16.07,331,31.82,328.66,52.44l-.29,154.26c0,27.51-16.64,61.43-43.42,88.5C254.48,326,216.61,343,178.31,343ZM18.69,6.64C31.61,19.17,36.12,33.77,36.48,60.86l-.57,145.85c-.08,25.91,16.4,59.22,42,84.86,28.77,28.85,64.44,44.75,100.43,44.75,36.51,0,72.71-16.26,101.92-45.79,25.6-25.88,41.51-58,41.51-83.83l.31-154.82c1.84-16.55,5.57-33.24,19-45.24Z"/></svg></span>
-  <span class="titre">LE PRIX DU PROGRÈS</span>
+  <span class="titre">THE PRICE OF PROGRESS</span>
   <span class="ecole">COLLÈGE ALPIN BEAU SOLEIL · G10</span>
   <span class="son-reglage">
-    <button id="btson" onclick="SON.couper(!SON.actif)" title="Couper le son">♪</button>
-    <span class="regl"><i>Musique</i>
+    <button id="btson" onclick="SON.couper(!SON.actif)" title="Mute">♪</button>
+    <span class="regl"><i>Music</i>
       <input id="volson" type="range" min="0" max="100" step="1" value="85"
-             aria-label="Volume de la musique" title="Volume de la musique"
+             aria-label="Music volume" title="Music volume"
              oninput="SON.volume(this.value/100)"></span>
-    <span class="regl"><i>Bruitages</i>
+    <span class="regl"><i>Sound effects</i>
       <input id="voleff" type="range" min="0" max="100" step="1" value="90"
-             aria-label="Volume des bruitages" title="Volume des bruitages"
+             aria-label="Sound effects volume" title="Sound effects volume"
              oninput="SON.bruitage(this.value/100)"></span>
   </span>
 </header>
 
 <main id="app"></main>
-<footer>Unité 1 — Quand l’innovation change la société<br>
-  <span class="signature">Conçu et écrit par <b>Jeremy Esposito</b> · Collège Alpin Beau Soleil</span>
+<footer>Unit 1 — When innovation changes society<br>
+  <span class="signature">Designed and written by <b>Jeremy Esposito</b> · Collège Alpin Beau Soleil</span>
 </footer>
 
 <script>
@@ -2641,6 +2641,19 @@ const ROLES = [
 ];
 
 const CONDITIONS = ["Ressources","Savoirs techniques","Capitaux","Main-d’œuvre","Marchés","Transports","Organisation"];
+/* Le libelle affiche d'une condition. La cle, elle, ne change jamais :
+   les cartes l'accordent et l'exigent par le mot exact. */
+const COND_NOM = {
+  "Ressources"         : "Resources",
+  "Savoirs techniques" : "Technical knowledge",
+  "Capitaux"           : "Capital",
+  "Main-d’œuvre"      : "Workforce",
+  "Marchés"           : "Markets",
+  "Transports"         : "Transport",
+  "Organisation"       : "Organisation of work",
+};
+const condNom = k => COND_NOM[k] || k;
+const condListe = a => a.map(condNom).join(", ");
 
 /* ==================================================================
    LE JEU DE CARTES
@@ -3122,24 +3135,24 @@ function rendre(){
 
   app.innerHTML=`
   <div class="tableau" ${D()}>
-    <span class="plaque">État des forces</span>
+    <span class="plaque">Balance of forces</span>
     ${barresForces()}
   </div>
   ${alerte()}
   <div class="bureau"><div class="plateau">
     <div class="col col-g">
       ${c.f?`<details class="dossier d-enquete ${guide?"guide":""}" ${D()}>
-          <summary><span class="onglet">Rapport d’enquête</span>
+          <summary><span class="onglet">Inquiry report</span>
             <span class="cq-txt">Le bureau d’enquête a joint une note.${
-              invite?`<i class="invite">Le fait historique est dedans.</i>`:""}</span>
+              invite?`<i class="invite">The historical fact is inside.</i>`:""}</span>
             <span class="pli"></span></summary>
           <div class="corps">${illuDoc(c)}${corpsRapport(c)}</div></details>`:""}
       ${courrier(D())}
     </div>
     <div class="col col-c">
       <div class="situ dossier d-situation" ${D()}>
-        <span class="onglet">Affaire du jour</span>
-        <div class="ct">Une nouvelle affaire vous arrive</div>
+        <span class="onglet">Case of the day</span>
+        <div class="ct">A new case has arrived</div>
         <div class="t"></div>
         <div class="ex"></div>
         <div class="parle">${illuPersonne(c.qui)}<span>${esc(c.qui)}</span></div>
@@ -3148,7 +3161,7 @@ function rendre(){
     <div class="col col-d">
       ${carnet(D())}
     </div>
-    <div class="question" ${D()}>Que décidez-vous ?</div>
+    <div class="question" ${D()}>What do you decide?</div>
     <div class="rep ${trois.length===2?"deux":""}" ${D()}>
       ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
         <span class="q">${esc(c[k].q)}</span><span class="impacts">${impacts(c[k].e)}</span></button>`).join("")}
@@ -3236,12 +3249,12 @@ function rendreEvenement(ev){
     <div class="evd">${esc(ev.date)}</div>
     <div class="evt">${esc(ev.t)}</div>
     <p class="evx">${gras(esc(ev.x))}</p>
-    <div class="evs"><strong>Fait authentique.</strong> ${gras(esc(ev.src))}</div>
+    <div class="evs"><strong>Historical fact.</strong> ${gras(esc(ev.src))}</div>
     <div class="evi">${impacts(ev.e)}</div>
   </div>
   <p class="centre" style="margin:20px 0 0">
-    ${ev.urgence ? `<button class="plein urg" onclick="rendreUrgence()">Il faut décider maintenant</button>`
-                 : `<button class="plein" onclick="suiteEvenement()">Continuer</button>`}
+    ${ev.urgence ? `<button class="plein urg" onclick="rendreUrgence()">You must decide now</button>`
+                 : `<button class="plein" onclick="suiteEvenement()">Continue</button>`}
   </p>`;
 }
 
@@ -3253,7 +3266,7 @@ function rendreUrgence(){
   app.innerHTML=`
   ${barresForces()}
   <div class="chrono"><div class="jauge" id="jt"></div></div>
-  <p class="compte">Il vous reste <b id="cpt">${SECONDES_URGENCE}</b> secondes</p>
+  <p class="compte">You have <b id="cpt">${SECONDES_URGENCE}</b> seconds</p>
   <div class="situ urgent">
     <div class="ct">Décision urgente — ${esc(ev.date)}</div>
     <div class="t">${esc(ev.t)}</div>
@@ -3320,11 +3333,11 @@ function courrier(attr){
   const der = recus[0] || null;
 
   const resume = proche
-    ? `<span class="cd">À l’instant</span>
-       <span class="cq">Un pli vient d’arriver. Il n’est pas encore ouvert.</span>`
+    ? `<span class="cd">Just now</span>
+       <span class="cq">A letter has just arrived. It is still sealed.</span>`
     : der
       ? `<span class="cd">${esc(der.date)}</span><span class="cq">${esc(der.t)}</span>`
-      : `<span class="cq vide">Rien au courrier ce matin.</span>`;
+      : `<span class="cq vide">No post this morning.</span>`;
 
   const neufs = Math.max(0, recus.length - (E.crLus||0));
   const classe = `courrier dossier ${proche?"attente":""} ${neufs?"neuf":""} ${der&&!proche?"ouvert":""}`;
@@ -3334,22 +3347,22 @@ function courrier(attr){
      dossier reste un simple carton, et il ne remue pas. */
   if(!recus.length && !proche)
     return `<div class="${classe}" ${attr}>
-      <span class="onglet">Courrier</span>${cachet}
+      <span class="onglet">Post</span>${cachet}
       <div class="env"></div>${resume}</div>`;
 
   /* Ce qu'un messager peut dire sans briser le cachet. */
   const scelle = proche ? `<article class="cr-pli cr-scelle">
-      <div class="cd">Cachet intact</div>
-      <div class="crt">Un messager attend dans l’antichambre</div>
-      <p class="crx">Le pli ne s’ouvre pas ici : il sera lu devant le conseil, à votre
-      <strong>prochaine décision</strong>. Ce qu’on sait déjà, c’est qu’une nouvelle du
+      <div class="cd">Seal intact</div>
+      <div class="crt">A messenger is waiting in the antechamber</div>
+      <p class="crx">The letter is not opened here: it will be read before the council, at your
+      <strong>next decision</strong>. Ce qu’on sait déjà, c’est qu’une nouvelle du
       dehors va tomber — et qu’elle ne vous demandera pas votre avis.
       Gardez-vous une marge sur vos quatre forces.</p>
     </article>` : "";
 
   return `<details class="${classe}" ${attr}>
     <summary>
-      <span class="onglet">Courrier</span>${cachet}
+      <span class="onglet">Post</span>${cachet}
       <span class="env"></span>
       <span class="cr-bas">
         <span class="cr-tete">${resume}</span>
@@ -3360,7 +3373,7 @@ function courrier(attr){
       <div class="cd">${esc(v.date)}</div>
       <div class="crt">${esc(v.t)}</div>
       <p class="crx">${gras(esc(v.x))}</p>
-      <div class="crs"><strong>Fait authentique.</strong> ${gras(esc(v.src))}</div>
+      <div class="crs"><strong>Historical fact.</strong> ${gras(esc(v.src))}</div>
     </article>`).join("")}</div>
   </details>`;
 }
@@ -3448,16 +3461,16 @@ function rendreGraine(gr){
   const ecart = (gr.semee!=null) ? (E.tour-gr.semee) : gr.s.dans;
   app.innerHTML=`
   <div class="tableau">
-    <span class="plaque">État des forces</span>
+    <span class="plaque">Balance of forces</span>
     ${barresForces()}
   </div>
   <div class="bureau"><div class="plateau un">
     <div class="ev graine ${bon?"bonne":"mauvaise"}">
       <div class="evd">${bon?"Grâce à":"À cause de"} votre choix d’il y a ${ecart} tour${ecart>1?"s":""}</div>
       <div class="origine">
-        Vous aviez répondu <em>${esc(gr.choix||"—")}</em>
+        You had answered <em>${esc(gr.choix||"—")}</em>
         à l’affaire « ${esc(gr.de).replace(/\s*\.$/,"")} ».
-        <span>Ce n’est donc pas votre dernière décision qui produit ceci.</span>
+        <span>So this is not the result of your last decision.</span>
       </div>
       <div class="evt">${esc(gr.s.t)}</div>
       <p class="evx">${gras(esc(gr.s.x))}</p>
@@ -3470,7 +3483,7 @@ function rendreGraine(gr){
         <span class="q">${esc(c.q)}</span><span class="impacts">${impacts(c.e)}</span></button>`).join("")}
     </div>`
     : `<p class="centre" style="margin:22px 0 0">
-      <button class="plein" onclick="suiteGraine()">Continuer</button>
+      <button class="plein" onclick="suiteGraine()">Continue</button>
     </p>`}
   </div></div>`;
   try{ SON.majTension() }catch(e){}
@@ -4053,12 +4066,12 @@ function blocChiffres(){
       société dans l’industrie ; il en manque une, et les machines restent des
       curiosités. Chacune s’obtient en prenant la décision qui l’apporte.</p>
       <span class="cond fin-cond">${CONDITIONS.map(x=>
-        `<span class="${E.acquis.includes(x)?"ok":""}">${x}</span>`).join("")}</span>
+        `<span class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</span>`).join("")}</span>
       <p class="fin-manque">${
         manque.length === 0 ? "Vous les avez toutes réunies."
         : manque.length === CONDITIONS.length
           ? "Vous n’en avez réuni aucune : la ville n’a jamais vraiment basculé."
-          : `Il vous manquait : ${manque.join(", ").toLowerCase()}.`}</p>
+          : `Il vous manquait : ${condListe(manque).toLowerCase()}.`}</p>
     </div>
 
   </div>`;
@@ -4144,7 +4157,7 @@ function carnet(d){
       <div class="cn-jauge"><i style="width:${
         Math.round(100*E.acquis.length/CONDITIONS.length)}%"></i></div>
       <ul class="cn-cond">${CONDITIONS.map(x=>
-        `<li class="${E.acquis.includes(x)?"ok":""}">${x}</li>`).join("")}</ul>
+        `<li class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</li>`).join("")}</ul>
 
     </div>
   </details>`;
@@ -4739,7 +4752,7 @@ const CARTES_II = [
  ex:"A rule posted last week bans sitting down, whistling and talking to a neighbour while working. Two workers have already been punished for speaking to each other at their posts. The workers have developed a way of talking without moving their lips. The worker who has come to see you speaks for her entire line.",
  f:"The workshop rules banned sitting down, whistling and talking to a neighbour: discipline is part of the **organisation of work** just as much as the pace. Ford workers developed a way of speaking without moving their lips, which they called the ‘Ford whisper’. Control of the body is one aspect of Fordism that Gramsci highlights: the factory seeks to regulate even the way people hold themselves.",
  a:{q:"“Let us keep the ban on talking.”", e:{i:7,o:-11,p:-5}, suite:{dans:3, t:"Line 7 has stopped by itself", x:"No order, no leader: the men simply folded their arms for twenty minutes. They were put back to work, but everyone understood that it could happen again at any time.", e:{i:-6,o:-4,p:-3}},
-    c:"The rule remains. People learn to talk without moving their lips, the workers call it Fordism."},
+    c:"The rule remains. People learn to talk without moving their lips, the workers call it the Ford whisper."},
  b:{q:"“Let us lift the ban on talking.”", e:{o:10,p:4,i:-8,m:-2},
     c:"Noise returns to the workshop. The foremen swear that output will fall. It does not."},
  c:{q:"“Let us impose silence only at dangerous stations.”", e:{o:2,i:-4,p:1},
@@ -5028,17 +5041,16 @@ function rendreTrace(){
 
   app.innerHTML=`
   <div class="bureau"><div class="plateau un trace">
-    <h1 style="font-size:clamp(26px,4vw,40px)">Ma trace de travail</h1>
+    <h1 style="font-size:clamp(26px,4vw,40px)">My work record</h1>
     <p class="sous">${N.lieu}, ${N.sous.replace(N.lieu+", ","")} — ${E.mode==="campagne"?"campagne":"survie"}</p>
 
     <div class="bilan">
-      <h2 style="margin-top:0">Mon carnet de bord</h2>
+      <h2 style="margin-top:0">My logbook</h2>
       <p style="margin:.2em 0 .8em;font-size:14px;color:var(--enc2)">
         ${E.carnet.length} décision${E.carnet.length>1?"s":""} prise${E.carnet.length>1?"s":""}.</p>
       ${courbesForces()}
       ${legendeForces()}
-      <p class="cfo-note">Chaque force part de 60 sur 100. La courbe dit qui a payé vos
-      décisions, et à quel moment.</p>
+      <p class="cfo-note">Each force starts at 60 out of 100. The graph shows who paid for your decisions, and when.</p>
       <ol class="carnet">${E.carnet.map(d=>`<li>
         ${d.an?`<span class="an">${d.an}</span>`:""}
         <span class="aff">${esc(d.t)}</span>
@@ -5047,9 +5059,9 @@ function rendreTrace(){
     </div>
 
     <div class="bilan">
-      <h2 style="margin-top:0">Ce que j’ai retenu</h2>
+      <h2 style="margin-top:0">What I learned</h2>
       <p style="margin:.2em 0 1em;font-size:14px;color:var(--enc2)">
-        Huit questions, tirées des affaires que vous avez traitées.</p>
+        Eight questions, drawn from the cases you handled.</p>
       ${E.quiz.map((q,i)=>`<div class="qz ${E.corrige?(rep[i]===q.b?"juste":"faux"):""}">
         <div class="qzq">${i+1}. ${esc(q.q)}</div>
         <div class="qzr">${q.r.map((t,j)=>`
@@ -5066,40 +5078,40 @@ function rendreTrace(){
     </div>
 
     <div class="bilan">
-      <h2 style="margin-top:0">Ma réflexion</h2>
-      <label>La décision dont je suis le plus sûr, et pourquoi :
+      <h2 style="margin-top:0">My reflection</h2>
+      <label>The decision I am most confident about, and why:
         <textarea id="r1" rows="3" placeholder="…"></textarea></label>
-      <label>La décision que je regrette, et ce que je ferais autrement :
+      <label>The decision I regret, and what I would do differently:
         <textarea id="r2" rows="3" placeholder="…"></textarea></label>
-      <label>Ce que cette partie m’apprend sur le progrès industriel :
+      <label>What this game teaches me about industrial progress:
         <textarea id="r3" rows="3" placeholder="…"></textarea></label>
-      <label class="nom">Mon nom :
-        <input id="rnom" type="text" placeholder="Prénom et nom"></label>
+      <label class="nom">My name:
+        <input id="rnom" type="text" placeholder="First name and surname"></label>
     </div>
 
     ${blocAvis()}
 
     <p class="centre" style="margin:22px 0 0">
-      <button class="plein" onclick="telechargerTrace()">Télécharger (Word)</button>
-      <button onclick="copierTrace()">Copier ma trace</button>
-      <button onclick="window.print()">Imprimer</button>
-      <button onclick="rendreFin()">Retour au verdict</button>
+      <button class="plein" onclick="telechargerTrace()">Download (Word)</button>
+      <button onclick="copierTrace()">Copy my work</button>
+      <button onclick="window.print()">Print</button>
+      <button onclick="rendreFin()">Back to verdict</button>
     </p>
     <p class="centre" id="msgcopie" style="min-height:1.3em;color:var(--pap);font-size:14px"></p>
 
     <div class="bilan validation" id="valid">
-      <h2 style="margin-top:0">Avant de quitter</h2>
+      <h2 style="margin-top:0">Before leaving</h2>
       <p style="margin:.2em 0 1em;font-size:14px;color:var(--enc2)">
-        Votre travail doit être rendu. Tant qu’il ne l’est pas, la partie reste ouverte.</p>
+        Your work must be submitted. Until it is, the game remains open.</p>
       <ul class="jalons">
-        <li id="j1">Écrire votre nom</li>
-        <li id="j2">Corriger le questionnaire</li>
-        <li id="j3">Enregistrer la trace — téléchargée ou copiée</li>
+        <li id="j1">Enter your name</li>
+        <li id="j2">Check the quiz</li>
+        <li id="j3">Save your work — downloaded or copied</li>
       </ul>
       <label class="coche"><input type="checkbox" id="jenvoi" onchange="rafraichirValidation()">
-        J’ai envoyé ma trace à mon professeur.</label>
+        I sent my work to my teacher.</label>
       <p class="centre" style="margin:16px 0 0">
-        <button class="plein" id="btvalid" disabled onclick="validerTrace()">Valider et terminer</button>
+        <button class="plein" id="btvalid" disabled onclick="validerTrace()">Confirm and finish</button>
       </p>
     </div>
   </div></div>`;
@@ -5132,7 +5144,7 @@ function texteTrace(){
   L.push("  Décisions prises : "+E.carnet.length);
   L.push("  "+N.unite+" finale : "+fmt(E.pop));
   L.push("  Conditions réunies : "+E.acquis.length+" / "+CONDITIONS.length
-    +(E.acquis.length?"  ("+E.acquis.join(", ")+")":""));
+    +(E.acquis.length?"  ("+condListe(E.acquis)+")":""));
   L.push("  Rapports d’enquête consultés : "+((E.lus&&E.lus.length)||0)+" sur "+E.carnet.length);
   L.push("");
   L.push("MON CARNET DE BORD");
@@ -5218,7 +5230,7 @@ function htmlTrace(){
         <p class=qq><b>${i+1}.</b> ${e(q.q)}</p>
         <p class=qr><span class=et>${ok?"Juste":"Faux"}</span>
            Votre réponse : ${j==null?"—":e(q.r[j])}</p>
-        ${ok?"":`<p class=qa>Réponse attendue : <b>${e(q.r[q.b])}</b></p>`}
+        ${ok?"":`<p class=qa>Expected answer: <b>${e(q.r[q.b])}</b></p>`}
         <p class=qx>${g(q.x)}</p>
       </div>`;
     }).join("");
@@ -5271,63 +5283,62 @@ p.leg{font-size:9.5pt;color:#9C9895;margin:2pt 0 5pt;font-style:italic}
 </style></head><body>
 
 <div class=bandeau>
-  <h1>Le prix du progrès</h1>
+  <h1>The price of progress</h1>
   <p class=sous>${e(N.lieu)}, ${e(N.sous.replace(N.lieu+", ",""))} — ${E.mode==="campagne"?"campagne":"mode survie"}</p>
   <p class=ident><b>Nom :</b> ${e(nom)} &nbsp;&nbsp;·&nbsp;&nbsp; <b>Date :</b> ${e(dt)}</p>
 </div>
 
-<h2>Résultat de la partie</h2>
+<h2>Game result</h2>
 <table class=fiche>
-  <tr><td class=k>Issue</td><td>${E.fini==="verdict"
+  <tr><td class=k>Outcome</td><td>${E.fini==="verdict"
       ? "Menée jusqu’au bout de la période."
       : "Interrompue — "+e(N.fins[E.fini]?N.fins[E.fini].t:E.fini)}</td></tr>
-  <tr><td class=k>Décisions prises</td><td>${E.carnet.length}</td></tr>
+  <tr><td class=k>Decisions made</td><td>${E.carnet.length}</td></tr>
   <tr><td class=k>${e(N.unite)} finale</td><td>${e(fmt(E.pop))} ${e(N.unite2)}</td></tr>
-  <tr><td class=k>Conditions réunies</td><td>${E.acquis.length} sur ${CONDITIONS.length}${
-      E.acquis.length?" — "+e(E.acquis.join(", ")):""}</td></tr>
-  <tr><td class=k>Rapports d’enquête consultés</td><td>${(E.lus&&E.lus.length)||0} sur ${E.carnet.length}</td></tr>
+  <tr><td class=k>Conditions met</td><td>${E.acquis.length} sur ${CONDITIONS.length}${
+      E.acquis.length?" — "+e(condListe(E.acquis)):""}</td></tr>
+  <tr><td class=k>Inquiry reports viewed</td><td>${(E.lus&&E.lus.length)||0} sur ${E.carnet.length}</td></tr>
 </table>
 
-<h2>Mon carnet de bord</h2>
-<p class=leg>Les quatre dernières colonnes disent ce que chaque décision a fait aux acteurs.</p>
+<h2>My logbook</h2>
+<p class=leg>The last four columns show what each decision did to the actors.</p>
 <table>
-  <tr><th class=n>N°</th><th class=an>Année</th><th>L’affaire, et ce que j’ai décidé</th>
+  <tr><th class=n>N°</th><th class=an>Year</th><th>The case, and what I decided</th>
       ${CLES.map(k=>`<th class=num>${e(N.forces[k].nom.slice(0,4))}.</th>`).join("")}</tr>
   ${carnet}
 </table>
 
-<h2>L’état des quatre forces, décision après décision</h2>
-<p class=leg>Chacune part de 60 sur 100. Une force à zéro arrête la partie.</p>
+<h2>The state of the four forces, decision by decision</h2>
+<p class=leg>Each starts at 60 out of 100. A force at zero ends the game.</p>
 <table>
-  <tr><th class=an>Année</th>${CLES.map(k=>`<th class=num>${e(N.forces[k].nom)}</th>`).join("")}</tr>
+  <tr><th class=an>Year</th>${CLES.map(k=>`<th class=num>${e(N.forces[k].nom)}</th>`).join("")}</tr>
   ${releve}
 </table>
 
-<h2>Ce que j’ai retenu</h2>
+<h2>What I learned</h2>
 ${pct===null?"":`<p class=score>Connaissances acquises : <b>${pct}&nbsp;%</b>
   &nbsp;&nbsp;(${note} bonne${note>1?"s":""} réponse${note>1?"s":""} sur ${E.quiz.length})</p>`}
 ${quiz}
 
-<h2>Ma réflexion</h2>
-<div class=refl><span class=k>La décision dont je suis le plus sûr, et pourquoi</span>
+<h2>My reflection</h2>
+<div class=refl><span class=k>The decision I am most confident about, and why</span>
   ${e((E.t_r1||"").trim())||"&nbsp;"}</div>
-<div class=refl><span class=k>La décision que je regrette, et ce que je ferais autrement</span>
+<div class=refl><span class=k>The decision I regret, and what I would do differently</span>
   ${e((E.t_r2||"").trim())||"&nbsp;"}</div>
-<div class=refl><span class=k>Ce que cette partie m’apprend sur le progrès industriel</span>
+<div class=refl><span class=k>What this game teaches me about industrial progress</span>
   ${e((E.t_r3||"").trim())||"&nbsp;"}</div>
 
-<h2>Mon avis sur le jeu</h2>
+<h2>My opinion of the game</h2>
 <table class=fiche>
   ${avisLignes().map(p=>`<tr><td class=k>${e(p[0])}</td><td>${e(p[1])}</td></tr>`).join("")}
 </table>
-<div class=refl><span class=k>Un moment où j’étais perdu ou ennuyé</span>
+<div class=refl><span class=k>A moment when I felt lost or bored</span>
   ${e((E.t_av1||"").trim())||"&nbsp;"}</div>
-<div class=refl><span class=k>À ajouter, retirer ou corriger</span>
+<div class=refl><span class=k>What to add, remove or correct</span>
   ${e((E.t_av2||"").trim())||"&nbsp;"}</div>
 
-<p class=pied>Collège Alpin Beau Soleil · Unité 1 — Quand l’innovation change la société · Grade 10.
-Les personnages du jeu sont des figures composites ; les événements datés sont authentiques et cités.<br>
-<i>Le prix du progrès</i> — jeu conçu et écrit par <b>Jeremy Esposito</b>, Collège Alpin Beau Soleil.</p>
+<p class=pied>Collège Alpin Beau Soleil · Unit 1 — When innovation changes society · Grade 10. The characters in the game are composite figures; the dated events are authentic and cited.<br>
+<i>The price of progress</i> — game designed and written by <b>Jeremy Esposito</b>, Collège Alpin Beau Soleil.</p>
 </body></html>`;
 }
 
@@ -5360,20 +5371,20 @@ function titre(){
     <div class="te-haut">
       <img class="logo-bs" src="img/logo-beausoleil.png" alt="Collège Alpin Beau Soleil"
            onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-txt',textContent:'COLLÈGE ALPIN BEAU SOLEIL'}))">
-      <div class="surtitre-txt">Manchester <i>·</i> Detroit <i>·</i> Demain</div>
+      <div class="surtitre-txt">Manchester <i>·</i> Detroit <i>·</i> Tomorrow</div>
     </div>
 
     <div class="dedans">
-      <h1>Le prix<br><span>du progrès</span></h1>
+      <h1>The price<br><span>of progress</span></h1>
       <div class="filet"></div>
-      <p class="accroche">Vous décidez. Quatre forces vous jugent.<br>
-        <strong>Une seule question : qui paie le progrès ?</strong></p>
-      <button class="demarrer" onclick="demarrer()">Démarrer</button>
+      <p class="accroche">You decide. Four forces judge you.<br>
+        <strong>One question only: who pays for progress?</strong></p>
+      <button class="demarrer" onclick="demarrer()">Start</button>
     </div>
 
     <div class="te-bas">
-      <p class="mention">Unité 1 — Quand l’innovation change la société · Grade 10</p>
-      <p class="paraphe">Conçu et écrit par <b>Jeremy Esposito</b></p>
+      <p class="mention">Unit 1 — When innovation changes society · Grade 10</p>
+      <p class="paraphe">Designed and written by <b>Jeremy Esposito</b></p>
     </div>
   </div>`;
 }
@@ -5437,7 +5448,7 @@ function accueil(){
         <span class="ord">${o}</span>
         <span class="lieu">${l}</span>
         <span class="per">${p}</span>
-        <span class="rec">En préparation.</span></button>`;
+        <span class="rec">In preparation.</span></button>`;
     }
     let r=0; try{ r=+(localStorage.getItem("pdp_pop_"+id)||0) }catch(e){}
     return `<button class="niv" onclick="menuNiveau('${id}')">
@@ -5451,65 +5462,57 @@ function accueil(){
     <div class="dedans-menu">
 
       <div class="entete">
-        <div class="surtitre-txt">Avant de commencer</div>
-        <h1>Comment on joue</h1>
+        <div class="surtitre-txt">Before you begin</div>
+        <h1>How to play</h1>
       </div>
 
       <div class="etapes">
         <div class="etape">
           <span class="num">1</span>
           <div>
-            <h3>Vous êtes celui qui tranche</h3>
-            <p>Ni le patron, ni l’ouvrier, ni le député. Chaque affaire vous arrive par
-            quelqu’un qui vient plaider sa cause — et vous devez répondre.</p>
+            <h3>You are the one who decides</h3>
+            <p>Neither the owner, nor the worker, nor the MP. Each case comes to you through someone pleading their cause, and you must answer.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">2</span>
           <div>
-            <h3>Quatre forces vous jugent</h3>
+            <h3>Four forces judge you</h3>
             <div class="mini-forces">${ROLES.map(r=>`<span>
               ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
-            <p>Les mêmes quatre rôles traversent les trois révolutions industrielles — seuls
-            les noms changent. <strong>Vous découvrirez les vôtres en choisissant votre
-            époque.</strong></p>
-            <p>Chaque décision en contente un et en fâche un autre.
-            <strong>Aucune réponse ne plaît à tout le monde</strong> — c’est le sujet même du cours.</p>
+            <p>The same four roles run through the three industrial revolutions, only the names change. <strong>You will discover yours when you choose your era.</strong></p>
+            <p>Every decision pleases one and angers another.
+            <strong>No answer pleases everyone</strong> — that is the very subject of the course.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">3</span>
           <div>
-            <h3>Si l’une tombe à zéro, tout s’arrête</h3>
-            <p>Vous êtes prévenu bien avant. Menez votre ville — ou votre usine — jusqu’au bout
-            de la période, et découvrez quel monde vous aurez bâti.</p>
+            <h3>If one falls to zero, everything stops</h3>
+            <p>You are warned well in advance. Lead your city, or your factory, to the end of the period, and discover what kind of world you have built.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">4</span>
           <div>
-            <h3>Ouvrez les dossiers</h3>
-            <p>Sous chaque affaire, le bureau d’enquête joint un <strong>rapport</strong> : le
-            fait historique, les chiffres, ce que le cours en dit. Il se déplie d’un clic.
-            <strong>Décider sans le lire finit par se savoir</strong> — et les questions de fin
-            porteront sur ce que vous aurez rencontré.</p>
+            <h3>Open the files</h3>
+            <p>Under each case, the inquiry office includes a <strong>report</strong> : the historical fact, the figures, what the course says about it. It opens with one click.
+            <strong>Deciding without reading it eventually shows</strong> — and the final questions will be based on what you encountered.</p>
           </div>
         </div>
         <div class="etape">
           <span class="num">5</span>
           <div>
-            <h3>Rien ne se perd</h3>
-            <p>À la fin, vous emportez votre carnet de décisions, un questionnaire noté sur ce que
-            vous avez rencontré, et votre propre réflexion sur la partie.</p>
+            <h3>Nothing is lost</h3>
+            <p>At the end, you take away your decision log, a marked quiz on what you encountered, and your own reflection on the game.</p>
           </div>
         </div>
       </div>
 
-      <div class="separation"><span>Choisissez votre époque</span></div>
+      <div class="separation"><span>Choose your era</span></div>
       <div class="niveaux">${carte("I",1)}${carte("II",1)}${carte("III",0)}</div>
 
-      <p class="note-menu">Les personnages qui vous parlent sont des figures composites.
-      Les événements datés, eux, sont authentiques — le jeu cite ses sources.</p>
+      <p class="note-menu">The characters who speak to you are composite figures. The dated events are authentic, and the game cites its sources.</p>
     </div>
   </div>`;
 }
@@ -5533,17 +5536,16 @@ function menuNiveau(id){
   <div class="role">
     <div class="r">${N.role}</div>
     <p class="r-qui">${N.qui}</p>
-    <p class="r-but"><strong>Si l’une des quatre forces tombe à zéro, la partie s’arrête.</strong> ${N.but}</p>
+    <p class="r-but"><strong>If one of the four forces falls to zero, the game ends.</strong> ${N.but}</p>
     <p class="note-role">${N.note}</p>
-    <p class="note-source">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
+    <p class="note-source">Those who come to speak to you are composite figures: they did not bear these names, but each says what people in their position said. The game's only two authentic testimonies await you at the end.</p>
   </div>
     <figure class="mission-illu mi-d">
       <img src="img/niveau/${N.id}-droite.jpg" alt="${esc(N.vues.d)}" loading="lazy"
            onerror="this.closest('figure').remove()">
     </figure>
   </div>
-  <p class="mission-note">Ces deux vues sont des <strong>illustrations</strong>, pas des documents
-  d’époque : elles montrent le contraste, elles ne le prouvent pas.</p>
+  <p class="mission-note">These two views are <strong>illustrations</strong>, not period documents: they show the contrast, they do not prove it.</p>
   <div class="acteurs">${CLES.map(k=>`<details class="acteur">
      <summary>
        <figure class="embleme"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
@@ -5563,9 +5565,9 @@ function menuNiveau(id){
   <p class="centre" style="margin:24px 0 8px">
     <button class="plein" onclick="nouvellePartie('campagne',N.id)">Campagne · ${N.tours} décisions jusqu’en ${N.a1}</button>
     <button onclick="nouvellePartie('infini',N.id)">Survie${rec?` · record ${fmt(rec)} ${N.unite2}`:""}</button>
-    <button onclick="accueil()">Changer de niveau</button>
+    <button onclick="accueil()">Change level</button>
   </p>
-  <div class="bilan"><h2 style="margin-top:0">Une chose à savoir avant de commencer</h2>
+  <div class="bilan"><h2 style="margin-top:0">One thing to know before you begin</h2>
     <p style="margin:.3em 0">${N.avant} C’est ce qui rendra la fin de partie difficile.</p></div>`;
   ecrireMission();
 }
