@@ -27,7 +27,7 @@ my %veille = (
   "contremaître" => undef, "métier"     => undef, "métiers" => undef,
 );
 
-for my $f (sort glob("$dos/[0-9]*.md")){
+for my $f (sort grep { !m{/LISEZ} } glob("$dos/*.md")){
   my $court = $f; $court =~ s{.*/}{};
   open my $h, "<:encoding(UTF-8)", $f or die "$f: $!";
   my ($fr, $num);

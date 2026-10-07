@@ -16,7 +16,7 @@
 # le francais ecrivait en mots, et cela n a rien de fautif.
 my $D = shift || "_a-installer/traduction";
 my $souci = 0;
-for my $f (sort glob("$D/[0-9]*.md")){
+for my $f (sort grep { !m{/LISEZ} } glob("$D/*.md")){
   my $court = $f; $court =~ s{.*/}{};
   open my $h, "<:encoding(UTF-8)", $f or die "$f: $!";
   my ($fr, $num);

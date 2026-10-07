@@ -20,16 +20,28 @@ use strict; use warnings; use utf8;
 binmode(STDOUT, ":encoding(UTF-8)");
 
 my $cible = shift or die "usage: verifier.pl <fichier.md | dossier>\n";
-my @fichiers = -d $cible ? (sort glob("$cible/[0-9]*.md")) : ($cible);
+my @fichiers = -d $cible ? (sort grep { !m{/LISEZ} } glob("$cible/*.md")) : ($cible);
 @fichiers or die "ARRET : aucun fichier à contrôler\n";
 
 # le dossier qui contient source.tsv
 my $dos = -d $cible ? $cible : do { my $d = $cible; $d =~ s{/[^/]+$}{}; $d };
+# Les textes d'interface coupés par un retour à la ligne sont échappés
+# dans source.tsv et aplatis dans le fichier à traduire — c'est une
+# phrase, elle se traduit d'un bloc. On compare donc à la forme aplatie,
+# sinon chaque texte multiligne passerait pour une ligne FR réécrite.
+my $AS = chr(92);
+sub attendu {
+  my ($t) = @_;
+  $t =~ s/\Q$AS\E(.)/$1 eq "n" ? "\n" : $1 eq "t" ? "\t" : $1/ge;
+  $t =~ s/\s*\n\s*/ /g;
+  return $t;
+}
+
 my %fr;
 open(my $m, "<:encoding(UTF-8)", "$dos/source.tsv") or die "$dos/source.tsv: $!";
 while(<$m>){ next if /^#/; chomp; next unless length;
   my (undef, undef, undef, undef, $t) = split /\t/, $_, 5;
-  my ($n) = /^(\d+)/; $fr{$n+0} = $t if defined $t; }
+  my ($n) = /^(\d+)/; $fr{$n+0} = attendu($t) if defined $t; }
 close $m;
 
 my ($totGraves, $totFaits, $totVides) = (0,0,0);

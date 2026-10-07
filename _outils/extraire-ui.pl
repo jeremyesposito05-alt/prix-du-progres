@@ -52,6 +52,11 @@ my %AUSSI = map { $_ => 1 } (
   "Revoir ma trace", "Copier ma trace", "Changer de niveau",
   "Valider et terminer", "Avant de commencer", "Avant de quitter",
   "Jeudi noir", "Dodge contre Ford",
+  # Trois mots en minuscule, chacun dans un <strong> ou apres un <b> au
+  # milieu d'une phrase dont le reste est extrait. Sans eux, la phrase
+  # anglaise garderait un mot francais en plein milieu — et « Il vous
+  # reste 20 secondes » resterait a demi traduit.
+  "rapport", "secondes", "illustrations",
 );
 
 # Ce qu'il ne faut surtout pas toucher.
@@ -68,13 +73,18 @@ my %JAMAIS = map { $_ => 1 } (
 );
 
 sub garde {
-  my ($t) = @_;
+  my ($t, $champ) = @_;
   return 0 if length($t) < 2;
   return 0 if $t !~ /\p{L}/;
   return 0 if $JAMAIS{$t};
   return 0 if $t =~ /\$\{/;                        # un morceau de gabarit
   return 0 if $t =~ /[<>{}]/ || $t =~ /&[a-z#]+;/; # du balisage, pas du texte
-  return 0 if $t =~ /^[a-z][\w-]*$/;               # un identifiant
+  # Un mot en minuscule, seul, est d'ordinaire un identifiant. Mais dans
+  # un noeud de texte c'est un mot affiche : « rapport », « secondes »
+  # et « illustrations » vivent chacun dans un <strong> au milieu d'une
+  # phrase dont le reste est extrait. Les ecarter coupait la phrase.
+  return 0 if $t =~ /^[a-z][\w-]*$/
+           && ($champ // "") !~ /^(?:texte|gabarit)$/;
   return 0 if $t =~ /^[.#]/;                       # un selecteur
   return 0 if $t =~ m{[\w-]+/[\w./-]+};            # un chemin
   return 0 if $t =~ /\.(?:mp3|jpg|jpeg|png|svg|css|js|html)$/i;
@@ -88,7 +98,7 @@ sub garde {
 my @lot;
 sub prendre {
   my ($champ, $txt, $deb) = @_;
-  return unless garde($txt);
+  return unless garde($txt, $champ);
   push @lot, { n=>0, champ=>$champ, fr=>$txt, deb=>$deb, len=>length($txt) };
 }
 
