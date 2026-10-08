@@ -2017,8 +2017,25 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   border:1px solid rgba(107,87,65,.28);
   transition:box-shadow .42s ease;
 }
+/* LE TEMPS PASSE SUR LES VISAGES.
+   « --age » va de 0 au premier tour a 1 au dernier. Le sepia monte, la
+   couleur se retire, le contraste durcit : la meme image n'est jamais
+   deux fois la meme, et cinq portraits par acteur deviennent un
+   continuum sur dix-huit decisions. Aucune image de plus a produire. */
 .poste .visage img{width:100%;height:100%;object-fit:cover;display:block;
-  filter:sepia(.14) contrast(1.03)}
+  filter:sepia(calc(.14 + var(--age,0) * .3))
+         saturate(calc(1 - var(--age,0) * .34))
+         contrast(calc(1.03 + var(--age,0) * .14))
+         brightness(calc(1 - var(--age,0) * .08));
+  transition:filter 1.2s ease}
+/* et le vignettage se ferme autour du visage */
+.poste .visage::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+  opacity:calc(var(--age,0) * .55);
+  background:radial-gradient(ellipse at 50% 40%,
+    transparent 42%, rgba(28,19,11,.62) 100%);
+  transition:opacity 1.2s ease;
+}
 .poste .visage .jeton{
   position:absolute; inset:0; display:flex; align-items:center;
   justify-content:center; opacity:.42;
@@ -2918,6 +2935,11 @@ const ROLES = [
   {k:"p", t:"ceux qui font la loi"},
 ];
 
+/* LES SEPT CONDITIONS ONT ETE RETIREES DU JEU le 8 octobre 2026.
+   Elles en etaient le mecanisme central, et aucune ne figurait dans le
+   vocabulaire du cours — un eleve y lisait sept mots a apprendre qui
+   ne lui seraient jamais demandes. La table reste pour la version
+   anglaise, qui n'a pas encore ete refondue. */
 const CONDITIONS = ["Ressources","Savoirs techniques","Capitaux","Main-d’œuvre","Marchés","Transports","Organisation"];
 /* Le libelle affiche d'une condition. En francais il est identique a la
    cle : la table reste vide, et condNom retombe sur la cle. C'est la
@@ -3295,7 +3317,12 @@ function nouvellePartie(mode,niv){
   E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:false,crLus:0,courbe:[{t:0,pop:N.pop0}],releve:[{t:0,an:N.a0,i:60,o:60,m:60,p:60}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
-const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
+/* Les sept conditions ont ete retirees du jeu : plus rien ne les
+   accorde, donc une carte qui en exigeait une ne sortirait jamais.
+   Detroit garde des « req » dans ses anciennes cartes — on les ignore
+   plutot que de les effacer, pour ne pas toucher a ses donnees avant
+   sa refonte. */
+const ok=c=>true;
 function piocher(){
   const an=E.mode==="campagne"?AN(E.tour):9999;
   let lot=N.cartes.filter(c=>!E.vues.includes(c.t)&&ok(c)&&(!c.apres||c.apres<=an));
@@ -3307,7 +3334,6 @@ function piocher(){
 function choisir(quel){
   const c=E.carte, r=c[quel];
   appliquer(r.e);
-  (r.g||[]).forEach(g=>{ if(!E.acquis.includes(g)) E.acquis.push(g); });
   /* ce que cette décision fera germer plus tard */
   if(r.suite) E.graines.push({tour:E.tour+r.suite.dans, s:r.suite, de:c.t, choix:r.q, semee:E.tour});
   E.vues.push(c.t);
@@ -3594,7 +3620,10 @@ function poste(k, c, vus){
      quatre bornes sont celles du mot affiche sous le nom : le visage
      et le mot changent ensemble. « neutre » est le portrait d'origine,
      qui existe deja — il n'y a donc que trois images a faire. */
-  const vis  = v>55 ? "content" : v>35 ? "portrait" : v>20 ? "fache" : "au-bord";
+  /* Bornes mesurees, non pas reparties egalement : 46 / 26 / 19 / 7 / 2 %
+     du temps d'ecran. « portrait » est le visage neutre d'origine. */
+  const vis  = v>58 ? "content" : v>48 ? "portrait" : v>35 ? "contrarie"
+             : v>20 ? "fache" : "au-bord";
   const base = `img/acteurs/${N.id}-${k}-`;
   return `<div class="poste p-${k} ${dit.sens}${pres} ${etat}">
     <div class="visage">
@@ -3757,6 +3786,11 @@ function rendre(){
   </div></div>
   `;
   app.classList.remove("presse");
+  /* L'age de la partie, de 0 a 1 : le CSS s'en sert pour vieillir les
+     portraits. En survie il n'y a pas de terme, on prend dix-huit
+     decisions comme echelle. */
+  document.body.style.setProperty("--age",
+    Math.min(1, E.tour / (N.tours || 18)).toFixed(3));
   ecrire(c.t, c.ex, c.d);
   /* Les images des portraits arrivent apres : on cale une fois tout de
      suite pour que le premier mot tombe au bon endroit, une fois la
@@ -4125,7 +4159,7 @@ const QUIZ_I = [
 {c:"Des familles devant l’usine",
  q:"Comment appelle-t-on le départ des paysans vers les villes industrielles ?",
  r:["L’exode rural", "L’urbanisation", "L’émigration"],
- b:0, x:"L’**exode rural** fournit la **main-d’œuvre**, l’une des conditions de la révolution industrielle. Il produit en même temps l’**urbanisation** : Manchester passe de 25 000 habitants en 1772 à plus de 300 000 en 1851."},
+ b:0, x:"L’**exode rural** fournit la **main-d’œuvre** dont les filatures ont besoin. Il produit en même temps l’**urbanisation** : Manchester passe de 25 000 habitants en 1772 à plus de 300 000 en 1851."},
 
 {c:"Des maisons construites dos à dos",
  q:"Pourquoi construit-on des maisons ouvrières « dos à dos » ?",
@@ -4151,7 +4185,7 @@ const QUIZ_I = [
  r:["Sans acheteurs nombreux, des machines coûteuses ne sont jamais rentables",
     "Sans coton venu des colonies, les machines des usines ne peuvent pas fonctionner",
     "Sans marchés étrangers, les ouvriers ne peuvent pas toucher leur salaire"],
- b:0, x:"Les **marchés** sont l’une des sept conditions. L’industrie et le commerce mondial se développent ensemble, souvent à travers l’Empire britannique."},
+ b:0, x:"Produire en masse n’a de sens que si l’on peut vendre en masse. L’industrie et le commerce mondial se développent ensemble, souvent à travers l’Empire britannique."},
 
 {c:"Des enfants sous les machines",
  q:"Quel travail confie-t-on aux enfants dans les filatures ?",
@@ -4626,9 +4660,9 @@ function blocPourquoi(){
     quelque chose, même au prix d’une autre.</p>`;
 }
 
-/* Les trois chiffres, chacun expliqué. */
+/* Les deux chiffres, chacun expliqué. Il y en avait trois : le
+   troisième comptait les sept conditions, retirées du jeu. */
 function blocChiffres(){
-  const manque = CONDITIONS.filter(x => !E.acquis.includes(x));
   return `<div class="fin-chiffres">
 
     <div class="fin-ch">
@@ -4645,21 +4679,6 @@ function blocChiffres(){
       <div class="fin-n">${fmt(E.pop)}</div>
       <div class="fin-k">${N.unite} finale <small>(${N.unite2})</small></div>
       <p>${N.reel||""}</p>
-    </div>
-
-    <div class="fin-ch fin-ch-large">
-      <div class="fin-n">${E.acquis.length} <small>/ ${CONDITIONS.length}</small></div>
-      <div class="fin-k">Conditions de la révolution industrielle</div>
-      <p>Ce sont les sept conditions vues en cours : réunies, elles font basculer une
-      société dans l’industrie ; il en manque une, et les machines restent des
-      curiosités. Chacune s’obtient en prenant la décision qui l’apporte.</p>
-      <span class="cond fin-cond">${CONDITIONS.map(x=>
-        `<span class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</span>`).join("")}</span>
-      <p class="fin-manque">${
-        manque.length === 0 ? "Vous les avez toutes réunies."
-        : manque.length === CONDITIONS.length
-          ? "Vous n’en avez réuni aucune : la ville n’a jamais vraiment basculé."
-          : `Il vous manquait : ${condListe(manque).toLowerCase()}.`}</p>
     </div>
 
   </div>`;
@@ -4742,16 +4761,6 @@ function carnet(d){
       ${courbePop()}
       <p class="cn-note">${N.a0} : ${fmt(N.pop0)} ${N.unite2}.</p>
 
-      ${N.cartes.some(x=>["a","b","c"].some(k=>x[k]&&x[k].g)) ? `
-      <div class="cn-sep"></div>
-
-      <div class="cn-ligne"><span class="cn-k">Conditions réunies</span>
-        <span class="cn-v cn-petit">${E.acquis.length} <small>sur ${CONDITIONS.length}</small></span></div>
-      <div class="cn-jauge"><i style="width:${
-        Math.round(100*E.acquis.length/CONDITIONS.length)}%"></i></div>
-      <ul class="cn-cond">${CONDITIONS.map(x=>
-        `<li class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</li>`).join("")}</ul>
-      ` : ""}
 
     </div>
   </details>`;
@@ -5091,7 +5100,7 @@ function VERDICT_I(f){
     x:"Vos filatures tournent, votre population a explosé, vos marchands se sont enrichis. Et voici ce qu’un visiteur allemand a vu de vos quartiers ouvriers. Le progrès technique a bien eu lieu — <strong>il n’a pas profité à tout le monde</strong>.",
     tem:[ENGELS]};
   if(prod<45) return {t:"La ville qui n’a pas basculé",
-    x:"Les conditions ne se sont jamais toutes réunies. Sans énergie, sans capitaux, sans bras ni débouchés, les machines restent des curiosités. <strong>Une révolution industrielle n’est pas une invention : c’est un système.</strong>",
+    x:"Vos fabricants et vos marchands n’ont jamais eu de quoi lancer la machine. Sans énergie, sans capitaux, sans bras ni débouchés, les machines restent des curiosités. <strong>Une révolution industrielle n’est pas une invention : c’est un système.</strong>",
     tem:[]};
   return {t:"Un équilibre fragile",
     x:"Ni grande puissance, ni désastre. Vous avez gouverné prudemment — l’histoire de Manchester, elle, ne l’a pas été.",
@@ -5750,8 +5759,6 @@ function texteTrace(){
   L.push("  "+(E.fini==="verdict" ? "Menée jusqu’au bout." : "Interrompue : "+(N.fins[E.fini]?N.fins[E.fini].t:E.fini)));
   L.push("  Décisions prises : "+E.carnet.length);
   L.push("  "+N.unite+" finale : "+fmt(E.pop));
-  L.push("  Conditions réunies : "+E.acquis.length+" / "+CONDITIONS.length
-    +(E.acquis.length?"  ("+condListe(E.acquis)+")":""));
   L.push("  Rapports d’enquête consultés : "+((E.lus&&E.lus.length)||0)+" sur "+E.carnet.length);
   L.push("");
   L.push("MON CARNET DE BORD");
@@ -5902,8 +5909,6 @@ p.leg{font-size:9.5pt;color:#9C9895;margin:2pt 0 5pt;font-style:italic}
       : "Interrompue — "+e(N.fins[E.fini]?N.fins[E.fini].t:E.fini)}</td></tr>
   <tr><td class=k>Décisions prises</td><td>${E.carnet.length}</td></tr>
   <tr><td class=k>${e(N.unite)} finale</td><td>${e(fmt(E.pop))} ${e(N.unite2)}</td></tr>
-  <tr><td class=k>Conditions réunies</td><td>${E.acquis.length} sur ${CONDITIONS.length}${
-      E.acquis.length?" — "+e(condListe(E.acquis)):""}</td></tr>
   <tr><td class=k>Rapports d’enquête consultés</td><td>${(E.lus&&E.lus.length)||0} sur ${E.carnet.length}</td></tr>
 </table>
 
