@@ -3590,8 +3590,11 @@ function poste(k, c, vus){
   const pres = (!dernierChoix() && vus.has(k)) ? " concerne" : "";
   const col  = v>55?"var(--vert)" : v>35?"var(--accent)" : v>20?"#D08A2A" : "var(--rge)";
   /* Le visage dit l'etat durable, pas la derniere decision : celle-la
-     est deja dite par le mouvement, le tremblement et la bulle. */
-  const vis  = v < 45 ? "fache" : "content";
+     est deja dite par le mouvement, le tremblement et la bulle. Les
+     quatre bornes sont celles du mot affiche sous le nom : le visage
+     et le mot changent ensemble. « neutre » est le portrait d'origine,
+     qui existe deja — il n'y a donc que trois images a faire. */
+  const vis  = v>55 ? "content" : v>35 ? "portrait" : v>20 ? "fache" : "au-bord";
   const base = `img/acteurs/${N.id}-${k}-`;
   return `<div class="poste p-${k} ${dit.sens}${pres} ${etat}">
     <div class="visage">
