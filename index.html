@@ -1889,6 +1889,52 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 @media(max-width:600px){ .but-jeu{font-size:15px;padding:12px 14px} }
 
 /* ==================================================================
+   LE PLI DU PROFESSEUR
+   Il s'ouvre avant le dilemme, une fois par carte. C'est le seul
+   moment ou le jeu parle au nom du cours, et il parle seul : on ne
+   decide pas tant qu'on ne l'a pas referme.
+   ================================================================== */
+.pli-prof{
+  position:fixed; inset:0; z-index:60; display:flex;
+  align-items:center; justify-content:center; padding:24px;
+  background:rgba(14,10,7,.74);
+  animation:pli-entre .3s ease-out;
+}
+.pli-prof.parti{animation:pli-sort .26s ease-in forwards}
+@keyframes pli-entre{from{opacity:0}to{opacity:1}}
+@keyframes pli-sort{to{opacity:0}}
+.lettre-prof{
+  max-width:560px; width:100%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.55), transparent 22%),
+    repeating-linear-gradient(94deg, rgba(160,140,110,.045) 0 2px, transparent 2px 5px),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  border:1px solid var(--fil); border-left:4px solid var(--rge);
+  border-radius:2px; padding:26px 30px 22px; color:var(--enc);
+  box-shadow:0 22px 60px rgba(0,0,0,.6);
+  transform:rotate(-.35deg);
+  animation:pli-pose .34s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes pli-pose{from{opacity:0;transform:rotate(-1.6deg) translateY(16px)}
+                    to{opacity:1;transform:rotate(-.35deg) translateY(0)}}
+.lettre-prof .lt-tete{
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--rge); font-weight:bold; margin-bottom:13px;
+}
+.lettre-prof .lt-x{margin:0;font-size:16px;line-height:1.65;color:var(--enc)}
+.lettre-prof .lt-x strong{color:var(--enc);font-weight:bold}
+.lettre-prof .lt-sig{
+  margin:18px 0 20px; text-align:right; font-family:var(--serif);
+  font-size:20px; color:var(--enc2); letter-spacing:.06em;
+}
+.lettre-prof button{display:block;margin:0 auto}
+@media(max-width:600px){ .lettre-prof{padding:20px 20px 18px}
+  .lettre-prof .lt-x{font-size:15px} }
+@media(prefers-reduced-motion:reduce){
+  .pli-prof,.lettre-prof{animation:none}
+}
+
+/* ==================================================================
    LA SCENE — les quatre acteurs autour de l'affaire
    Trois colonnes, deux rangs : l'affaire tient la colonne du milieu sur
    toute la hauteur, les quatre acteurs occupent les coins. Celui qui
@@ -2893,232 +2939,335 @@ const condListe = a => a.map(condNom).join(", ");
    ceux de Johanna Schopenhauer et de Friedrich Engels, au verdict.
    ================================================================== */
 const CARTES_I = [
-{t:"Le charbon manque à la filature.", qui:"Josiah Halliwell, propriétaire d’une filature de coton",
- d:"« Ma machine reste à l’arrêt trois jours sur sept faute de charbon. Creusez ce canal jusqu’aux mines, et je vous promets deux filatures de plus avant Noël. »",
- ex:"Les machines à vapeur qui font tourner les filatures — les usines où l’on file le coton — brûlent du charbon, et la ville en manque. Trois d’entre elles sur cinq ont dû s’arrêter la semaine dernière. Les charretiers qui apportent le charbon depuis les mines réclament le double et livrent quand ils veulent. Un canal permettrait de le faire venir par bateau : dix fois plus à chaque voyage, et bien moins cher.",
- f:"Le charbon est la **ressource** qui rend possible toute la première révolution industrielle : c’est lui qui chauffe l’eau des machines à vapeur. La Grande-Bretagne en possède d’énormes gisements, et c’est l’une des raisons pour lesquelles la révolution industrielle commence chez elle. Mais une ressource ne sert à rien si l’on ne peut pas l’acheminer : il faut aussi des **transports**. Une péniche porte trente fois la charge d’une charrette, ce qui explique que l’Angleterre se couvre de canaux entre 1760 et 1830.",
- a:{q:"« Qu’on creuse le canal. »", e:{i:12,m:10,o:-6,p:-4}, g:["Ressources","Transports"],
-    c:"Les péniches arrivent chargées. L’énergie cesse d’être un obstacle — au prix de mois de terrassement, payés par la ville."},
- b:{q:"« Le charbon viendra par la route. »", e:{i:-9,m:-6,p:3},
-    c:"Les charrettes coûtent cher et arrivent à moitié vides. Les fabricants murmurent."},
- c:{q:"« Qu’on le creuse, aux frais des fabricants. »", e:{i:-1,m:1,o:-2,p:6}, g:["Ressources","Transports"],
-    c:"Le canal se fera, mais plus tard et sans entrain. Halliwell paie en grinçant des dents."}},
+{n:"01", t:"Le charbon et la route", qui:"Thomas Whitworth, marchand de charbon",
+ d:"« Je veux un canal pour livrer davantage de charbon à meilleur prix. »",
+ ex:"Le charbon arrive par charrette et coûte très cher. Un canal vers les mines réduirait son transport, mais sa construction prendrait des années.",
+ l:"Consultez Document 1 (la carte) · trace écrite 2 §1. Retenez **bassin houiller** : une région où l’on extrait le charbon. Quelles causes expliquent le prix du charbon, et quelles conséquences auront vos travaux ?",
+ a:{q:"« Je fais creuser le canal. »", e:{m:9,p:-8},
+    c:"Les marchands gagnent une voie de transport, mais le Parlement doit engager de fortes dépenses."},
+ b:{q:"« Je garde le transport par charrette. »", e:{i:-8,p:9},
+    c:"Le Parlement évite les travaux, mais les industriels continuent de payer leur charbon cher."},
+ c:{q:"« Je finance seulement une meilleure route. »", e:{i:9,m:-8},
+    c:"Les industriels obtiennent des livraisons plus faciles, mais les marchands perdent l’espoir d’un canal."}},
 
-{t:"Un mécanicien vous montre un plan.", qui:"Thomas Ainsworth, mécanicien",
- d:"« Une seule machine en bas, et tout tourne en haut, hiver comme été. J’ai vu cela fonctionner à Cromford. Il vous faut du charbon, et de l’audace. »", req:["Ressources"],
- ex:"Jusqu’ici, les filatures de la ville sont entraînées par des roues qu’une rivière fait tourner. Il faut donc s’installer au bord de l’eau, et tout s’arrête quand elle gèle ou qu’elle baisse. Le mécanicien propose autre chose : une machine à vapeur installée au sous-sol, qui entraînerait par des courroies toutes les machines des quatre étages. La dépense est considérable, et deux fabricants attendent votre décision avant d’engager la leur.",
- f:"La machine à vapeur de James Watt, perfectionnée dans les années 1770, est l’**innovation** qui change tout : jusque-là, une usine devait s’installer au bord d’une rivière pour profiter de la force de l’eau. La vapeur libère l’usine de cette contrainte — elle peut désormais s’installer près du charbon, près des ouvriers, près des marchés. Une invention ne devient une innovation que lorsqu’elle est réellement appliquée à la production : c’est ce qui se joue ici.",
- a:{q:"« Installons la machine à vapeur. »", e:{i:14,m:5,o:-8}, g:["Savoirs techniques"],
-    c:"Une seule machine remplace des dizaines de bras. Ceux qui restent suivent désormais son rythme, pas le leur."},
- b:{q:"« Continuons de filer à la main. »", e:{i:-9,o:6},
-    c:"On file à la main. La ville prend du retard sur Bolton et Oldham."},
- c:{q:"« Installons-la sans renvoyer personne. »", e:{i:3,o:3,m:-9}, g:["Savoirs techniques"],
-    c:"La machine tourne et personne n’est renvoyé. Les comptes de la ville, eux, s’en ressentent."}},
+{n:"02", t:"Une ligne vers Liverpool", qui:"Edward Mercer, négociant en coton",
+ d:"« Je veux rejoindre le port rapidement pour recevoir mon coton et expédier mes tissus. »",
+ ex:"Liverpool propose un chemin de fer vers Manchester. Il faut acheter des terrains, sinon les trains pourraient desservir une autre ville.",
+ l:"Consultez Document 1 (la carte). Retenez **textile** : l’ensemble des activités qui transforment des fibres en fil et en tissu. Quelles conséquences une liaison au port peut-elle avoir sur la fabrication des tissus ?",
+ a:{q:"« J’achète les terrains nécessaires. »", e:{m:9,p:-8},
+    c:"Les marchands gagnent un accès au port, mais le Parlement supporte le prix des terrains."},
+ b:{q:"« Je refuse de payer les terrains. »", e:{m:-8,p:9},
+    c:"Le Parlement préserve son argent, mais les marchands risquent de perdre la liaison."},
+ c:{q:"« Je propose de partager les frais. »", e:{i:-8,m:9},
+    c:"Les marchands peuvent obtenir leur ligne, mais les industriels doivent contribuer aux achats."}},
 
-{t:"Quarante familles attendent à la grille.", qui:"Abel Crompton, qui commande les équipes dans l’atelier",
- d:"« Elles sont là depuis l’aube, avec leurs enfants. Elles accepteront n’importe quel salaire, et c’est bien ce qui m’ennuie : les nôtres vont le comprendre. Je les prends toutes ? »",
- ex:"Elles ont marché depuis le nord du comté, où elles cultivaient des terres qu’on leur a retirées. Le contremaître a fermé la grille en attendant vos instructions, et la foule ne se disperse pas. Chacune de ces familles, c’est une paire de bras pour les machines — et des bouches de plus dans une ville qui manque déjà de logements.",
- f:"Ces familles quittent la campagne parce qu’on y a supprimé les terres communes où elles faisaient paître leurs bêtes : ce mouvement s’appelle l’**exode rural**. Il fournit aux usines la **main-d’œuvre** dont elles ont besoin — l’une des conditions de la révolution industrielle. Il produit en même temps l’**urbanisation** : Manchester passe d’environ 25 000 habitants en 1772 à plus de 300 000 en 1851. Une main-d’œuvre nombreuse et sans autre ressource accepte des salaires bas : c’est aussi ce qui rend la production rentable.",
- a:{q:"« Embauchons-les toutes. »", e:{i:10,m:4,o:-10,p:-5}, pop:.20, g:["Main-d’œuvre"],
-    c:"Les filatures tournent jour et nuit. Les nouveaux venus s’entassent où ils peuvent, et tirent les salaires vers le bas."},
- b:{q:"« Refusons les nouveaux arrivants. »", e:{i:-8,o:5,p:4},
-    c:"On refoule les arrivants. Les fabricants se plaignent de manquer de bras."},
- c:{q:"« N’embauchons que ceux qu’on peut loger. »", e:{i:-2,o:-2,m:-5,p:3}, pop:.08, g:["Main-d’œuvre"],
-    c:"On trie à la grille. Ceux qu’on renvoie iront grossir Salford, juste de l’autre côté de la rivière."}},
+{n:"03", t:"La vapeur à la place de l’eau", qui:"William Hartley, mécanicien dans une usine",
+ d:"« Je veux installer mon moteur pour que les ateliers tournent sans dépendre de la rivière. »",
+ ex:"Un mécanicien propose un moteur à vapeur pour remplacer la roue de la rivière. La machine coûte cher, mais elle fonctionnerait loin du cours d’eau.",
+ l:"Consultez Document 4 (Schopenhauer) · trace écrite 2 §1. Retenez **mécanisation** : le remplacement d’une partie du travail humain par des machines. Qu’est-ce qui change avec la vapeur, et qu’est-ce qui reste identique dans le travail ?",
+ a:{q:"« J’achète le moteur à vapeur. »", e:{i:9,o:-8},
+    c:"Les industriels gagnent en liberté d’installation, mais les ouvriers craignent la suppression de postes."},
+ b:{q:"« Je conserve la roue à eau. »", e:{i:-8,o:9},
+    c:"Les ouvriers gardent leurs habitudes, mais les industriels restent dépendants du cours d’eau."},
+ c:{q:"« Je teste d’abord le moteur dans un atelier. »", e:{i:9,m:-8},
+    c:"Les industriels peuvent essayer la nouveauté, mais les marchands attendent un accroissement des livraisons."}},
 
-{t:"Un bâtisseur propose soixante cottages.", qui:"Amos Pilkington, entrepreneur en bâtiment",
- d:"« Soixante maisons avant les premières gelées, ou rien du tout — et dans ce cas, ils resteront dans les caves où ils sont. À vous de voir. »",
- ex:"Le terrain derrière la filature a été vendu hier. L’entrepreneur propose d’y construire des maisons ouvrières accolées les unes aux autres, qui partagent leurs murs pour coûter moins cher : une seule façade, pas de cour, pas d’évacuation des eaux sales. Il peut les livrer avant l’hiver. Ce qu’on décide aujourd’hui tiendra debout pendant un siècle.",
- f:"L’**urbanisation** est bien plus rapide que la construction de logements : les villes industrielles grossissent en quelques décennies sans plan d’ensemble ni règlement. Les maisons « dos à dos » partagent trois murs sur quatre pour coûter le moins cher possible — pas de traversée d’air, une cour et des latrines pour plusieurs dizaines d’habitants. Le logement ouvrier est le premier endroit où se lit l’inégalité du progrès : la production augmente, les conditions de vie ne suivent pas.",
- a:{q:"« Bâtissons vite, et au plus bas prix. »", e:{o:9,i:2,p:-6}, pop:.10,
-    c:"Des murs aussi minces que possible, mais un toit. La ville en attire davantage encore."},
- b:{q:"« Ne bâtissons aucun logement. »", e:{o:-12,i:4,p:-3}, suite:{dans:3, t:"Ils s’entassent où ils peuvent", x:"Faute de maisons, les arrivants se sont logés dans les greniers, les caves, les courettes. Trois familles par pièce dans certaines rues. Les propriétaires louent au mois et augmentent chaque mois.", e:{o:-7,p:-4,i:3}},
-    c:"On s’entasse dans les caves. Chaque nouvelle arrivée aggrave la précédente."},
- c:{q:"« Bâtissons moins, mais avec cour et égout. »", e:{o:5,p:4,m:-9,i:-6}, pop:.05,
-    c:"Trente maisons au lieu de soixante, mais on y respire. Pilkington double son devis."}},
+{n:"04", t:"Des familles devant l’usine", qui:"Mary Fletcher, mère arrivée de la campagne",
+ d:"« Je cherche un salaire et un toit pour mes enfants avant l’hiver. »",
+ ex:"Des familles ont quitté la campagne après la disparition de terres utilisées en commun. Elles demandent du travail, alors que les logements manquent près des usines.",
+ l:"Consultez Document 1 · document 3 (la population). Retenez **monde ouvrier** : l’ensemble des personnes qui vivent de leur salaire dans les ateliers et les usines. Quelles transformations des campagnes ont causé l’arrivée de ces travailleurs en ville ?",
+ a:{q:"« J’ouvre des postes aux nouveaux arrivants. »", e:{o:9,p:-8},
+    c:"Les ouvriers trouvent des salaires, mais le Parlement doit affronter une pénurie de logements."},
+ b:{q:"« Je limite les embauches pour le moment. »", e:{i:9,o:-8},
+    c:"Les industriels évitent de nouvelles charges, mais les ouvriers arrivés de la campagne restent sans travail."},
+ c:{q:"« J’aide les familles à trouver un logement d’abord. »", e:{i:-8,o:9},
+    c:"Les ouvriers gagnent un abri, mais les industriels attendent plus longtemps de nouveaux bras."}},
 
-{t:"Deux heures de plus par jour.", qui:"Josiah Halliwell, propriétaire d’une filature de coton",
- d:"« Liverpool veut son fil pour mars et nous n’y arriverons pas autrement. Mes ouvriers ont des bouches à nourrir : ils comprendront. »",
- ex:"Une grosse commande doit partir pour Liverpool en mars, et les machines ne produisent pas assez vite pour la livrer à temps. Les fabricants ont calculé qu’il leur manquait deux heures de travail par jour et par ouvrier. La journée passerait ainsi de douze à quatorze heures. Ils attendent votre accord avant de faire changer les horloges de l’atelier.",
- f:"Dans les années 1830, la journée ordinaire en filature va de douze à seize heures, six jours sur sept ; l’éclairage au gaz a rendu le travail de nuit possible. L’usine impose un temps nouveau : celui de la machine, qui ne s’arrête pas, et non plus celui du jour ou des saisons. C’est un changement d’**organisation du travail** au moins aussi important que les machines elles-mêmes, et c’est lui qui provoquera les premières lois sociales.",
- a:{q:"« Passons à quatorze heures par jour. »", e:{i:13,m:6,o:-14,p:-6}, suite:{dans:3, t:"Les accidents se multiplient en fin de poste", x:"Quatre mains prises dans les métiers ce mois-ci, toutes après la douzième heure. Le chirurgien de l’infirmerie tient le compte et il a commencé à le dire.", e:{o:-6,p:-5}},
-    c:"Quatorze heures durant, on entre avant le jour et on sort après la nuit. Les accidents se multiplient en fin de journée."},
- b:{q:"« Restons à douze heures. »", e:{i:-7,o:9,p:4},
-    c:"La commande partira en retard. Les ouvriers, eux, n’oublieront pas qui a tranché."}},
+{n:"05", t:"De nouvelles commandes lointaines", qui:"Samuel Prescott, exportateur de tissus",
+ d:"« Je veux remplir ces commandes avant que les clients choisissent d’autres fabricants. »",
+ ex:"Des clients d’Europe et d’Amérique du Sud demandent davantage de tissus. Doubler les machines permettrait de vendre plus, mais engagerait de lourdes dépenses.",
+ l:"Consultez Document 1 · trace écrite 1. Retenez **production de masse** : la fabrication de grandes quantités de produits semblables. Pourquoi la présence d’acheteurs lointains peut-elle expliquer le développement des usines ?",
+ a:{q:"« J’achète de nouvelles machines. »", e:{o:-8,m:9},
+    c:"Les marchands gagnent davantage de tissus à vendre, mais les ouvriers subissent une cadence plus forte."},
+ b:{q:"« Je garde la production actuelle. »", e:{o:9,m:-8},
+    c:"Les ouvriers évitent une hausse de cadence, mais les marchands perdent une partie des commandes."},
+ c:{q:"« Je prends seulement une partie des commandes. »", e:{i:9,m:-8},
+    c:"Les industriels limitent leurs dépenses, mais les marchands doivent renoncer à des ventes."}},
 
-{t:"Le Parlement a voté le Factory Act.", qui:"Sir Charles Beresford, envoyé du Parlement de Londres", apres:1830,
- d:"« La loi est votée, elle s’applique à vous comme aux autres. Reste à savoir ce que cette ville en fera, puisque personne ne viendra le vérifier avant longtemps. »",
- ex:"Une loi votée à Londres vient d’arriver par la poste. Elle interdit d’employer des enfants de moins de neuf ans dans le textile et limite la journée de ceux de moins de treize ans. C’est la première fois qu’une loi prévoit des inspecteurs pour vérifier qu’on l’applique — mais ils ne sont que quatre pour tout le royaume. Les fabricants ont déjà calculé ce qu’elle leur coûterait.",
- f:"La loi de 1833 interdit le travail des enfants de moins de neuf ans dans le textile et limite à neuf heures la journée des moins de treize ans. Elle est la première à prévoir un contrôle — mais avec quatre inspecteurs pour tout le royaume, autant dire aucun. Elle marque pourtant un tournant : l’État admet que le **progrès** industriel a des effets qu’il faut encadrer. Les lois suivantes, en 1842 et 1847, iront plus loin.",
- a:{q:"« Appliquons la loi : les enfants sortent. »", e:{p:12,o:10,i:-10,m:-4},
-    c:"Les plus jeunes sortent des ateliers. Certaines familles perdent d’un coup le tiers de leur revenu."},
- b:{q:"« N’appliquons pas la loi. »", e:{i:9,m:4,o:-8,p:-12}, suite:{dans:4, t:"Un inspecteur est venu de Londres", x:"Il a visité quatre filatures sans prévenir et relevé des enfants de sept ans aux machines. Son rapport part au Parlement. La ville est nommée dedans.", e:{p:-9,i:-4,o:3}, q:{texte:"Le rapport conclut à une amende et à une inspection annuelle. Un avocat de la ville propose de contester devant les tribunaux.",
-     choix:[
-      {q:"« Payons, et mettons-nous en règle. »", e:{p:10,o:7,i:-8,m:-3},
-       c:"L’amende est réglée sans bruit et les enfants sortent des ateliers. Les fabricants parlent de capitulation."},
-      {q:"« Contestons : la loi est mal rédigée. »", e:{i:7,p:-9,o:-6,m:2},
-       c:"La procédure durera des années, et pendant ce temps rien ne change. Londres retient le nom de la ville."}]}},
-    c:"Quatre inspecteurs pour tout le royaume : le risque est mince, et tout le monde le sait."},
- c:{q:"« Ne l’appliquons qu’aux grandes filatures. »", e:{p:-2,i:2,o:-4,m:-1},
-    c:"Les grandes filatures se mettent en règle, les petits ateliers de cave continuent. La loi devient une affaire de taille."}},
+{n:"06", t:"Une condition encore absente", qui:"George Ashcroft, conseiller de la ville",
+ d:"« Je veux lancer les fabriques maintenant, même si les commandes manquent encore. »",
+ ex:"Le charbon, les machines et les travailleurs sont disponibles. Les acheteurs restent trop peu nombreux pour écouler toute la production.",
+ l:"Consultez Trace écrite 1 · document 1. Retenez **industrialisation** : la transformation d’une société par le développement des usines et de leurs productions. Quelle importance accordez-vous aux acheteurs parmi les conditions nécessaires à ce changement ?",
+ a:{q:"« Je soutiens immédiatement les nouvelles usines. »", e:{i:9,m:-8},
+    c:"Les industriels peuvent investir, mais les marchands risquent de garder des tissus invendus."},
+ b:{q:"« Je cherche d’abord davantage de clients. »", e:{i:-8,m:9},
+    c:"Les marchands gagnent du temps pour trouver des débouchés, mais les industriels doivent retarder leurs projets."},
+ c:{q:"« Je finance quelques ateliers seulement. »", e:{i:9,o:-8},
+    c:"Les industriels peuvent démarrer prudemment, mais les ouvriers obtiennent moins de nouveaux emplois."}},
 
-{t:"L’eau croupit devant les portes.", qui:"Le docteur William Rait, qui soigne les pauvres du quartier",
- d:"« Ce ne sont pas les malades qu’il faut soigner, c’est la rue. Tant que l’eau sale restera devant les portes, je reviendrai vous voir chaque hiver avec les mêmes chiffres. »",
- ex:"Dans les rues ouvrières, il n’y a ni pavés ni canalisations pour emporter les eaux sales : on les jette devant la porte, et elles y stagnent. Le médecin a relevé cinq cas de fièvre cette semaine, tous dans la même rue. Creuser des égouts coûterait deux années de budget et supposerait d’éventrer des quartiers entiers pendant des mois.",
- f:"Avant les années 1840, aucune ville industrielle anglaise n’a d’égouts dignes de ce nom : les eaux usées stagnent dans des rues non pavées où jouent les enfants. Une enquête officielle de 1842, le rapport Chadwick, établit que l’espérance de vie moyenne d’un ouvrier de Manchester est de dix-sept ans, contre trente-huit dans un comté rural voisin. C’est l’un des documents qui obligeront l’État à intervenir : le coût humain de l’**industrialisation** devient un problème public.",
- a:{q:"« Creusons les égouts. »", e:{o:11,p:10,i:-6,m:-8}, suite:{dans:4, t:"Les fièvres ont reculé", x:"Le médecin apporte ses chiffres : deux fois moins de fièvres dans les rues assainies que dans les autres. Londres a demandé copie du rapport — on cite désormais la ville en exemple.", e:{o:9,p:11,m:3}, q:{texte:"Londres propose de financer l’extension des égouts à toute la ville — à condition d’envoyer ses propres inspecteurs contrôler les travaux.",
-     choix:[
-      {q:"« Acceptons leur argent et leurs inspecteurs. »", e:{o:8,p:9,i:-7,m:-4},
-       c:"Les travaux s’étendent deux fois plus vite. Des fonctionnaires de Londres s’installent à demeure et regardent tout."},
-      {q:"« Nous continuerons seuls, à notre rythme. »", e:{i:5,m:4,o:-5,p:-6},
-       c:"La ville garde la main et l’addition. Les quartiers les plus pauvres attendront encore."}]}},
-    c:"Le chantier est long et cher. Les fièvres reculent là où il passe."},
- b:{q:"« Ne creusons rien : à chacun sa rue. »", e:{o:-9,p:-8,i:5,m:3}, suite:{dans:3, t:"Le typhus part des rues sans égouts", x:"Les fièvres que le médecin annonçait sont là. Elles suivent exactement les rues où l’eau stagne — celles que vous aviez laissées en l’état. Cent quarante malades en trois semaines.", e:{o:-6,p:-6,i:-3}, q:{texte:"Le médecin demande de fermer les trois rues les plus touchées, le temps de les nettoyer. Deux filatures y ont leurs ouvriers.",
-     choix:[
-      {q:"« Fermons ces rues et nettoyons-les. »", e:{o:9,p:8,i:-9,m:-5},
-       c:"Trois semaines de travaux et deux filatures au ralenti. L’épidémie s’arrête aux limites du quartier."},
-      {q:"« Les filatures ne peuvent pas s’arrêter. »", e:{i:6,m:3,o:-10,p:-8},
-       c:"On produit sans interruption. Le typhus, lui, ne s’arrête pas aux limites du quartier."}]}},
-    c:"On laisse chaque propriétaire décider. Aucun ne décide rien."},
- c:{q:"« Ne creusons que les rues principales. »", e:{o:3,p:3,m:-7},
-    c:"Le centre s’assainit. Les ruelles d’Ancoats, elles, restent ce qu’elles sont."}},
+{n:"07", t:"Une machine pour quatre étages", qui:"Robert Henshaw, directeur d’une fabrique de coton",
+ d:"« Je veux faire tourner toutes les machines avec un seul moteur. »",
+ ex:"Une machine à vapeur pourrait entraîner les métiers des quatre étages. Elle ferait travailler tout l’atelier ensemble, mais remplacerait plusieurs travailleurs.",
+ l:"Consultez Document 4 (Schopenhauer) · trace écrite 2 §1. Retenez **filature** : une usine où l’on transforme le coton en fil. Comment ce rassemblement des machines et des travailleurs marque-t-il une rupture avec le travail à domicile ?",
+ a:{q:"« J’installe le grand moteur. »", e:{i:9,o:-8},
+    c:"Les industriels accroissent la fabrication, mais des ouvriers risquent de perdre leur emploi."},
+ b:{q:"« Je garde les machines actuelles. »", e:{i:-8,o:9},
+    c:"Les ouvriers conservent leurs postes, mais les industriels renoncent à une fabrication plus régulière."},
+ c:{q:"« J’équipe un étage avant les autres. »", e:{i:9,m:-8},
+    c:"Les industriels essaient la nouvelle installation, mais les marchands doivent attendre davantage de tissus."}},
 
-{t:"Liverpool propose une voie ferrée.", qui:"Ezra Duckworth, négociant à Liverpool", apres:1820,
- d:"« Une locomotive a déjà fait l’essai. Ceux qui auront la ligne prendront le marché, ceux qui ne l’auront pas le perdront. Il faut que la ville rachète les terres sur le tracé. »",
- ex:"Liverpool est le port par lequel arrive le coton brut d’Amérique et par lequel repart le fil une fois filé. Aujourd’hui, il faut une journée de charrette pour faire le trajet. Des ingénieurs proposent de construire une ligne de chemin de fer entre les deux villes : deux heures au lieu de douze. Les actionnaires de Liverpool ont réuni la moitié de l’argent et veulent une réponse ce mois-ci, sinon ils desserviront une autre ville.",
- f:"La ligne Liverpool–Manchester, ouverte en 1830, est la première au monde à relier deux grandes villes. Le chemin de fer est la deuxième grande **innovation** de transport après le canal, et il transforme l’échelle des **marchés** : ce qu’on produit ici peut être vendu partout. Il crée aussi une demande énorme de fer, de charbon et de main-d’œuvre — une innovation en entraîne d’autres, c’est ce qui fait un système.",
- a:{q:"« Ouvrons la ligne de chemin de fer. »", e:{m:14,i:9,o:-4,p:-3}, g:["Transports","Marchés"],
-    c:"Le coton brut arrive le matin, le fil repart le soir. La ville change d’échelle."},
- b:{q:"« Refusons la ligne, gardons les canaux. »", e:{m:-10,i:-5,p:3},
-    c:"Les péniches sont lentes et gèlent en hiver. Duckworth commence à traiter avec Leeds."},
- c:{q:"« Ouvrons-la, mais sous contrôle de la ville. »", e:{m:2,i:1,p:6,o:-2}, g:["Transports"],
-    c:"La ligne se fera aux conditions du conseil. Les actionnaires de Liverpool tempêtent, puis signent."}},
+{n:"08", t:"La journée de quatorze heures", qui:"James Barlow, directeur d’une fabrique de coton",
+ d:"« Je veux livrer cette commande sans perdre un client important. »",
+ ex:"Un client exige une commande de fil pour mars. Le directeur propose d’allonger la journée de douze à quatorze heures pour tenir le délai.",
+ l:"Consultez Trace écrite 2 §1. Retenez **condition de travail** : l’ensemble des horaires, des tâches et des dangers du métier. Quelle continuité ou rupture voyez-vous entre les rythmes anciens et ceux de l’usine ?",
+ a:{q:"« J’accepte les deux heures de plus. »", e:{o:-8,m:9},
+    c:"Les marchands reçoivent leur commande plus vite, mais les ouvriers perdent du temps de repos."},
+ b:{q:"« Je maintiens la journée actuelle. »", e:{o:9,m:-8},
+    c:"Les ouvriers conservent leur repos, mais les marchands risquent de perdre le client."},
+ c:{q:"« J’engage d’autres travailleurs pour aider. »", e:{i:-8,o:9},
+    c:"Les ouvriers gagnent de nouveaux salaires, mais les industriels paient davantage de personnes."}},
 
-{t:"Des acheteurs attendent à Hambourg.", qui:"Ezra Duckworth, négociant à Liverpool", req:["Transports"],
- d:"« J’ai des acheteurs qui attendent. Si vos métiers ne doublent pas, j’achèterai le fil à Oldham : cela ne me coûtera qu’une journée de voiture. »",
- ex:"Le fil produit ici se vend dans le monde entier, et c’est ce qui rend les machines rentables : sans acheteurs lointains, il ne servirait à rien d’en produire autant. Le négociant apporte des commandes venues d’Allemagne et du Brésil qui dépassent à elles seules la production d’une année. Il faudra produire beaucoup plus, et vite, ou les laisser partir chez un concurrent.",
- f:"Produire en masse n’a de sens que si l’on peut vendre en masse : les **marchés**, ou débouchés, sont l’une des conditions de la révolution industrielle. Le coton anglais se vend sur tous les continents, souvent dans les colonies de l’Empire britannique, qui fournissent aussi la matière première. Sans ces débouchés lointains, des machines aussi coûteuses ne seraient jamais rentables : le commerce mondial et l’industrie se développent ensemble.",
- a:{q:"« Doublons les métiers à tisser. »", e:{i:10,m:12,o:-11}, g:["Marchés"],
-    c:"On produit deux fois plus avec les mêmes murs. On y tient aussi deux fois moins longtemps."},
- b:{q:"« Refusons : gardons nos cadences. »", e:{m:-11,i:-6,o:6},
-    c:"La commande part à Oldham. Duckworth s’en souviendra à la prochaine."},
- c:{q:"« Doublons en embauchant, sans presser personne. »", e:{i:2,m:3,o:-6,p:-4}, pop:.12, g:["Marchés"],
-    c:"On produit plus parce qu’on est plus nombreux. La ville enfle d’autant."}},
+{n:"09", t:"Des enfants sous les machines", qui:"Anne Collins, mère d’un jeune travailleur",
+ d:"« J’ai besoin de son salaire, mais je crains chaque jour un accident. »",
+ ex:"Des fils cassent sous les machines en marche. Le directeur veut y faire passer des enfants, car arrêter les moteurs ralentirait la fabrication.",
+ l:"Consultez Document 4 · document 5. Retenez **condition de travail** : l’ensemble des horaires, des tâches et des dangers du métier. Quelle importance le salaire des enfants a-t-il pour les familles face au risque d’accident ?",
+ a:{q:"« J’interdis ce travail sous les machines en marche. »", e:{i:-8,o:9},
+    c:"Les ouvriers gagnent en sécurité, mais les industriels doivent ralentir les machines."},
+ b:{q:"« J’autorise ce travail pour garder les salaires. »", e:{i:9,o:-8},
+    c:"Les industriels évitent les arrêts, mais les ouvriers exposent leurs enfants au danger."},
+ c:{q:"« J’impose l’arrêt des machines avant toute réparation. »", e:{o:9,m:-8},
+    c:"Les ouvriers travaillent plus sûrement, mais les marchands reçoivent moins vite leurs commandes."}},
 
-{t:"Un médecin demande une salle et deux lits.", qui:"Le docteur William Rait, qui soigne les pauvres du quartier",
- d:"« Un seul praticien pour huit mille personnes. Je ne peux pas isoler un malade, donc je ne peux arrêter aucune contagion. Donnez-moi une pièce et deux lits. »",
- ex:"Il n’existe aucun lieu de soin dans les quartiers ouvriers : le médecin examine ses malades sur le pas des portes. Il demande une salle, deux lits et de quoi acheter des médicaments — pas un hôpital. La somme est modeste. C’est le principe qui divise le conseil : faut-il que la ville soigne ceux que les usines épuisent ?",
- f:"Les villes industrielles n’ont presque aucune structure de soin pour les ouvriers : la médecine des pauvres repose sur la charité privée et sur quelques praticiens dévoués. Les épidémies y circulent d’autant plus vite que l’**urbanisation** entasse les gens. Ce sont souvent les médecins qui, en tenant des registres, produisent les premières statistiques sociales — et rendent visible ce que l’industrialisation coûte à ceux qui la font tourner.",
- a:{q:"« Ouvrons le dispensaire. »", e:{o:10,p:7,m:-6,i:-3},
-    c:"Le dispensaire ne désemplit pas. On y découvre l’ampleur de ce qu’on ne voyait pas."},
- b:{q:"« Refusons le dispensaire. »", e:{o:-7,p:-4,i:3}, suite:{dans:4, t:"Une fièvre a couru faute de soins", x:"Elle est partie d’une seule cour et personne n’a pu l’arrêter : il n’y avait ni médecin ni lit pour isoler qui que ce soit. On compte les morts par famille entière.", e:{o:-6,p:-5,i:-2}},
-    c:"Rait continue seul, et le dit à qui veut l’entendre."},
- c:{q:"« Ouvrons-le, aux frais des fabricants. »", e:{o:6,p:4,i:-11,m:-3},
-    c:"Les fabricants paient, et ne manquent pas de rappeler que c’est eux qui paient."}},
+{n:"10", t:"Un poste fixe par ouvrier", qui:"John Radcliffe, contremaître d’une usine",
+ d:"« Je veux que chacun répète le geste qu’il maîtrise le mieux. »",
+ ex:"Un contremaître veut confier à chacun un geste répété plutôt qu’un métier entier. Il promet davantage de tissus, mais le travail deviendrait monotone.",
+ l:"Consultez Trace écrite 1 · trace écrite 2 §1. Retenez **division du travail** : le partage de la fabrication en tâches distinctes entre plusieurs travailleurs. Qu’est-ce qui change dans le métier, et que conserve-t-on de l’ancien travail ?",
+ a:{q:"« Je fixe un geste à chaque ouvrier. »", e:{i:9,o:-8},
+    c:"Les industriels accélèrent la fabrication, mais les ouvriers perdent une part de leur savoir-faire."},
+ b:{q:"« Je conserve des métiers variés. »", e:{i:-8,o:9},
+    c:"Les ouvriers gardent leurs compétences, mais les industriels produisent moins rapidement."},
+ c:{q:"« J’alterne les postes pendant la semaine. »", e:{i:-8,o:9},
+    c:"Les ouvriers conservent des gestes variés, mais les industriels renoncent à une partie des gains de vitesse."}},
 
-{t:"On loue désormais les sous-sols.", qui:"Le révérend Ellis Hargreaves, pasteur du quartier",
- d:"« J’ai enterré quatre enfants cette semaine, tous venus de la même cave. On y loue le sol comme on louerait une chambre. Fermez ces logements. »",
- ex:"Faute de logements, les propriétaires ont commencé à louer les caves de leurs maisons : une pièce en sous-sol, sans fenêtre, sans évacuation, souvent inondée, où s’installe une famille entière. Cela leur rapporte autant qu’une chambre et rien ne l’interdit. Le pasteur tient le compte des enterrements de sa paroisse et il l’a apporté. Interdire ces caves mettrait à la rue ceux qui y vivent.",
- f:"Au début des années 1840, on estime que quinze à vingt mille habitants de Manchester vivent dans des caves : une pièce en sous-sol, sans fenêtre ni évacuation, souvent humide. Friedrich Engels, qui séjourne dans la ville à partir de 1842, les décrit dans *La Situation de la classe laborieuse en Angleterre*. Le logement en cave montre que la croissance de la production et l’amélioration des conditions de vie ne vont pas ensemble : le **progrès ne profite pas également à tous**.",
- a:{q:"« On ferme les logements en cave. »", e:{p:9,o:-6,i:-4,m:-2},
-    c:"Les caves sont murées — et ceux qui y vivaient se retrouvent à la rue. Fermer un taudis ne crée pas un logement."},
- b:{q:"« Laissons louer les caves. »", e:{o:-8,p:-6,i:4}, suite:{dans:4, t:"On meurt dans les sous-sols", x:"Le registre des décès de la paroisse est accablant : un enterrement sur trois vient d’un logement en cave. Ce que le révérend décrivait il y a quelques années est devenu un chiffre.", e:{o:-6,p:-7}},
-    c:"Sous presque chaque maison, une famille de plus. Le loyer du sous-sol devient un commerce."},
- c:{q:"« On les ferme à mesure qu’on reloge. »", e:{o:3,p:4,m:-10,i:-6},
-    c:"Lent, coûteux, et personne ne dort dehors. Le conseil s’endette."}},
+{n:"11", t:"Un incendie et des familles sans salaire", qui:"Elizabeth Turner, ouvrière sans emploi",
+ d:"« Je veux nourrir mes enfants pendant que notre usine reste fermée. »",
+ ex:"Un incendie a détruit plusieurs étages d’une usine de coton. Des familles se retrouvent sans revenu pendant sa reconstruction.",
+ l:"Consultez Trace écrite 2 §1. Retenez **condition de travail** : l’ensemble des horaires, des tâches et des dangers du métier. Quelles conséquences la concentration des travailleurs dans une seule usine entraîne-t-elle lors d’un incendie ?",
+ a:{q:"« Je verse une aide aux familles touchées. »", e:{o:9,p:-8},
+    c:"Les ouvriers peuvent acheter du pain, mais le Parlement doit financer les secours."},
+ b:{q:"« Je privilégie la reconstruction de l’usine. »", e:{i:9,o:-8},
+    c:"Les industriels retrouvent plus vite leur atelier, mais les ouvriers attendent une aide immédiate."},
+ c:{q:"« Je propose du travail dans d’autres ateliers. »", e:{i:-8,o:9},
+    c:"Les ouvriers retrouvent certains salaires, mais les industriels voisins doivent réorganiser leur travail."}},
 
-{t:"Une fileuse demande à vous parler.", qui:"Mary Kearsley, ouvrière fileuse dans le quartier d’Ancoats",
- d:"« Mon garçon a onze ans et il passe sous les métiers toute la journée. S’il en sort, nous ne mangeons plus. S’il y reste, il y restera pour de bon. C’est vous qui choisissez, pas moi. »",
- ex:"Dans les filatures, on emploie des enfants pour se glisser sous les machines en marche et renouer les fils qui cassent : ils sont les seuls assez petits pour passer sans qu’on arrête la production. Beaucoup y perdent des doigts, certains davantage. Une ouvrière a attendu la fin de son poste pour venir en parler ; elle repart travailler dans une heure.",
- f:"Les enfants sont employés comme « rattacheurs » : assez petits pour passer sous les machines en marche et renouer les fils cassés sans qu’on arrête la production. Le travail des enfants n’est pas une invention de l’usine — on travaillait déjà jeune à la ferme —, mais l’usine le transforme : il devient continu, surveillé, dangereux, et surtout **indispensable au salaire familial**. Une famille ouvrière ne vit pas d’un seul revenu.",
- a:{q:"« Interdisons le travail des enfants. »", e:{p:11,o:3,i:-11,m:-4}, suite:{dans:4, t:"Une école du soir a ouvert", x:"Les enfants sortis des filatures ont été pris en charge par une souscription de la paroisse. Quatre-vingts élèves le premier hiver. Les familles y ont perdu un salaire et gagné autre chose.", e:{p:10,o:7,i:-3}},
-    c:"Les enfants sortent. Leurs familles perdent un salaire sur trois, et le leur disent."},
- b:{q:"« Laissons les enfants sous les machines. »", e:{i:8,o:-4,p:-10},
-    c:"Ils restent sous les machines. Certains n’en ressortiront pas entiers."}},
+{n:"12", t:"Une loi pour les plus jeunes", qui:"Henry Wilkins, inspecteur des fabriques",
+ d:"« Je veux pouvoir faire respecter cette loi sans abandonner les familles. »",
+ ex:"Le Parlement limite désormais le travail des très jeunes enfants dans certaines usines. Les contrôles restent rares et les familles redoutent de perdre des salaires.",
+ l:"Consultez Trace écrite 2 §3. Retenez **inégalité** : une différence de droits, de revenus ou de possibilités entre des groupes. Quelle rupture cette loi introduit-elle, et quelles difficultés anciennes subsistent ?",
+ a:{q:"« Je fais appliquer la loi avec des contrôles. »", e:{o:-8,p:9},
+    c:"Le Parlement renforce les protections, mais les ouvriers pauvres perdent certains revenus."},
+ b:{q:"« Je demande davantage d’inspecteurs avant d’agir. »", e:{o:9,p:-8},
+    c:"Les ouvriers conservent provisoirement leurs salaires, mais le Parlement retarde les protections promises."},
+ c:{q:"« Je prévois une aide aux familles concernées. »", e:{i:-8,o:9},
+    c:"Les ouvriers reçoivent un soutien, mais les industriels craignent de nouveaux prélèvements."}},
 
-{t:"Un contremaître veut chronométrer les gestes.", qui:"Abel Crompton, qui commande les équipes dans l’atelier", req:["Savoirs techniques"],
- d:"« Chacun à sa place, chaque geste compté. Ils n’aimeront pas, je le sais. Ils s’y feront, comme ailleurs. »",
- ex:"Jusqu’ici, chaque ouvrier travaille à peu près à son rythme, comme le faisait l’artisan avant l’usine. Le contremaître a passé trois semaines à mesurer les gestes en cachette, montre en main. Il propose d’assigner chacun à un poste fixe et de fixer le temps de chaque opération : un tiers de production en plus, sans acheter une seule machine. L’atelier a compris ce qu’il faisait.",
- f:"Avant l’usine, l’artisan décidait de son rythme et maîtrisait tout son métier. La **division du travail** découpe la fabrication en tâches simples confiées chacune à un ouvrier différent : on produit beaucoup plus, mais chacun ne sait plus faire qu’un fragment. Adam Smith l’avait décrite dès 1776 à propos d’une fabrique d’épingles. La discipline d’atelier — horaires fixes, poste assigné, amendes — est vécue par les ouvriers comme une dépossession de leur métier.",
- a:{q:"« Organisons le travail en postes fixes. »", e:{i:12,m:6,o:-12}, g:["Organisation"],
-    c:"Le rendement grimpe. L’ouvrier cesse de conduire son travail : c’est le travail qui le conduit."},
- b:{q:"« Refusons le chronométrage. »", e:{i:-8,o:7},
-    c:"On garde les habitudes de l’atelier. Les coûts restent ce qu’ils sont."},
- c:{q:"« Organisons, avec une pause par demi-journée. »", e:{i:3,o:-5,m:1}, g:["Organisation"],
-    c:"La cadence s’installe, coupée de deux répits. On tient — un peu plus longtemps."}},
+{n:"13", t:"Le pain devient trop cher", qui:"Sarah Greenwood, ouvrière dans une fabrique de coton",
+ d:"« Je veux un salaire qui permette de nourrir ma famille. »",
+ ex:"Des ouvrières cessent le travail pour protester contre le prix du pain. Leurs salaires ne suffisent plus à nourrir correctement leurs familles.",
+ l:"Consultez Trace écrite 2 §3. Retenez **monde ouvrier** : l’ensemble des personnes qui vivent de leur salaire dans les ateliers et les usines. Pourquoi la hausse du pain entraîne-t-elle une protestation de travailleurs payés en argent ?",
+ a:{q:"« Je soutiens une hausse des salaires. »", e:{i:-8,o:9},
+    c:"Les ouvriers peuvent mieux acheter leur pain, mais les industriels paient davantage."},
+ b:{q:"« Je négocie une baisse du prix du pain. »", e:{o:9,m:-8},
+    c:"Les ouvriers pourraient dépenser moins pour manger, mais les marchands de grains perdraient des recettes."},
+ c:{q:"« Je demande une reprise du travail sans hausse. »", e:{i:9,o:-8},
+    c:"Les industriels retrouvent les machines en marche, mais les ouvriers gardent leurs difficultés."}},
 
-{t:"Trois morts dans la même ruelle.", qui:"Le docteur William Rait, qui soigne les pauvres du quartier", apres:1830,
- d:"« Trois en une nuit, et je n’ai pas encore prévenu les maisons voisines. Décidez aujourd’hui, pas la semaine prochaine. »",
- ex:"Trois personnes sont mortes cette nuit dans la même ruelle, avec les mêmes symptômes. Le médecin redoute le choléra, une maladie venue d’Asie qui tue en quelques heures ; on ignore encore qu’elle se transmet par l’eau souillée, mais on a remarqué qu’elle frappe surtout les quartiers sans égouts. Fermer le quartier arrêterait deux filatures. Ne rien faire, c’est parier qu’il se trompe.",
- f:"Le choléra atteint la Grande-Bretagne en 1831. On ignore encore qu’il se transmet par l’eau souillée : on l’attribue aux mauvaises odeurs. Ce sont les quartiers sans égouts qui paient le plus lourd tribut, ce qui finira par établir le lien entre **conditions de vie urbaines** et santé publique. Les grandes épidémies du XIXᵉ siècle sont l’un des moteurs de l’intervention de l’État dans des domaines qu’il laissait jusque-là aux propriétaires.",
- a:{q:"« Bouclons le quartier et nettoyons. »", e:{o:12,p:12,i:-12,m:-10},
-    c:"Le quartier est bouclé, les filatures à l’arrêt. L’épidémie s’éteint plus vite qu’ailleurs."},
- b:{q:"« Ne fermons rien : produisons. »", e:{i:8,m:6,o:-15,p:-12},
-    c:"Les machines n’ont pas cessé de tourner. Le quartier a enterré ses morts sans vous."}},
+{n:"14", t:"Des métiers à tisser brisés", qui:"Thomas Atkinson, tisserand à la main",
+ d:"« Je veux encore vivre de mon métier sans voir mes enfants manquer de pain. »",
+ ex:"Des tisserands qui travaillent à la main attaquent des machines qui produisent à moindre coût. Les fabricants demandent une punition et les familles ruinées réclament du secours.",
+ l:"Consultez Trace écrite 1 · trace écrite 2 §3. Retenez **mécanisation** : le remplacement d’une partie du travail humain par des machines. Quelle importance donnez-vous aux métiers détruits par ce changement technique ?",
+ a:{q:"« Je poursuis les auteurs des destructions. »", e:{i:9,o:-8},
+    c:"Les industriels protègent leurs machines, mais les ouvriers ruinés perdent tout espoir de clémence."},
+ b:{q:"« Je propose une aide aux tisserands sans travail. »", e:{o:9,p:-8},
+    c:"Les ouvriers en difficulté reçoivent du secours, mais le Parlement doit payer cette aide."},
+ c:{q:"« J’impose une négociation avant toute sanction. »", e:{i:-8,o:9},
+    c:"Les ouvriers obtiennent la parole, mais les industriels craignent de nouvelles attaques."}},
 
-{t:"Le dernier terrain libre du centre.", qui:"Miss Agnes Thorne, qui dirige une œuvre de bienfaisance",
- d:"« Il y a dans cette ville des enfants de six ans qui n’ont jamais vu un arbre. C’est le dernier terrain. Après, la question ne se posera plus. »",
- ex:"La ville s’est construite sans plan : chaque terrain libre a été bâti dès qu’il se vendait, et il n’en reste plus qu’un au centre. Deux offres sont sur la table. Un négociant veut y construire des entrepôts pour stocker le coton. Une souscription de dames de la bourgeoisie a réuni de quoi en faire un jardin public. Après celui-ci, il n’y aura plus rien à partager.",
- f:"Manchester se construit sans plan : chaque terrain libre est bâti dès qu’il se vend, au plus offrant. Les premiers parcs publics anglais naissent précisément dans les années 1840, sous la pression de médecins et de philanthropes qui font le lien entre air, lumière et santé. La question posée ici est celle de toute **urbanisation** rapide : à qui appartient l’espace d’une ville, et qui décide de ce qu’on en fait ?",
- a:{q:"« Faisons un parc public. »", e:{o:10,p:8,m:-9,i:-6},
-    c:"Un parc au milieu des cheminées. On y vient le dimanche, en habits propres."},
- b:{q:"« Vendons le terrain pour des entrepôts. »", e:{m:10,i:7,o:-8,p:-5},
-    c:"Les entrepôts sortent de terre en six mois. Le dernier arbre du centre tombe avec eux."},
- c:{q:"« La moitié en parc, la moitié en entrepôts. »", e:{o:4,p:2,i:-1,m:-7},
-    c:"Un square et quatre hangars. Il faut dédommager le propriétaire, qui espérait tout vendre."}},
+{n:"15", t:"Des maisons construites dos à dos", qui:"Benjamin Cooper, constructeur de logements",
+ d:"« Je peux loger rapidement des familles si vous acceptez mon projet. »",
+ ex:"Un constructeur propose des maisons serrées et peu coûteuses pour loger des ouvriers. Sans cour ni évacuation des eaux, ces logements seraient malsains.",
+ l:"Consultez Document 5 (Engels) · trace écrite 2 §2. Retenez **logement insalubre** : un logement dangereux pour la santé à cause de l’humidité, du manque d’air ou de la saleté. Quelle importance auront ces choix de construction pour la vie future des habitants ?",
+ a:{q:"« J’autorise ces maisons sans modification. »", e:{i:9,o:-8},
+    c:"Les industriels trouvent des travailleurs logés près d’eux, mais les ouvriers vivent dans des conditions malsaines."},
+ b:{q:"« J’exige des cours et des évacuations. »", e:{i:-8,o:9},
+    c:"Les ouvriers gagnent des logements plus sains, mais les industriels attendent leur construction."},
+ c:{q:"« Je fais bâtir moins de maisons mieux équipées. »", e:{o:-8,p:9},
+    c:"Le Parlement améliore la salubrité, mais des ouvriers restent sans logement."}},
 
-{t:"Le pain a doublé depuis le printemps.", qui:"Mary Kearsley, ouvrière fileuse dans le quartier d’Ancoats",
- d:"« Nous ne demandons pas la fortune, nous demandons de quoi manger en travaillant. Sinon les machines s’arrêteront d’elles-mêmes, et ce ne sera pas de notre fait. »",
- ex:"Le pain représente près de la moitié de ce que dépense une famille ouvrière : quand son prix double, c’est la faim immédiatement. Hier après-midi, les ouvrières de plusieurs filatures ont cessé le travail deux heures, sans dégât et sans meneur, puis ont désigné l’une d’entre elles pour venir parler. Les fabricants jurent qu’ils ne tiendront pas une augmentation générale des salaires.",
- f:"Le pain représente près de la moitié du budget d’une famille ouvrière : quand son prix monte, c’est la faim immédiatement. Le salaire industriel est versé en argent, ce qui rend l’ouvrier entièrement dépendant du marché — contrairement au paysan qui produisait une partie de sa nourriture. Les arrêts de travail des années 1830 et 1840 partent presque toujours du prix du pain avant de devenir des revendications politiques.",
- a:{q:"« Accordons la hausse des salaires. »", e:{o:13,i:-9,m:-6,p:3},
-    c:"Les salaires montent. Les fabricants jurent qu’ils ne tiendront pas l’année."},
- b:{q:"« Refusons la hausse. »", e:{i:8,m:4,o:-13,p:-4}, suite:{dans:2, t:"Les métiers se sont arrêtés", x:"Ce n’est pas une émeute : elles ont simplement cessé de venir. Trois filatures à l’arrêt depuis lundi, et personne à qui parler puisqu’on a refusé de les recevoir.", e:{i:-8,m:-5,o:-2}},
-    c:"On refuse, et l’on compte sur la faim pour ramener chacun à son métier."}},
+{n:"16", t:"Les familles dans les caves", qui:"Margaret Hughes, locataire d’une cave",
+ d:"« Je veux quitter l’humidité sans dormir dehors avec mes enfants. »",
+ ex:"Des familles louent des caves humides faute de logements disponibles. Les fermer immédiatement pourrait les laisser sans aucun abri.",
+ l:"Consultez Document 5 (Engels). Retenez **logement insalubre** : un logement dangereux pour la santé à cause de l’humidité, du manque d’air ou de la saleté. Quelles conséquences imprévues peut avoir l’interdiction d’un habitat dangereux ?",
+ a:{q:"« J’interdis immédiatement la location des caves. »", e:{o:-8,p:9},
+    c:"Le Parlement retire des logements malsains, mais les ouvriers concernés risquent la rue."},
+ b:{q:"« J’attends la construction d’autres logements. »", e:{o:9,p:-8},
+    c:"Les ouvriers gardent temporairement un toit, mais le Parlement laisse durer l’insalubrité."},
+ c:{q:"« Je finance des logements de remplacement. »", e:{o:9,p:-8},
+    c:"Les ouvriers peuvent déménager, mais le Parlement engage des dépenses importantes."}},
 
-{t:"Une pétition contre les droits sur le grain.", qui:"Josiah Halliwell, propriétaire d’une filature de coton", apres:1830,
- d:"« Ce sont les propriétaires terriens qui vivent sur notre dos, pas nous sur celui de nos ouvriers. Signez avec nous. »",
- ex:"Une taxe protège le blé anglais en renchérissant le blé importé : elle enrichit les grands propriétaires terriens et maintient le pain cher. Les fabricants de la ville font circuler une pétition pour la supprimer — car le pain cher les oblige à payer des salaires plus élevés. Les mêmes refusent pourtant d’augmenter ces salaires. Londres regarde de près qui signe.",
- f:"Les *Corn Laws* taxent le grain importé pour protéger les grands propriétaires terriens, et maintiennent donc le pain cher. Les industriels y voient la cause des salaires qu’on leur réclame : la Ligue contre les Corn Laws naît à Manchester en 1838 et obtient leur abolition en 1846. C’est l’un des premiers grands conflits entre l’**ancienne richesse foncière et la nouvelle richesse industrielle** — deux mondes qui ne veulent pas la même politique.",
- a:{q:"« Signons la pétition contre les Corn Laws. »", e:{i:10,m:9,o:5,p:-11},
-    c:"Manchester devient le cœur de la Ligue. Londres le remarque, et n’apprécie pas."},
- b:{q:"« Ne prenons pas parti. »", e:{i:-5,m:-4,p:4},
-    c:"On ne se fâche avec personne, et l’on n’obtient rien."},
- c:{q:"« Soutenons-les, mais en secret. »", e:{i:1,m:1,p:-5},
-    c:"On finance discrètement la Ligue. Tout le monde le sait, personne ne le dit."}},
+{n:"17", t:"Des rues sans égouts", qui:"Frederick Lowe, responsable des rues de Manchester",
+ d:"« Je veux évacuer les eaux sales avant que les rues deviennent impraticables. »",
+ ex:"Les rues ouvrières sont boueuses et les eaux sales y stagnent. Construire des égouts demanderait des dépenses que la ville hésite à engager.",
+ l:"Consultez Document 5 · trace écrite 2 §2. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelles conséquences le manque d’évacuation des eaux peut-il avoir sur la santé des habitants ?",
+ a:{q:"« Je lance les travaux d’égouts. »", e:{o:9,p:-8},
+    c:"Les ouvriers gagnent des rues plus saines, mais le Parlement supporte de lourds frais."},
+ b:{q:"« Je reporte les travaux d’une année. »", e:{o:-8,p:9},
+    c:"Le Parlement ménage ses finances, mais les ouvriers continuent de vivre près des eaux sales."},
+ c:{q:"« Je commence par les ruelles les plus touchées. »", e:{o:9,m:-8},
+    c:"Les ouvriers des rues choisies sont mieux protégés, mais les marchands d’autres quartiers attendent encore."}},
 
-{t:"Le monde entier défile au Crystal Palace.", qui:"Le secrétaire du conseil de ville", apres:1840,
- d:"« Nous pouvons préparer ce qu’ils verront, ou les laisser aller où ils veulent. Dans les deux cas, on écrira sur nous. »",
- ex:"Londres organise une exposition universelle sous une immense halle de verre et de fer : les produits du monde entier y sont présentés, et six millions de visiteurs sont attendus. On demande à la ville d’y envoyer ses cotonnades. Des journalistes ont déjà annoncé leur intention de venir voir les filatures d’où elles sortent — et les quartiers qui les entourent.",
- f:"L’Exposition universelle de 1851 rassemble à Londres les produits du monde entier sous une halle de verre et de fer, et attire six millions de visiteurs en cinq mois. La Grande-Bretagne y met en scène sa suprématie industrielle : elle est alors « l’atelier du monde ». La même année, le recensement établit que le pays compte pour la première fois **plus de citadins que de ruraux** — l’aboutissement de l’exode rural commencé un siècle plus tôt.",
- a:{q:"« Repeignons les façades avant la visite. »", e:{m:8,i:6,p:5,o:-7},
-    c:"Les visiteurs voient une ville prospère et ordonnée. Ancoats est à dix minutes, et personne n’y va."},
- b:{q:"« Ne cachons rien aux visiteurs. »", e:{o:11,p:-8,i:-7,m:-5},
-    c:"On montre les caves avec les cheminées. Les journaux de Londres s’en emparent."},
- c:{q:"« Exposons le fil, sans visite d’usine. »", e:{m:2,i:1,p:-1,o:-3},
-    c:"Le fil de Manchester triomphe à l’exposition. Les filatures restent fermées aux curieux."}},
+{n:"18", t:"Une fièvre dans le quartier", qui:"Dr. Arthur Bennett, médecin du quartier",
+ d:"« Je veux limiter les morts avant que davantage de familles soient touchées. »",
+ ex:"Plusieurs habitants de la même ruelle sont morts après une maladie soudaine. Fermer le quartier protégerait peut-être les voisins, mais arrêterait deux usines.",
+ l:"Consultez Document 5 · trace écrite 2 §2. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelles causes possibles relient l’état des rues et la santé des habitants ?",
+ a:{q:"« Je ferme provisoirement les deux usines. »", e:{i:-8,o:9},
+    c:"Les ouvriers du voisinage limitent les contacts, mais les industriels perdent plusieurs journées de travail."},
+ b:{q:"« Je garde les usines ouvertes sous surveillance. »", e:{i:9,o:-8},
+    c:"Les industriels poursuivent leur activité, mais les ouvriers restent exposés à une possible contagion."},
+ c:{q:"« Je finance de l’eau propre et des soins. »", e:{o:9,p:-8},
+    c:"Les ouvriers obtiennent de l’aide sanitaire, mais le Parlement doit payer les interventions."}},
 
-{t:"Une filature a brûlé cette nuit.", qui:"Abel Crompton, qui commande les équipes dans l’atelier",
- d:"« Les murs tiennent encore, le reste est par terre. Quarante familles attendent dehors, et le propriétaire attend votre réponse. »",
- ex:"Le feu a pris aux machines qui démêlent le coton, là où la poussière et l’huile s’accumulent — c’est de là que partent presque tous les incendies de filature. Les pompes à bras, tirées par des chevaux, ont mis quarante minutes à arriver : trois étages se sont effondrés. Ce matin, les quarante familles qui travaillaient là se sont présentées devant une grille fermée, et n’ont plus de salaire. Le propriétaire refuse de reconstruire si la ville ne l’aide pas.",
- f:"Les filatures brûlent souvent : le coton en poussière, l’huile des machines et les lampes à flamme nue forment un mélange redoutable, dans des bâtiments à escaliers étroits et sans issue de secours. Aucune réglementation de sécurité n’existe encore. L’incendie révèle aussi une fragilité nouvelle : des centaines de familles dépendent d’un seul bâtiment et d’un seul propriétaire. C’est le revers de la **concentration de la production** en usine.",
- a:{q:"« Aidons le propriétaire à reconstruire. »", e:{i:10,o:7,m:-9,p:-4},
-    c:"Les murs se relèvent en quatre mois. On n’a pas discuté des issues de secours."},
- b:{q:"« N’aidons pas : qu’il paie seul. »", e:{i:-9,o:-7,p:5,m:3},
-    c:"Il ne rebâtira pas. Quarante familles cherchent ailleurs."},
- c:{q:"« Prêtons l’argent, remboursable. »", e:{i:3,o:2,m:-7},
-    c:"Le prêt est signé devant notaire. Il faudra bien qu’il rembourse un jour."}},
+{n:"19", t:"Une ville sans assez de toits", qui:"Charles Miller, conseiller chargé des logements",
+ d:"« Je veux éviter que les nouveaux arrivants dorment à plusieurs familles par pièce. »",
+ ex:"La population de Manchester augmente rapidement avec les arrivées de travailleurs. Les familles s’entassent, car les constructions ne suivent pas.",
+ l:"Consultez Document 3 (la population) · trace écrite 2 §2. Retenez **urbanisation** : l’augmentation de la population des villes et de leur espace bâti. Comment la croissance des usines provoque-t-elle aussi une crise du logement ?",
+ a:{q:"« Je réserve des terrains aux logements. »", e:{o:9,m:-8},
+    c:"Les ouvriers trouvent plus de place pour habiter, mais les marchands perdent des terrains pour leurs entrepôts."},
+ b:{q:"« Je laisse les propriétaires bâtir librement. »", e:{i:9,o:-8},
+    c:"Les industriels obtiennent des logements rapides pour leurs salariés, mais les ouvriers risquent des maisons trop serrées."},
+ c:{q:"« Je limite temporairement les nouvelles installations. »", e:{i:-8,p:9},
+    c:"Le Parlement freine l’encombrement des quartiers, mais les industriels manquent de nouveaux travailleurs."}},
 
-{t:"Un prédicateur décrit ce qu’il voit.", qui:"Le révérend Ellis Hargreaves, pasteur du quartier",
- d:"« Du haut de ma chaire, je dis ce que je vois : des caves, des fièvres, des enfants sous les machines. On m’écoute, et l’on répète mes mots dans la rue. »",
- ex:"Dans les villes industrielles, les pasteurs des Églises qui ne dépendent pas de l’État sont souvent les premiers à décrire publiquement la vie des ouvriers. Celui-ci attire maintenant plus de monde que l’office du dimanche, et ses sermons circulent imprimés jusqu’à Londres. Il n’accuse personne par son nom, ce qui le rend difficile à attaquer.",
- f:"Dans les villes industrielles, les Églises qui ne dépendent pas de l’État — méthodistes, baptistes — sont très implantées chez les ouvriers, et leurs pasteurs comptent parmi les premiers à décrire publiquement leurs conditions de vie. Avec les médecins et les journalistes, ils créent ce qu’on appellera l’**enquête sociale** : décrire pour faire agir. C’est de ces descriptions que naîtront les premières lois sur la santé publique.",
- a:{q:"« Ouvrons une enquête sur les quartiers. »", e:{p:9,o:8,i:-9,m:-4},
-    c:"L’enquête établit noir sur blanc ce que chacun savait. Il devient difficile de ne rien faire."},
- b:{q:"« Faisons taire le prédicateur. »", e:{i:7,m:4,p:-8,o:-9}, suite:{dans:3, t:"Ses sermons circulent imprimés", x:"On l’a empêché de parler en chaire ; ses textes paraissent maintenant en brochures vendues un penny, jusqu’à Londres. Le faire taire lui a donné plus d’audience qu’il n’en aurait jamais eu.", e:{p:-6,o:-4,m:-2}},
-    c:"On étouffe le sermon. Les mots, eux, continuent de circuler."},
- c:{q:"« Nommons-le au conseil de salubrité. »", e:{p:5,o:3,i:-5,m:-4},
-    c:"Le révérend a désormais un siège, un registre, et l’obligation de nuancer."}},
+{n:"20", t:"Le dernier terrain du centre", qui:"Philip Dawson, propriétaire d’un terrain central",
+ d:"« Je veux vendre ce terrain au projet qui me paiera le mieux. »",
+ ex:"Un terrain libre pourrait accueillir des entrepôts pour le coton. Des habitants préfèrent un jardin ouvert à tous.",
+ l:"Consultez Document 2 (Wyld) · trace écrite 2 §2. Retenez **urbanisation** : l’augmentation de la population des villes et de leur espace bâti. Quelle importance accordez-vous à un espace accessible à tous dans une ville qui grandit ?",
+ a:{q:"« Je réserve le terrain aux entrepôts. »", e:{o:-8,m:9},
+    c:"Les marchands gagnent de la place pour leurs marchandises, mais les ouvriers perdent un possible jardin."},
+ b:{q:"« Je soutiens la création du jardin. »", e:{o:9,m:-8},
+    c:"Les ouvriers obtiennent un espace de repos, mais les marchands manquent de stockage."},
+ c:{q:"« Je partage le terrain entre les deux projets. »", e:{o:-8,m:9},
+    c:"Les marchands disposent d’une partie du sol, mais les ouvriers n’obtiennent qu’un petit jardin."}},
+
+{n:"21", t:"Une salle pour soigner les pauvres", qui:"Dr. Edward Phillips, médecin des quartiers ouvriers",
+ d:"« Je veux soigner les malades même lorsqu’ils ne peuvent pas me payer. »",
+ ex:"Un médecin propose une petite salle de soins pour les habitants sans argent. Certains conseillers préfèrent laisser cette aide aux dons privés.",
+ l:"Consultez Trace écrite 2 §3. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Comment un médecin pauvre et un conseiller préoccupé par les dépenses voient-ils différemment ce projet ?",
+ a:{q:"« Je finance une salle de soins publique. »", e:{o:9,p:-8},
+    c:"Les ouvriers accèdent plus facilement aux soins, mais le Parlement doit assumer une dépense nouvelle."},
+ b:{q:"« Je laisse les dons privés financer les soins. »", e:{o:-8,p:9},
+    c:"Le Parlement limite ses dépenses, mais les ouvriers dépendent de la générosité des donateurs."},
+ c:{q:"« Je prête une salle aux médecins bénévoles. »", e:{i:-8,o:9},
+    c:"Les ouvriers obtiennent un lieu de consultation, mais les industriels doivent rechercher les fonds nécessaires."}},
+
+{n:"22", t:"Une visite de la reine", qui:"Richard Ellis, organisateur des cérémonies municipales",
+ d:"« Je veux offrir à la reine une image digne de notre ville. »",
+ ex:"Une visite royale doit traverser Manchester. Des conseillers veulent embellir uniquement les rues du cortège plutôt que montrer les quartiers ouvriers.",
+ l:"Consultez Document 2 (Wyld, peint après la visite royale). Retenez **urbanisation** : l’augmentation de la population des villes et de leur espace bâti. Quel point de vue chaque parcours donnera-t-il à la reine sur Manchester ?",
+ a:{q:"« Je fais repeindre les façades du parcours. »", e:{o:-8,m:9},
+    c:"Les marchands gagnent une belle vitrine pour la ville, mais les ouvriers ne voient pas leurs rues améliorées."},
+ b:{q:"« Je choisis un parcours dans les quartiers ouvriers. »", e:{i:-8,o:9},
+    c:"Les ouvriers peuvent montrer leurs difficultés, mais les industriels craignent une mauvaise image."},
+ c:{q:"« Je consacre l’argent au nettoyage des ruelles. »", e:{o:9,m:-8},
+    c:"Les ouvriers vivent dans des rues plus propres, mais les marchands perdent les décorations prévues."}},
+
+{n:"23", t:"Une visiteuse dans les ateliers", qui:"Clara Vogel, voyageuse allemande intéressée par les usines",
+ d:"« Je veux voir de mes yeux ce que les machines ont changé. »",
+ ex:"Une voyageuse allemande veut découvrir les machines de Manchester. Les fabricants souhaitent lui présenter une usine moderne plutôt qu’un atelier aux conditions difficiles.",
+ l:"Consultez Document 4 et son bonus. Retenez **mécanisation** : le remplacement d’une partie du travail humain par des machines. Comment la perspective de la visiteuse dépendra-t-elle des ateliers qu’elle verra ?",
+ a:{q:"« Je lui montre la plus grande usine. »", e:{i:9,o:-8},
+    c:"Les industriels exposent leurs réussites, mais les ouvriers des petits ateliers restent invisibles."},
+ b:{q:"« Je lui laisse choisir les ateliers. »", e:{i:-8,o:9},
+    c:"Les ouvriers peuvent montrer leur quotidien, mais les industriels perdent le contrôle de la visite."},
+ c:{q:"« J’organise deux visites très différentes. »", e:{i:9,m:-8},
+    c:"Les industriels présentent leurs machines, mais les marchands craignent des récits sur les difficultés sociales."}},
+
+{n:"24", t:"Un enquêteur dans Ancoats", qui:"Friedrich Engels, observateur des quartiers ouvriers",
+ d:"« Je veux décrire ce que vivent les familles derrière les murs des fabriques. »",
+ ex:"Un Allemand installé à Manchester prend des notes sur la pauvreté d’Ancoats. Certains propriétaires craignent que ses descriptions nuisent à la réputation des usines.",
+ l:"Consultez Document 5 et son bonus. Retenez **monde ouvrier** : l’ensemble des personnes qui vivent de leur salaire dans les ateliers et les usines. Pourquoi le regard de cet observateur peut-il différer de celui des propriétaires ?",
+ a:{q:"« Je lui ouvre les quartiers et les ateliers. »", e:{i:-8,o:9},
+    c:"Les ouvriers peuvent faire entendre leurs difficultés, mais les industriels redoutent les critiques."},
+ b:{q:"« Je limite son entrée dans les usines. »", e:{i:9,o:-8},
+    c:"Les industriels protègent leur image, mais les ouvriers perdent une occasion d’être entendus."},
+ c:{q:"« Je lui propose aussi des entretiens avec les patrons. »", e:{i:9,o:-8},
+    c:"Les industriels exposent leur point de vue, mais les ouvriers craignent que leur parole passe au second plan."}},
+
+{n:"25", t:"Une peinture pour représenter Manchester", qui:"William Wyld, peintre de vues urbaines",
+ d:"« Je veux montrer la beauté du paysage sans cacher les cheminées. »",
+ ex:"Un peintre propose de représenter Manchester depuis une colline verdoyante. Les cheminées seraient visibles au loin, mais les logements pauvres disparaîtraient de la vue.",
+ l:"Consultez Document 2 et son bonus. Retenez **industrialisation** : la transformation d’une société par le développement des usines et de leurs productions. Quelle perspective chaque peinture donne-t-elle des transformations de Manchester ?",
+ a:{q:"« Je commande cette vue depuis la colline. »", e:{o:-8,m:9},
+    c:"Les marchands obtiennent une image flatteuse, mais les ouvriers voient leurs quartiers laissés hors du tableau."},
+ b:{q:"« Je demande une vue des rues ouvrières. »", e:{i:-8,o:9},
+    c:"Les ouvriers rendent leurs conditions visibles, mais les industriels craignent une image sombre."},
+ c:{q:"« Je commande deux vues de la ville. »", e:{o:9,p:-8},
+    c:"Les ouvriers gagnent une représentation de leurs quartiers, mais le Parlement doit financer deux tableaux."}},
+
+{n:"26", t:"Un pasteur réclame une enquête", qui:"Reverend John Foster, pasteur d’un quartier ouvrier",
+ d:"« Je veux que la ville écoute les familles qui vivent dans ces caves. »",
+ ex:"Un pasteur décrit publiquement les caves humides et les maladies. Les fabricants redoutent ses accusations, tandis que des habitants demandent une enquête.",
+ l:"Consultez Trace écrite 2 §3. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelle importance ces témoignages peuvent-ils avoir dans la naissance de mesures publiques ?",
+ a:{q:"« J’ouvre une enquête sur les logements. »", e:{i:-8,o:9},
+    c:"Les ouvriers obtiennent une écoute officielle, mais les industriels craignent des contrôles coûteux."},
+ b:{q:"« Je demande au pasteur de cesser ses accusations. »", e:{i:9,o:-8},
+    c:"Les industriels préservent leur réputation, mais les ouvriers perdent un défenseur public."},
+ c:{q:"« Je l’invite au conseil de salubrité. »", e:{o:9,p:-8},
+    c:"Les ouvriers gagnent un représentant, mais le Parlement doit partager ses décisions avec un critique."}},
+
+{n:"27", t:"Une foule réclame le vote", qui:"Joseph Fielding, organisateur d’une réunion publique",
+ d:"« Je veux que nos demandes de vote puissent être entendues en paix. »",
+ ex:"Une foule nombreuse se rassemble près de Manchester pour réclamer des droits politiques. Les magistrats demandent comment agir sans perdre le contrôle de la réunion.",
+ l:"Consultez Trace écrite 2 §3 · tableau de vocabulaire. Retenez **inégalité** : une différence de droits, de revenus ou de possibilités entre des groupes. Pourquoi l’absence de droit de vote est-elle aussi importante que les différences de richesse ?",
+ a:{q:"« J’autorise la réunion sous surveillance. »", e:{o:9,p:-8},
+    c:"Les ouvriers peuvent défendre leurs droits, mais le Parlement redoute une agitation prolongée."},
+ b:{q:"« J’ordonne la dispersion de la foule. »", e:{o:-8,p:9},
+    c:"Le Parlement affirme son autorité, mais les ouvriers perdent la possibilité de se réunir."},
+ c:{q:"« Je propose de recevoir une délégation. »", e:{o:9,m:-8},
+    c:"Les ouvriers peuvent présenter leurs demandes, mais les marchands craignent que la contestation se poursuive."}},
+
+{n:"28", t:"Le pain et les intérêts des fabricants", qui:"Nathaniel Briggs, fabricant de tissus",
+ d:"« Je veux du grain moins cher sans augmenter les salaires de mon usine. »",
+ ex:"Des fabricants demandent de supprimer les taxes sur le grain importé au nom du pain moins cher. Ils refusent pourtant une hausse de salaire réclamée par leurs employés.",
+ l:"Consultez Trace écrite 2 §3. Retenez **inégalité** : une différence de droits, de revenus ou de possibilités entre des groupes. De quelle perspective parle chaque groupe lorsqu’il prétend défendre le prix du pain ?",
+ a:{q:"« Je soutiens la suppression des taxes. »", e:{o:9,p:-8},
+    c:"Les ouvriers pourraient acheter du pain moins cher, mais les propriétaires terriens perdent leur protection."},
+ b:{q:"« Je défends le maintien des taxes. »", e:{o:-8,p:9},
+    c:"Les propriétaires terriens conservent leur avantage, mais les ouvriers continuent de payer leur pain cher."},
+ c:{q:"« Je réclame aussi une négociation salariale. »", e:{i:-8,o:9},
+    c:"Les ouvriers gagnent une possibilité de hausse, mais les industriels craignent une augmentation des coûts."}},
+
+{n:"29", t:"Les égouts sous contrôle de Londres", qui:"Sir Henry Wallace, représentant du gouvernement",
+ d:"« Je veux financer les égouts et vérifier que l’argent est bien dépensé. »",
+ ex:"L’État propose de financer les égouts de Manchester. En échange, ses inspecteurs superviseraient les travaux et les dépenses de la ville.",
+ l:"Consultez Trace écrite 2 §3. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelle rupture représente l’intervention de l’État dans la santé des quartiers ?",
+ a:{q:"« J’accepte les fonds et les inspecteurs. »", e:{o:9,p:-8},
+    c:"Les ouvriers bénéficient de futurs égouts, mais le Parlement local perd une part de son autonomie."},
+ b:{q:"« Je refuse toute intervention de Londres. »", e:{o:-8,p:9},
+    c:"Le Parlement local garde le contrôle, mais les ouvriers attendent encore des égouts."},
+ c:{q:"« Je négocie des contrôles partagés. »", e:{o:9,m:-8},
+    c:"Les ouvriers peuvent obtenir les travaux, mais les marchands craignent des délais de négociation."}},
+
+{n:"30", t:"Manchester à l’Exposition de 1851", qui:"Francis Cartwright, représentant des fabricants de coton",
+ d:"« Je veux que Londres admire nos tissus et les machines qui les fabriquent. »",
+ ex:"Londres invite Manchester à présenter ses tissus à une grande exposition. Des journalistes veulent aussi visiter les usines et les quartiers voisins.",
+ l:"Consultez Trace écrite 2 §3, conclusion. Retenez **progrès technique** : les améliorations apportées aux outils et aux machines pour fabriquer ou transporter. Quelle importance historique faut-il donner aux inventions face à leurs effets sur les habitants ?",
+ a:{q:"« J’envoie les tissus et j’ouvre les visites. »", e:{i:9,m:-8},
+    c:"Les industriels montrent leurs inventions, mais les marchands craignent les critiques des journalistes."},
+ b:{q:"« Je présente seulement les tissus à Londres. »", e:{o:-8,m:9},
+    c:"Les marchands gagnent une vitrine commerciale, mais les ouvriers restent absents du récit."},
+ c:{q:"« J’organise aussi une visite des quartiers ouvriers. »", e:{i:-8,o:9},
+    c:"Les ouvriers peuvent montrer leur vie quotidienne, mais les industriels craignent que les souffrances éclipsent leurs succès."}},
 ];
 
 /* ==================================================================
@@ -3318,18 +3467,42 @@ function peindreVille(){
 
 /* Une image existe-t-elle pour ce niveau ? Si oui elle remplace le décor
    peint ; si non, rien ne se voit — le jeu reste beau sans elle. */
+/* Ou en est la partie : le debut, la pleine croissance, ou ce que la
+   ville est devenue. Trois tiers, pas davantage — au-dela, le fond
+   changerait trop souvent pour qu'on le remarque. */
+function phaseVue(){
+  if(typeof E === "undefined" || !E || !N.tours) return "debut";
+  const p = E.tour / N.tours;
+  return p < .34 ? "debut" : p < .67 ? "milieu" : "fin";
+}
+
 function chercherVue(ecran){
   poserDecor(ecran);
   if(!SC.el) return;
-  SC.el.classList.remove("aimg");
-  const src="img/vue-"+N.id+".jpg", im=new Image();
-  im.onload=()=>{ SC.el.querySelector(".vue").style.backgroundImage=`url("${src}")`;
-                  SC.el.classList.add("aimg"); };
-  im.src=src;
+  const ph = N.id + "/" + phaseVue();
+  if(SC.phase === ph) return;                 /* deja en place */
+  SC.phase = ph;
+  /* On essaie dans l'ordre et on s'arrete au premier qui charge. Le
+     « aimg » n'est retire qu'en cas d'echec complet : l'enlever tout
+     de suite faisait clignoter le fond a chaque changement de tiers. */
+  const liste = [ "img/" + N.id + "-vue-" + phaseVue() + ".jpg",
+                  "img/" + N.id + "-vue-" + phaseVue() + ".png",
+                  "img/vue-" + N.id + ".jpg" ];
+  (function essayer(i){
+    if(i >= liste.length){ SC.el.classList.remove("aimg"); SC.phase = null; return; }
+    const im = new Image();
+    im.onload  = ()=>{ SC.el.querySelector(".vue").style.backgroundImage =
+                         `url("${liste[i]}")`;
+                       SC.el.classList.add("aimg"); };
+    im.onerror = ()=>essayer(i+1);
+    im.src = liste[i];
+  })(0);
 }
 
 function majVue(){
   if(!SC.el||!E) return;
+  /* Le tiers a pu changer depuis la derniere decision. */
+  if(SC.phase !== N.id + "/" + phaseVue()) chercherVue();
   /* combien la ville a-t-elle enflé depuis le premier tour */
   const croiss = Math.min(1, Math.log(E.pop/N.pop0+1)/Math.log(9));
   /* la suie : l'usure ouvrière d'abord, la taille de la ville ensuite */
@@ -3395,6 +3568,18 @@ function diraActeur(k){
   return { txt: N.forces[k].veut, sens: "attend" };
 }
 
+/* UNE IMAGE QUI MANQUE NE DOIT RIEN CASSER.
+   « data-repli » porte les adresses de rechange, separees par une
+   barre. A chaque echec on essaie la suivante ; quand la liste est
+   vide, l'image s'efface et ce qui est dessous — le pictogramme grave
+   — reprend la main de lui-meme. */
+function secours(img){
+  const l = (img.dataset.repli || "").split("|").filter(Boolean);
+  if(!l.length){ img.remove(); return; }
+  img.dataset.repli = l.slice(1).join("|");
+  img.src = l[0];
+}
+
 function poste(k, c, vus){
   const v = E.f[k];
   const etat = v<=10 ? "critique" : v<=20 ? "danger" : v<=35 ? "fragile" : "";
@@ -3404,10 +3589,15 @@ function poste(k, c, vus){
   /* avant la decision seulement : apres, la reaction parle deja */
   const pres = (!dernierChoix() && vus.has(k)) ? " concerne" : "";
   const col  = v>55?"var(--vert)" : v>35?"var(--accent)" : v>20?"#D08A2A" : "var(--rge)";
+  /* Le visage dit l'etat durable, pas la derniere decision : celle-la
+     est deja dite par le mouvement, le tremblement et la bulle. */
+  const vis  = v < 45 ? "fache" : "content";
+  const base = `img/acteurs/${N.id}-${k}-`;
   return `<div class="poste p-${k} ${dit.sens}${pres} ${etat}">
     <div class="visage">
-      <img src="img/acteurs/${N.id}-${k}-portrait.jpg" alt="" loading="lazy"
-           onerror="this.remove()">
+      <img src="${base}${vis}.jpg" alt="" loading="lazy"
+           data-repli="${base}${vis}.png|${base}portrait.jpg"
+           onerror="secours(this)">
       <span class="jeton">${icone(k)}</span>
     </div>
     <div class="ident">
@@ -3500,6 +3690,34 @@ addEventListener("resize", ()=>{
   clearTimeout(calage); calage = setTimeout(calerBulles, 120);
 });
 
+/* LA LETTRE DU PROFESSEUR — une fois par carte, avant de decider.
+   On garde les titres deja lus plutot qu'un simple drapeau : apres la
+   consequence, « rendre » repasse sur la meme carte, et la lettre se
+   rouvrirait a chaque fois. */
+function lettreAlire(){
+  const c = E && E.carte;
+  return !!(c && c.l && !(E.lettresLues || []).includes(c.t));
+}
+function lettreLue(){
+  if(!E || !E.carte) return;
+  E.lettresLues = E.lettresLues || [];
+  if(!E.lettresLues.includes(E.carte.t)) E.lettresLues.push(E.carte.t);
+  const el = document.getElementById("pli-prof");
+  if(el){ el.classList.add("parti"); setTimeout(()=>el.remove(), 260); }
+  try{ SON.papier() }catch(e){}
+}
+function pliProf(){
+  if(!lettreAlire()) return "";
+  return `<div class="pli-prof" id="pli-prof">
+    <article class="lettre-prof">
+      <div class="lt-tete">Un mot de votre professeur</div>
+      <p class="lt-x">${gras(esc(E.carte.l))}</p>
+      <div class="lt-sig">J. E.</div>
+      <button class="plein" onclick="lettreLue()">J’ai lu</button>
+    </article>
+  </div>`;
+}
+
 function rendre(){
   remonter();
   const c=E.carte;
@@ -3517,6 +3735,7 @@ function rendre(){
      l'attention a l'affaire du jour. */
   app.innerHTML=`
   ${alerte()}
+  ${pliProf()}
   <div class="bureau"><div class="plateau large">
     ${scene(c, `<div class="rep" ${D()}>
       ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
@@ -3886,80 +4105,80 @@ function suiteGraine(){
    notion du cours — le questionnaire doit apprendre, pas seulement noter.
    ================================================================== */
 const QUIZ_I = [
-{c:"Le charbon manque à la filature.",
+{c:"Le charbon et la route",
  q:"Pourquoi le charbon est-il décisif dans la première révolution industrielle ?",
  r:["C’est lui qui chauffe l’eau des machines à vapeur",
     "C’est lui qui sert à fabriquer les bobines de coton",
     "C’est lui qui actionne directement les métiers à tisser"],
  b:0, x:"Le charbon est la **ressource** énergétique de toute la période. La Grande-Bretagne en possède d’énormes gisements : c’est l’une des raisons pour lesquelles la révolution industrielle y commence."},
 
-{c:"Un mécanicien vous montre un plan.",
+{c:"La vapeur à la place de l’eau",
  q:"Qu’est-ce que la machine à vapeur change pour l’emplacement des usines ?",
  r:["Elles ne sont plus obligées de s’installer au bord d’une rivière",
     "Elles doivent désormais se rapprocher des mines de fer pour fonctionner",
     "Elles doivent être installées près des ports pour recevoir la vapeur"],
  b:0, x:"Avant la vapeur, il fallait la force de l’eau : l’usine dépendait de la géographie et s’arrêtait quand la rivière gelait. La vapeur la libère de cette contrainte."},
 
-{c:"Quarante familles attendent à la grille.",
+{c:"Des familles devant l’usine",
  q:"Comment appelle-t-on le départ des paysans vers les villes industrielles ?",
  r:["L’exode rural", "L’urbanisation", "L’émigration"],
  b:0, x:"L’**exode rural** fournit la **main-d’œuvre**, l’une des conditions de la révolution industrielle. Il produit en même temps l’**urbanisation** : Manchester passe de 25 000 habitants en 1772 à plus de 300 000 en 1851."},
 
-{c:"Un bâtisseur propose soixante cottages.",
+{c:"Des maisons construites dos à dos",
  q:"Pourquoi construit-on des maisons ouvrières « dos à dos » ?",
  r:["Pour loger le plus de monde possible au moindre coût",
     "Pour mieux garder la chaleur entre les logements voisins",
     "Pour respecter les règles sanitaires imposées par la ville"],
  b:0, x:"Elles partagent trois murs sur quatre : pas de traversée d’air, pas de cour, pas d’évacuation. Le logement ouvrier est le premier endroit où se lit l’inégalité du progrès."},
 
-{c:"L’eau croupit devant les portes.",
+{c:"Un enquêteur dans Ancoats",
  q:"Selon l’enquête officielle de 1842, quelle est l’espérance de vie moyenne d’un ouvrier de Manchester ?",
  r:["Environ 17 ans", "Environ 35 ans", "Environ 50 ans"],
  b:0, x:"Contre trente-huit ans dans un comté rural voisin. La mortalité des jeunes enfants pèse lourd dans ce chiffre, qui obligera l’État à intervenir."},
 
-{c:"Liverpool propose une voie ferrée.",
+{c:"Une ligne vers Liverpool",
  q:"Qu’a d’exceptionnel la ligne Liverpool–Manchester ouverte en 1830 ?",
  r:["C’est la première au monde à relier deux grandes villes",
     "C’est la première au monde à transporter du charbon en train",
     "C’est la première au monde à fonctionner sans aucun cheval"],
  b:0, x:"Le chemin de fer transforme l’échelle des **marchés** : ce qu’on produit ici peut être vendu partout. Il crée aussi une demande énorme de fer et de charbon — une innovation en entraîne d’autres."},
 
-{c:"Des acheteurs attendent à Hambourg.",
+{c:"De nouvelles commandes lointaines",
  q:"Pourquoi les débouchés lointains sont-ils une condition de la production de masse ?",
  r:["Sans acheteurs nombreux, des machines coûteuses ne sont jamais rentables",
     "Sans coton venu des colonies, les machines des usines ne peuvent pas fonctionner",
     "Sans marchés étrangers, les ouvriers ne peuvent pas toucher leur salaire"],
  b:0, x:"Les **marchés** sont l’une des sept conditions. L’industrie et le commerce mondial se développent ensemble, souvent à travers l’Empire britannique."},
 
-{c:"Une fileuse demande à vous parler.",
+{c:"Des enfants sous les machines",
  q:"Quel travail confie-t-on aux enfants dans les filatures ?",
  r:["Passer sous les machines en marche pour renouer les fils cassés",
     "Surveiller les machines à vapeur et en régler la vitesse",
     "Diriger les métiers à tisser et remplacer les ouvriers adultes absents"],
  b:0, x:"On les appelle des « rattacheurs » : ils sont les seuls assez petits pour passer sans qu’on arrête la production. Le salaire de l’enfant est indispensable au revenu familial."},
 
-{c:"Un contremaître veut chronométrer les gestes.",
+{c:"Un poste fixe par ouvrier",
  q:"Qu’appelle-t-on la division du travail ?",
  r:["Découper la fabrication en tâches simples confiées chacune à un ouvrier différent",
     "Partager la fabrication entre plusieurs usines qui produisent chacune un objet entier",
     "Répartir les bénéfices de chaque produit entre les ouvriers selon le temps travaillé"],
  b:0, x:"Adam Smith l’a décrite dès 1776 à propos d’une fabrique d’épingles. On produit beaucoup plus, mais chacun ne sait plus faire qu’un fragment du métier."},
 
-{c:"Le pain a doublé depuis le printemps.",
+{c:"Le pain devient trop cher",
  q:"Pourquoi le prix du pain est-il un enjeu politique majeur pour les ouvriers ?",
  r:["Il représente près de la moitié du budget d’une famille ouvrière",
     "Il est soumis à une taxe qui augmente avec les salaires des ouvriers",
     "Il est le seul aliment que les patrons fournissent aux familles ouvrières"],
  b:0, x:"Le salaire industriel est versé en argent : l’ouvrier dépend entièrement du marché, contrairement au paysan qui produisait une partie de sa nourriture."},
 
-{c:"Une pétition contre les droits sur le grain.",
+{c:"Le pain et les intérêts des fabricants",
  q:"Que sont les Corn Laws, abolies en 1846 ?",
  r:["Des taxes sur le grain importé, qui protégeaient les propriétaires terriens",
     "Des lois sur le prix du pain qui limitaient les profits des boulangers",
     "Des taxes sur le grain produit en Angleterre, qui favorisaient les importations"],
  b:0, x:"Elles maintenaient le pain cher. La Ligue contre les Corn Laws naît à **Manchester en 1838** : c’est l’un des premiers grands conflits entre la richesse foncière et la richesse industrielle."},
 
-{c:"Le monde entier défile au Crystal Palace.",
+{c:"Manchester à l’Exposition de 1851",
  q:"Que révèle le recensement britannique de 1851 ?",
  r:["Le pays compte pour la première fois plus de citadins que de ruraux",
     "Le pays compte pour la première fois davantage d’ouvriers que de paysans",
@@ -4520,6 +4739,7 @@ function carnet(d){
       ${courbePop()}
       <p class="cn-note">${N.a0} : ${fmt(N.pop0)} ${N.unite2}.</p>
 
+      ${N.cartes.some(x=>["a","b","c"].some(k=>x[k]&&x[k].g)) ? `
       <div class="cn-sep"></div>
 
       <div class="cn-ligne"><span class="cn-k">Conditions réunies</span>
@@ -4528,6 +4748,7 @@ function carnet(d){
         Math.round(100*E.acquis.length/CONDITIONS.length)}%"></i></div>
       <ul class="cn-cond">${CONDITIONS.map(x=>
         `<li class="${E.acquis.includes(x)?"ok":""}">${condNom(x)}</li>`).join("")}</ul>
+      ` : ""}
 
     </div>
   </details>`;
