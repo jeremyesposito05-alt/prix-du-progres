@@ -3864,7 +3864,7 @@ function rendreUrgence(){
   </div>
   <div class="rep ${u.choix.length===2?"deux":""}">
     ${u.choix.map((c,i)=>`<button class="choix" onclick="urgenceChoix(${i})">
-      <span class="q">${esc(c.q)}</span><span class="impacts">${impacts(c.e)}</span></button>`).join("")}
+      <span class="q">${esc(c.q)}</span></button>`).join("")}
   </div>`;
   const jt=document.getElementById("jt");
   if(jt){ jt.style.transition=`width ${SECONDES_URGENCE}s linear`; requestAnimationFrame(()=>{ jt.style.width="0%" }); }
@@ -4068,7 +4068,7 @@ function rendreGraine(gr){
     <div class="question">${esc(gr.s.q.texte)}</div>
     <div class="rep ${gr.s.q.choix.length===2?"deux":""}">
       ${gr.s.q.choix.map((c,i)=>`<button class="choix" onclick="graineChoix(${i})">
-        <span class="q">${esc(c.q)}</span><span class="impacts">${impacts(c.e)}</span></button>`).join("")}
+        <span class="q">${esc(c.q)}</span></button>`).join("")}
     </div>`
     : `<p class="centre" style="margin:22px 0 0">
       <button class="plein" onclick="suiteGraine()">Continuer</button>
