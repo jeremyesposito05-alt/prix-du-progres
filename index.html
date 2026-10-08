@@ -1888,6 +1888,41 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    13 % pose sur une photographie d'usine ne se lisait pas. */
 @media(max-width:600px){ .but-jeu{font-size:15px;padding:12px 14px} }
 
+/* ---------- ce que la decision precedente a produit ---------------
+   Une bande etroite au-dessus de l'affaire du jour. Elle doit se lire
+   comme un echo, pas comme une consigne : d'ou le filet rouge a
+   gauche, le corps plus petit que l'expose, et la mention en capitales
+   qui dit que c'est du passe. */
+.retombee{
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+  margin:0 0 14px; padding:10px 15px; border-radius:2px;
+  background:rgba(255,252,242,.86);
+  border:1px solid rgba(107,87,65,.3); border-left:3px solid var(--rge);
+  box-shadow:0 4px 12px rgba(43,33,24,.22);
+  animation:retombe .45s ease-out;
+}
+@keyframes retombe{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.retombee .rt-k{
+  flex:0 0 auto; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--rge); font-weight:bold;
+}
+.retombee p{margin:0; flex:1 1 300px; font-size:14.5px; line-height:1.45; color:var(--enc)}
+.retombee{flex-direction:column; align-items:stretch; gap:9px}
+.retombee .rt-tete{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+/* les deux voix : cote a cote quand la place le permet, l'une sous
+   l'autre sinon. Un filet vert ou rouge dit qui a gagne, sans un mot. */
+.retombee .rt-voix{display:flex; gap:9px; flex-wrap:wrap;
+  padding-top:8px; border-top:1px solid rgba(107,87,65,.22)}
+.retombee .rt-v{
+  flex:1 1 260px; font-size:13px; line-height:1.4; color:var(--enc2);
+  padding-left:9px; border-left:2px solid rgba(107,87,65,.4);
+}
+.retombee .rt-v b{color:var(--enc); font-weight:bold; margin-right:3px}
+.retombee .rt-v.gagne{border-left-color:rgba(63,106,46,.75)}
+.retombee .rt-v.perd{border-left-color:rgba(166,48,36,.7)}
+@media(max-width:600px){ .retombee{gap:5px} .retombee p{font-size:13.5px} }
+@media(prefers-reduced-motion:reduce){ .retombee{animation:none} }
+
 /* ==================================================================
    LE PLI DU PROFESSEUR
    Il s'ouvre avant le dilemme, une fois par carte. C'est le seul
@@ -2965,331 +3000,361 @@ const CARTES_I = [
  d:"« Je veux un canal pour livrer davantage de charbon à meilleur prix. »",
  ex:"Le charbon arrive par charrette et coûte très cher. Un canal vers les mines réduirait son transport, mais sa construction prendrait des années.",
  l:"Consultez Document 1 (la carte) · trace écrite 2 §1. Retenez **bassin houiller** : une région où l’on extrait le charbon. Quelles causes expliquent le prix du charbon, et quelles conséquences auront vos travaux ?",
+ av:{i:"Nous voulons du charbon moins cher sans attendre des années.", p:"Nous devons mesurer le coût du canal avant d’engager l’argent public."},
  a:{q:"« Je fais creuser le canal. »", e:{m:9,p:-8},
-    c:"Les marchands gagnent une voie de transport, mais le Parlement doit engager de fortes dépenses."},
+    c:"Les marchands gagnent une voie de transport, mais le Parlement doit engager de fortes dépenses.", dit:{m:"Nous pourrons enfin acheminer davantage de charbon par le canal.",p:"Nous devrons financer un chantier qui pèsera sur nos comptes."}},
  b:{q:"« Je garde le transport par charrette. »", e:{i:-8,p:9},
-    c:"Le Parlement évite les travaux, mais les industriels continuent de payer leur charbon cher."},
+    c:"Le Parlement évite les travaux, mais les industriels continuent de payer leur charbon cher.", dit:{i:"Nous continuerons à payer cher chaque charrette de charbon.",p:"Nous évitons pour l’instant une lourde dépense de travaux."}},
  c:{q:"« Je finance seulement une meilleure route. »", e:{i:9,m:-8},
-    c:"Les industriels obtiennent des livraisons plus faciles, mais les marchands perdent l’espoir d’un canal."}},
+    c:"Les industriels obtiennent des livraisons plus faciles, mais les marchands perdent l’espoir d’un canal.", dit:{i:"Nous recevrons plus facilement le charbon par la route améliorée.",m:"Nous espérions un canal pour transporter de plus grandes cargaisons."}}},
 
 {n:"02", t:"Une ligne vers Liverpool", qui:"Edward Mercer, négociant en coton",
  d:"« Je veux rejoindre le port rapidement pour recevoir mon coton et expédier mes tissus. »",
  ex:"Liverpool propose un chemin de fer vers Manchester. Il faut acheter des terrains, sinon les trains pourraient desservir une autre ville.",
  l:"Consultez Document 1 (la carte). Retenez **textile** : l’ensemble des activités qui transforment des fibres en fil et en tissu. Quelles conséquences une liaison au port peut-elle avoir sur la fabrication des tissus ?",
+ av:{i:"Nous avons besoin de coton livré rapidement depuis Liverpool.", p:"Nous voulons préserver les fonds de la ville malgré le projet ferroviaire."},
  a:{q:"« J’achète les terrains nécessaires. »", e:{m:9,p:-8},
-    c:"Les marchands gagnent un accès au port, mais le Parlement supporte le prix des terrains."},
+    c:"Les marchands gagnent un accès au port, mais le Parlement supporte le prix des terrains.", dit:{m:"Nous pourrons faire circuler nos tissus vers le port par train.",p:"Nous devons acheter les terrains avant même le premier voyage."}},
  b:{q:"« Je refuse de payer les terrains. »", e:{m:-8,p:9},
-    c:"Le Parlement préserve son argent, mais les marchands risquent de perdre la liaison."},
+    c:"Le Parlement préserve son argent, mais les marchands risquent de perdre la liaison.", dit:{m:"Nous risquons de voir les trains de Liverpool partir ailleurs.",p:"Nous gardons l’argent prévu pour les terrains du chemin de fer."}},
  c:{q:"« Je propose de partager les frais. »", e:{i:-8,m:9},
-    c:"Les marchands peuvent obtenir leur ligne, mais les industriels doivent contribuer aux achats."}},
+    c:"Les marchands peuvent obtenir leur ligne, mais les industriels doivent contribuer aux achats.", dit:{i:"Nous devons payer une part des terrains pour recevoir notre coton.",m:"Nous pouvons encore obtenir notre liaison grâce au partage des frais."}}},
 
 {n:"03", t:"La vapeur à la place de l’eau", qui:"William Hartley, mécanicien dans une usine",
  d:"« Je veux installer mon moteur pour que les ateliers tournent sans dépendre de la rivière. »",
  ex:"Un mécanicien propose un moteur à vapeur pour remplacer la roue de la rivière. La machine coûte cher, mais elle fonctionnerait loin du cours d’eau.",
  l:"Consultez Document 4 (Schopenhauer) · trace écrite 2 §1. Retenez **mécanisation** : le remplacement d’une partie du travail humain par des machines. Qu’est-ce qui change avec la vapeur, et qu’est-ce qui reste identique dans le travail ?",
+ av:{i:"Nous pourrions installer nos ateliers loin de la rivière.", o:"Nous voulons savoir quels postes disparaîtront avec ce moteur."},
  a:{q:"« J’achète le moteur à vapeur. »", e:{i:9,o:-8},
-    c:"Les industriels gagnent en liberté d’installation, mais les ouvriers craignent la suppression de postes."},
+    c:"Les industriels gagnent en liberté d’installation, mais les ouvriers craignent la suppression de postes.", dit:{i:"Nous ne dépendrons plus du courant pour faire tourner nos ateliers.",o:"Nous craignons de perdre nos places avec le nouveau moteur."}},
  b:{q:"« Je conserve la roue à eau. »", e:{i:-8,o:9},
-    c:"Les ouvriers gardent leurs habitudes, mais les industriels restent dépendants du cours d’eau."},
+    c:"Les ouvriers gardent leurs habitudes, mais les industriels restent dépendants du cours d’eau.", dit:{i:"Nous restons liés au débit de la rivière pour fabriquer.",o:"Nous gardons les gestes et les postes que nous connaissons."}},
  c:{q:"« Je teste d’abord le moteur dans un atelier. »", e:{i:9,m:-8},
-    c:"Les industriels peuvent essayer la nouveauté, mais les marchands attendent un accroissement des livraisons."}},
+    c:"Les industriels peuvent essayer la nouveauté, mais les marchands attendent un accroissement des livraisons.", dit:{i:"Nous pourrons essayer la vapeur sans transformer toute l’usine.",m:"Nous attendrons encore les tissus promis par la nouvelle machine."}}},
 
 {n:"04", t:"Des familles devant l’usine", qui:"Mary Fletcher, mère arrivée de la campagne",
  d:"« Je cherche un salaire et un toit pour mes enfants avant l’hiver. »",
  ex:"Des familles ont quitté la campagne après la disparition de terres utilisées en commun. Elles demandent du travail, alors que les logements manquent près des usines.",
  l:"Consultez Document 1 · document 3 (la population). Retenez **monde ouvrier** : l’ensemble des personnes qui vivent de leur salaire dans les ateliers et les usines. Quelles transformations des campagnes ont causé l’arrivée de ces travailleurs en ville ?",
+ av:{i:"Nous avons besoin de bras supplémentaires dans les ateliers.", o:"Nous cherchons du travail, mais aussi un toit pour nos familles."},
  a:{q:"« J’ouvre des postes aux nouveaux arrivants. »", e:{o:9,p:-8},
-    c:"Les ouvriers trouvent des salaires, mais le Parlement doit affronter une pénurie de logements."},
+    c:"Les ouvriers trouvent des salaires, mais le Parlement doit affronter une pénurie de logements.", dit:{o:"Nous pourrons enfin gagner de quoi nourrir nos enfants.",p:"Nous devons loger davantage de familles près des usines."}},
  b:{q:"« Je limite les embauches pour le moment. »", e:{i:9,o:-8},
-    c:"Les industriels évitent de nouvelles charges, mais les ouvriers arrivés de la campagne restent sans travail."},
+    c:"Les industriels évitent de nouvelles charges, mais les ouvriers arrivés de la campagne restent sans travail.", dit:{i:"Nous évitons d’embaucher plus de monde que nos ateliers ne peuvent accueillir.",o:"Nous resterons devant les grilles sans salaire pour l’hiver."}},
  c:{q:"« J’aide les familles à trouver un logement d’abord. »", e:{i:-8,o:9},
-    c:"Les ouvriers gagnent un abri, mais les industriels attendent plus longtemps de nouveaux bras."}},
+    c:"Les ouvriers gagnent un abri, mais les industriels attendent plus longtemps de nouveaux bras.", dit:{i:"Nous devrons attendre avant de recevoir ces nouveaux travailleurs.",o:"Nous aurons un abri avant de chercher une place à l’usine."}}},
 
 {n:"05", t:"De nouvelles commandes lointaines", qui:"Samuel Prescott, exportateur de tissus",
  d:"« Je veux remplir ces commandes avant que les clients choisissent d’autres fabricants. »",
  ex:"Des clients d’Europe et d’Amérique du Sud demandent davantage de tissus. Doubler les machines permettrait de vendre plus, mais engagerait de lourdes dépenses.",
  l:"Consultez Document 1 · trace écrite 1. Retenez **production de masse** : la fabrication de grandes quantités de produits semblables. Pourquoi la présence d’acheteurs lointains peut-elle expliquer le développement des usines ?",
+ av:{i:"Nous voulons davantage de machines pour livrer ces clients étrangers.", o:"Nous craignons que les nouvelles commandes allongent nos journées."},
  a:{q:"« J’achète de nouvelles machines. »", e:{o:-8,m:9},
-    c:"Les marchands gagnent davantage de tissus à vendre, mais les ouvriers subissent une cadence plus forte."},
+    c:"Les marchands gagnent davantage de tissus à vendre, mais les ouvriers subissent une cadence plus forte.", dit:{m:"Nous disposerons de plus de tissus à envoyer à nos clients.",o:"Nous redoutons une cadence plus dure avec ces machines supplémentaires."}},
  b:{q:"« Je garde la production actuelle. »", e:{o:9,m:-8},
-    c:"Les ouvriers évitent une hausse de cadence, mais les marchands perdent une partie des commandes."},
+    c:"Les ouvriers évitent une hausse de cadence, mais les marchands perdent une partie des commandes.", dit:{m:"Nous laisserons partir une partie des clients vers d’autres vendeurs.",o:"Nous gardons nos journées actuelles malgré les commandes lointaines."}},
  c:{q:"« Je prends seulement une partie des commandes. »", e:{i:9,m:-8},
-    c:"Les industriels limitent leurs dépenses, mais les marchands doivent renoncer à des ventes."}},
+    c:"Les industriels limitent leurs dépenses, mais les marchands doivent renoncer à des ventes.", dit:{i:"Nous pouvons accepter quelques commandes sans acheter trop de machines.",m:"Nous renoncerons à vendre les tissus que ces clients réclament."}}},
 
 {n:"06", t:"Une condition encore absente", qui:"George Ashcroft, conseiller de la ville",
  d:"« Je veux lancer les fabriques maintenant, même si les commandes manquent encore. »",
  ex:"Le charbon, les machines et les travailleurs sont disponibles. Les acheteurs restent trop peu nombreux pour écouler toute la production.",
  l:"Consultez Trace écrite 1 · document 1. Retenez **industrialisation** : la transformation d’une société par le développement des usines et de leurs productions. Quelle importance accordez-vous aux acheteurs parmi les conditions nécessaires à ce changement ?",
+ av:{i:"Nous pouvons ouvrir les ateliers grâce au charbon et aux machines disponibles.", m:"Nous demandons des acheteurs avant d’accumuler des tissus invendus."},
  a:{q:"« Je soutiens immédiatement les nouvelles usines. »", e:{i:9,m:-8},
-    c:"Les industriels peuvent investir, mais les marchands risquent de garder des tissus invendus."},
+    c:"Les industriels peuvent investir, mais les marchands risquent de garder des tissus invendus.", dit:{i:"Nous pouvons commencer à produire avec les travailleurs déjà présents.",m:"Nous craignons de remplir nos entrepôts sans assez de clients."}},
  b:{q:"« Je cherche d’abord davantage de clients. »", e:{i:-8,m:9},
-    c:"Les marchands gagnent du temps pour trouver des débouchés, mais les industriels doivent retarder leurs projets."},
+    c:"Les marchands gagnent du temps pour trouver des débouchés, mais les industriels doivent retarder leurs projets.", dit:{i:"Nous devrons laisser nos nouvelles machines attendre les commandes.",m:"Nous aurons le temps de trouver des acheteurs pour ces tissus."}},
  c:{q:"« Je finance quelques ateliers seulement. »", e:{i:9,o:-8},
-    c:"Les industriels peuvent démarrer prudemment, mais les ouvriers obtiennent moins de nouveaux emplois."}},
+    c:"Les industriels peuvent démarrer prudemment, mais les ouvriers obtiennent moins de nouveaux emplois.", dit:{i:"Nous pouvons démarrer quelques ateliers sans engager toutes nos économies.",o:"Nous aurons moins de places offertes dans ces ateliers réduits."}}},
 
 {n:"07", t:"Une machine pour quatre étages", qui:"Robert Henshaw, directeur d’une fabrique de coton",
  d:"« Je veux faire tourner toutes les machines avec un seul moteur. »",
  ex:"Une machine à vapeur pourrait entraîner les métiers des quatre étages. Elle ferait travailler tout l’atelier ensemble, mais remplacerait plusieurs travailleurs.",
  l:"Consultez Document 4 (Schopenhauer) · trace écrite 2 §1. Retenez **filature** : une usine où l’on transforme le coton en fil. Comment ce rassemblement des machines et des travailleurs marque-t-il une rupture avec le travail à domicile ?",
+ av:{i:"Nous voulons faire tourner les quatre étages avec le même moteur.", m:"Nous attendons une fabrication régulière pour recevoir assez de tissus."},
  a:{q:"« J’installe le grand moteur. »", e:{i:9,o:-8},
-    c:"Les industriels accroissent la fabrication, mais des ouvriers risquent de perdre leur emploi."},
+    c:"Les industriels accroissent la fabrication, mais des ouvriers risquent de perdre leur emploi.", dit:{i:"Nous pourrons entraîner les machines des quatre étages ensemble.",o:"Nous craignons que le grand moteur remplace plusieurs de nos postes."}},
  b:{q:"« Je garde les machines actuelles. »", e:{i:-8,o:9},
-    c:"Les ouvriers conservent leurs postes, mais les industriels renoncent à une fabrication plus régulière."},
+    c:"Les ouvriers conservent leurs postes, mais les industriels renoncent à une fabrication plus régulière.", dit:{i:"Nous manquerons la chance de faire tourner tous les étages régulièrement.",o:"Nous conservons nos places auprès des machines actuelles."}},
  c:{q:"« J’équipe un étage avant les autres. »", e:{i:9,m:-8},
-    c:"Les industriels essaient la nouvelle installation, mais les marchands doivent attendre davantage de tissus."}},
+    c:"Les industriels essaient la nouvelle installation, mais les marchands doivent attendre davantage de tissus.", dit:{i:"Nous pourrons éprouver le moteur sur un seul étage.",m:"Nous recevrons moins de tissus tant que les autres étages attendent."}}},
 
 {n:"08", t:"La journée de quatorze heures", qui:"James Barlow, directeur d’une fabrique de coton",
  d:"« Je veux livrer cette commande sans perdre un client important. »",
  ex:"Un client exige une commande de fil pour mars. Le directeur propose d’allonger la journée de douze à quatorze heures pour tenir le délai.",
  l:"Consultez Trace écrite 2 §1. Retenez **condition de travail** : l’ensemble des horaires, des tâches et des dangers du métier. Quelle continuité ou rupture voyez-vous entre les rythmes anciens et ceux de l’usine ?",
+ av:{i:"Nous voulons tenir la commande de mars sans perdre le client.", m:"Nous attendons les fils promis à Liverpool avant le printemps."},
  a:{q:"« J’accepte les deux heures de plus. »", e:{o:-8,m:9},
-    c:"Les marchands reçoivent leur commande plus vite, mais les ouvriers perdent du temps de repos."},
+    c:"Les marchands reçoivent leur commande plus vite, mais les ouvriers perdent du temps de repos.", dit:{m:"Nous recevrons la commande assez tôt pour satisfaire notre client.",o:"Nous rentrerons deux heures plus tard après une journée déjà longue."}},
  b:{q:"« Je maintiens la journée actuelle. »", e:{o:9,m:-8},
-    c:"Les ouvriers conservent leur repos, mais les marchands risquent de perdre le client."},
+    c:"Les ouvriers conservent leur repos, mais les marchands risquent de perdre le client.", dit:{m:"Nous risquons de perdre le client qui attend son fil.",o:"Nous gardons nos heures de repos malgré la commande de mars."}},
  c:{q:"« J’engage d’autres travailleurs pour aider. »", e:{i:-8,o:9},
-    c:"Les ouvriers gagnent de nouveaux salaires, mais les industriels paient davantage de personnes."}},
+    c:"Les ouvriers gagnent de nouveaux salaires, mais les industriels paient davantage de personnes.", dit:{i:"Nous devrons payer davantage d’ouvriers pour livrer à temps.",o:"Nous aurons de nouvelles places et des salaires pour cette commande."}}},
 
 {n:"09", t:"Des enfants sous les machines", qui:"Anne Collins, mère d’un jeune travailleur",
  d:"« J’ai besoin de son salaire, mais je crains chaque jour un accident. »",
  ex:"Des fils cassent sous les machines en marche. Le directeur veut y faire passer des enfants, car arrêter les moteurs ralentirait la fabrication.",
  l:"Consultez Document 4 · document 5. Retenez **condition de travail** : l’ensemble des horaires, des tâches et des dangers du métier. Quelle importance le salaire des enfants a-t-il pour les familles face au risque d’accident ?",
+ av:{i:"Nous voulons renouer les fils sans arrêter les moteurs.", o:"Nous avons besoin du salaire des enfants, mais craignons les machines en marche."},
  a:{q:"« J’interdis ce travail sous les machines en marche. »", e:{i:-8,o:9},
-    c:"Les ouvriers gagnent en sécurité, mais les industriels doivent ralentir les machines."},
+    c:"Les ouvriers gagnent en sécurité, mais les industriels doivent ralentir les machines.", dit:{i:"Nous devrons interrompre les moteurs pour récupérer les fils cassés.",o:"Nous éviterons de passer sous les machines pendant leur marche."}},
  b:{q:"« J’autorise ce travail pour garder les salaires. »", e:{i:9,o:-8},
-    c:"Les industriels évitent les arrêts, mais les ouvriers exposent leurs enfants au danger."},
+    c:"Les industriels évitent les arrêts, mais les ouvriers exposent leurs enfants au danger.", dit:{i:"Nous maintenons les machines en marche pour achever nos tissus.",o:"Nous tremblerons encore pour les enfants qui passent dessous."}},
  c:{q:"« J’impose l’arrêt des machines avant toute réparation. »", e:{o:9,m:-8},
-    c:"Les ouvriers travaillent plus sûrement, mais les marchands reçoivent moins vite leurs commandes."}},
+    c:"Les ouvriers travaillent plus sûrement, mais les marchands reçoivent moins vite leurs commandes.", dit:{m:"Nous attendrons plus longtemps les tissus à livrer aux clients.",o:"Nous pourrons réparer les fils sans risquer d’être happés."}}},
 
 {n:"10", t:"Un poste fixe par ouvrier", qui:"John Radcliffe, contremaître d’une usine",
  d:"« Je veux que chacun répète le geste qu’il maîtrise le mieux. »",
  ex:"Un contremaître veut confier à chacun un geste répété plutôt qu’un métier entier. Il promet davantage de tissus, mais le travail deviendrait monotone.",
  l:"Consultez Trace écrite 1 · trace écrite 2 §1. Retenez **division du travail** : le partage de la fabrication en tâches distinctes entre plusieurs travailleurs. Qu’est-ce qui change dans le métier, et que conserve-t-on de l’ancien travail ?",
+ av:{i:"Nous voulons fabriquer davantage avec un geste précis par poste.", o:"Nous voulons conserver plusieurs gestes pour connaître notre métier."},
  a:{q:"« Je fixe un geste à chaque ouvrier. »", e:{i:9,o:-8},
-    c:"Les industriels accélèrent la fabrication, mais les ouvriers perdent une part de leur savoir-faire."},
+    c:"Les industriels accélèrent la fabrication, mais les ouvriers perdent une part de leur savoir-faire.", dit:{i:"Nous pourrons faire avancer les tissus plus vite dans chaque atelier.",o:"Nous ne saurons bientôt plus accomplir notre métier entier."}},
  b:{q:"« Je conserve des métiers variés. »", e:{i:-8,o:9},
-    c:"Les ouvriers gardent leurs compétences, mais les industriels produisent moins rapidement."},
+    c:"Les ouvriers gardent leurs compétences, mais les industriels produisent moins rapidement.", dit:{i:"Nous produirons moins vite sans attribuer un seul geste à chacun.",o:"Nous conservons la possibilité de pratiquer tout notre savoir-faire."}},
  c:{q:"« J’alterne les postes pendant la semaine. »", e:{i:-8,o:9},
-    c:"Les ouvriers conservent des gestes variés, mais les industriels renoncent à une partie des gains de vitesse."}},
+    c:"Les ouvriers conservent des gestes variés, mais les industriels renoncent à une partie des gains de vitesse.", dit:{i:"Nous perdrons une partie du temps gagné par les postes fixes.",o:"Nous changerons de poste et garderons plusieurs gestes en mémoire."}}},
 
 {n:"11", t:"Un incendie et des familles sans salaire", qui:"Elizabeth Turner, ouvrière sans emploi",
  d:"« Je veux nourrir mes enfants pendant que notre usine reste fermée. »",
  ex:"Un incendie a détruit plusieurs étages d’une usine de coton. Des familles se retrouvent sans revenu pendant sa reconstruction.",
  l:"Consultez Trace écrite 2 §1. Retenez **condition de travail** : l’ensemble des horaires, des tâches et des dangers du métier. Quelles conséquences la concentration des travailleurs dans une seule usine entraîne-t-elle lors d’un incendie ?",
+ av:{i:"Nous voulons reconstruire les étages pour reprendre la fabrication.", o:"Nous n’avons plus de salaire depuis l’incendie de notre atelier."},
  a:{q:"« Je verse une aide aux familles touchées. »", e:{o:9,p:-8},
-    c:"Les ouvriers peuvent acheter du pain, mais le Parlement doit financer les secours."},
+    c:"Les ouvriers peuvent acheter du pain, mais le Parlement doit financer les secours.", dit:{o:"Nous pourrons acheter du pain pendant la fermeture de l’usine.",p:"Nous devons trouver l’argent des secours après cet incendie."}},
  b:{q:"« Je privilégie la reconstruction de l’usine. »", e:{i:9,o:-8},
-    c:"Les industriels retrouvent plus vite leur atelier, mais les ouvriers attendent une aide immédiate."},
+    c:"Les industriels retrouvent plus vite leur atelier, mais les ouvriers attendent une aide immédiate.", dit:{i:"Nous pourrons remettre nos machines en service plus tôt.",o:"Nous attendrons la reconstruction sans argent pour nos familles."}},
  c:{q:"« Je propose du travail dans d’autres ateliers. »", e:{i:-8,o:9},
-    c:"Les ouvriers retrouvent certains salaires, mais les industriels voisins doivent réorganiser leur travail."}},
+    c:"Les ouvriers retrouvent certains salaires, mais les industriels voisins doivent réorganiser leur travail.", dit:{i:"Nous devrons faire une place imprévue aux ouvriers de l’usine brûlée.",o:"Nous retrouverons un salaire dans les ateliers encore ouverts."}}},
 
 {n:"12", t:"Une loi pour les plus jeunes", qui:"Henry Wilkins, inspecteur des fabriques",
  d:"« Je veux pouvoir faire respecter cette loi sans abandonner les familles. »",
  ex:"Le Parlement limite désormais le travail des très jeunes enfants dans certaines usines. Les contrôles restent rares et les familles redoutent de perdre des salaires.",
  l:"Consultez Trace écrite 2 §3. Retenez **inégalité** : une différence de droits, de revenus ou de possibilités entre des groupes. Quelle rupture cette loi introduit-elle, et quelles difficultés anciennes subsistent ?",
+ av:{o:"Nous avons besoin des salaires des enfants pour vivre.", p:"Nous voulons faire respecter la nouvelle limite d’âge dans les usines."},
  a:{q:"« Je fais appliquer la loi avec des contrôles. »", e:{o:-8,p:9},
-    c:"Le Parlement renforce les protections, mais les ouvriers pauvres perdent certains revenus."},
+    c:"Le Parlement renforce les protections, mais les ouvriers pauvres perdent certains revenus.", dit:{o:"Nous perdrons le salaire de certains enfants sans autre secours.",p:"Nous pourrons vérifier si les plus jeunes sont retirés des ateliers."}},
  b:{q:"« Je demande davantage d’inspecteurs avant d’agir. »", e:{o:9,p:-8},
-    c:"Les ouvriers conservent provisoirement leurs salaires, mais le Parlement retarde les protections promises."},
+    c:"Les ouvriers conservent provisoirement leurs salaires, mais le Parlement retarde les protections promises.", dit:{o:"Nous gardons pour un temps les salaires des plus jeunes.",p:"Nous laissons la loi sans contrôle pendant que nous cherchons des inspecteurs."}},
  c:{q:"« Je prévois une aide aux familles concernées. »", e:{i:-8,o:9},
-    c:"Les ouvriers reçoivent un soutien, mais les industriels craignent de nouveaux prélèvements."}},
+    c:"Les ouvriers reçoivent un soutien, mais les industriels craignent de nouveaux prélèvements.", dit:{i:"Nous craignons de nouveaux frais pour financer cette aide familiale.",o:"Nous recevrons une aide pour remplacer les salaires perdus."}}},
 
 {n:"13", t:"Le pain devient trop cher", qui:"Sarah Greenwood, ouvrière dans une fabrique de coton",
  d:"« Je veux un salaire qui permette de nourrir ma famille. »",
  ex:"Des ouvrières cessent le travail pour protester contre le prix du pain. Leurs salaires ne suffisent plus à nourrir correctement leurs familles.",
  l:"Consultez Trace écrite 2 §3. Retenez **monde ouvrier** : l’ensemble des personnes qui vivent de leur salaire dans les ateliers et les usines. Pourquoi la hausse du pain entraîne-t-elle une protestation de travailleurs payés en argent ?",
+ av:{i:"Nous voulons rouvrir les ateliers sans augmenter fortement les salaires.", m:"Nous craignons de vendre moins de grain si son prix baisse."},
  a:{q:"« Je soutiens une hausse des salaires. »", e:{i:-8,o:9},
-    c:"Les ouvriers peuvent mieux acheter leur pain, mais les industriels paient davantage."},
+    c:"Les ouvriers peuvent mieux acheter leur pain, mais les industriels paient davantage.", dit:{i:"Nous devrons relever les salaires alors que les ateliers sont arrêtés.",o:"Nous pourrons acheter davantage de pain avec notre paie."}},
  b:{q:"« Je négocie une baisse du prix du pain. »", e:{o:9,m:-8},
-    c:"Les ouvriers pourraient dépenser moins pour manger, mais les marchands de grains perdraient des recettes."},
+    c:"Les ouvriers pourraient dépenser moins pour manger, mais les marchands de grains perdraient des recettes.", dit:{m:"Nous vendrons notre grain moins cher malgré les frais de transport.",o:"Nous paierons moins pour le pain de nos enfants."}},
  c:{q:"« Je demande une reprise du travail sans hausse. »", e:{i:9,o:-8},
-    c:"Les industriels retrouvent les machines en marche, mais les ouvriers gardent leurs difficultés."}},
+    c:"Les industriels retrouvent les machines en marche, mais les ouvriers gardent leurs difficultés.", dit:{i:"Nous pourrons remettre les machines en marche sans hausse de paie.",o:"Nous travaillerons encore sans assez d’argent pour le pain."}}},
 
 {n:"14", t:"Des métiers à tisser brisés", qui:"Thomas Atkinson, tisserand à la main",
  d:"« Je veux encore vivre de mon métier sans voir mes enfants manquer de pain. »",
  ex:"Des tisserands qui travaillent à la main attaquent des machines qui produisent à moindre coût. Les fabricants demandent une punition et les familles ruinées réclament du secours.",
  l:"Consultez Trace écrite 1 · trace écrite 2 §3. Retenez **mécanisation** : le remplacement d’une partie du travail humain par des machines. Quelle importance donnez-vous aux métiers détruits par ce changement technique ?",
+ av:{i:"Nous voulons protéger nos métiers mécaniques contre les destructions.", o:"Nous voulons une aide depuis que les machines nous ont privés de travail."},
  a:{q:"« Je poursuis les auteurs des destructions. »", e:{i:9,o:-8},
-    c:"Les industriels protègent leurs machines, mais les ouvriers ruinés perdent tout espoir de clémence."},
+    c:"Les industriels protègent leurs machines, mais les ouvriers ruinés perdent tout espoir de clémence.", dit:{i:"Nous pourrons garder nos métiers mécaniques sans craindre de nouvelles attaques.",o:"Nous risquons la prison alors que nos familles manquent déjà de pain."}},
  b:{q:"« Je propose une aide aux tisserands sans travail. »", e:{o:9,p:-8},
-    c:"Les ouvriers en difficulté reçoivent du secours, mais le Parlement doit payer cette aide."},
+    c:"Les ouvriers en difficulté reçoivent du secours, mais le Parlement doit payer cette aide.", dit:{o:"Nous recevrons du secours pendant que nous cherchons un autre métier.",p:"Nous devrons payer une aide aux tisserands ruinés."}},
  c:{q:"« J’impose une négociation avant toute sanction. »", e:{i:-8,o:9},
-    c:"Les ouvriers obtiennent la parole, mais les industriels craignent de nouvelles attaques."}},
+    c:"Les ouvriers obtiennent la parole, mais les industriels craignent de nouvelles attaques.", dit:{i:"Nous craignons d’autres bris de machines pendant ces discussions.",o:"Nous pourrons expliquer pourquoi les machines nous ont ruinés."}}},
 
 {n:"15", t:"Des maisons construites dos à dos", qui:"Benjamin Cooper, constructeur de logements",
  d:"« Je peux loger rapidement des familles si vous acceptez mon projet. »",
  ex:"Un constructeur propose des maisons serrées et peu coûteuses pour loger des ouvriers. Sans cour ni évacuation des eaux, ces logements seraient malsains.",
  l:"Consultez Document 5 (Engels) · trace écrite 2 §2. Retenez **logement insalubre** : un logement dangereux pour la santé à cause de l’humidité, du manque d’air ou de la saleté. Quelle importance auront ces choix de construction pour la vie future des habitants ?",
+ av:{o:"Nous avons besoin de maisons, mais pas de pièces humides et sans cour.", p:"Nous refusons de laisser les eaux sales s’accumuler entre ces maisons."},
  a:{q:"« J’autorise ces maisons sans modification. »", e:{i:9,o:-8},
-    c:"Les industriels trouvent des travailleurs logés près d’eux, mais les ouvriers vivent dans des conditions malsaines."},
+    c:"Les industriels trouvent des travailleurs logés près d’eux, mais les ouvriers vivent dans des conditions malsaines.", dit:{i:"Nous pourrons loger rapidement les bras nécessaires à nos usines.",o:"Nous vivrons serrés dans ces maisons sans évacuation des eaux."}},
  b:{q:"« J’exige des cours et des évacuations. »", e:{i:-8,o:9},
-    c:"Les ouvriers gagnent des logements plus sains, mais les industriels attendent leur construction."},
+    c:"Les ouvriers gagnent des logements plus sains, mais les industriels attendent leur construction.", dit:{i:"Nous attendrons plus longtemps les logements de nos travailleurs.",o:"Nous aurons des cours et moins d’eaux sales près de nos portes."}},
  c:{q:"« Je fais bâtir moins de maisons mieux équipées. »", e:{o:-8,p:9},
-    c:"Le Parlement améliore la salubrité, mais des ouvriers restent sans logement."}},
+    c:"Le Parlement améliore la salubrité, mais des ouvriers restent sans logement.", dit:{o:"Nous serons encore nombreux sans toit puisque moins de maisons seront construites.",p:"Nous pourrons éviter de nouvelles ruelles malsaines autour des maisons."}}},
 
 {n:"16", t:"Les familles dans les caves", qui:"Margaret Hughes, locataire d’une cave",
  d:"« Je veux quitter l’humidité sans dormir dehors avec mes enfants. »",
  ex:"Des familles louent des caves humides faute de logements disponibles. Les fermer immédiatement pourrait les laisser sans aucun abri.",
  l:"Consultez Document 5 (Engels). Retenez **logement insalubre** : un logement dangereux pour la santé à cause de l’humidité, du manque d’air ou de la saleté. Quelles conséquences imprévues peut avoir l’interdiction d’un habitat dangereux ?",
+ av:{o:"Nous ne voulons plus de caves humides, mais il nous faut un toit.", p:"Nous voulons fermer ces caves sans abandonner les familles à la rue."},
  a:{q:"« J’interdis immédiatement la location des caves. »", e:{o:-8,p:9},
-    c:"Le Parlement retire des logements malsains, mais les ouvriers concernés risquent la rue."},
+    c:"Le Parlement retire des logements malsains, mais les ouvriers concernés risquent la rue.", dit:{o:"Nous risquons de dormir dehors dès la fermeture des caves.",p:"Nous pourrons enfin interdire la location de ces caves malsaines."}},
  b:{q:"« J’attends la construction d’autres logements. »", e:{o:9,p:-8},
-    c:"Les ouvriers gardent temporairement un toit, mais le Parlement laisse durer l’insalubrité."},
+    c:"Les ouvriers gardent temporairement un toit, mais le Parlement laisse durer l’insalubrité.", dit:{o:"Nous conserverons un toit pendant que d’autres maisons se construisent.",p:"Nous laisserons des familles vivre encore dans l’humidité."}},
  c:{q:"« Je finance des logements de remplacement. »", e:{o:9,p:-8},
-    c:"Les ouvriers peuvent déménager, mais le Parlement engage des dépenses importantes."}},
+    c:"Les ouvriers peuvent déménager, mais le Parlement engage des dépenses importantes.", dit:{o:"Nous pourrons quitter ces caves pour un logement moins dangereux.",p:"Nous devrons trouver l’argent nécessaire pour bâtir ces logements."}}},
 
 {n:"17", t:"Des rues sans égouts", qui:"Frederick Lowe, responsable des rues de Manchester",
  d:"« Je veux évacuer les eaux sales avant que les rues deviennent impraticables. »",
  ex:"Les rues ouvrières sont boueuses et les eaux sales y stagnent. Construire des égouts demanderait des dépenses que la ville hésite à engager.",
  l:"Consultez Document 5 · trace écrite 2 §2. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelles conséquences le manque d’évacuation des eaux peut-il avoir sur la santé des habitants ?",
+ av:{m:"Nous voulons pouvoir traverser les rues sans enliser nos charrettes.", p:"Nous voulons évacuer les eaux sales, mais le chantier sera coûteux."},
  a:{q:"« Je lance les travaux d’égouts. »", e:{o:9,p:-8},
-    c:"Les ouvriers gagnent des rues plus saines, mais le Parlement supporte de lourds frais."},
+    c:"Les ouvriers gagnent des rues plus saines, mais le Parlement supporte de lourds frais.", dit:{o:"Nous pourrons traverser des rues moins sales près de nos maisons.",p:"Nous devons consacrer une forte somme à creuser les égouts."}},
  b:{q:"« Je reporte les travaux d’une année. »", e:{o:-8,p:9},
-    c:"Le Parlement ménage ses finances, mais les ouvriers continuent de vivre près des eaux sales."},
+    c:"Le Parlement ménage ses finances, mais les ouvriers continuent de vivre près des eaux sales.", dit:{o:"Nous verrons encore les eaux sales stagner devant nos portes.",p:"Nous gardons cette année l’argent nécessaire à d’autres travaux."}},
  c:{q:"« Je commence par les ruelles les plus touchées. »", e:{o:9,m:-8},
-    c:"Les ouvriers des rues choisies sont mieux protégés, mais les marchands d’autres quartiers attendent encore."}},
+    c:"Les ouvriers des rues choisies sont mieux protégés, mais les marchands d’autres quartiers attendent encore.", dit:{m:"Nous attendrons toujours des travaux près de nos magasins.",o:"Nous aurons enfin des conduites dans les ruelles les plus touchées."}}},
 
 {n:"18", t:"Une fièvre dans le quartier", qui:"Dr. Arthur Bennett, médecin du quartier",
  d:"« Je veux limiter les morts avant que davantage de familles soient touchées. »",
  ex:"Plusieurs habitants de la même ruelle sont morts après une maladie soudaine. Fermer le quartier protégerait peut-être les voisins, mais arrêterait deux usines.",
  l:"Consultez Document 5 · trace écrite 2 §2. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelles causes possibles relient l’état des rues et la santé des habitants ?",
+ av:{i:"Nous craignons une fermeture qui laisserait deux usines sans travail.", p:"Nous voulons freiner cette fièvre avant qu’elle touche d’autres ruelles."},
  a:{q:"« Je ferme provisoirement les deux usines. »", e:{i:-8,o:9},
-    c:"Les ouvriers du voisinage limitent les contacts, mais les industriels perdent plusieurs journées de travail."},
+    c:"Les ouvriers du voisinage limitent les contacts, mais les industriels perdent plusieurs journées de travail.", dit:{i:"Nous laisserons les machines arrêtées pendant plusieurs journées.",o:"Nous aurons moins de contacts pendant que la maladie circule."}},
  b:{q:"« Je garde les usines ouvertes sous surveillance. »", e:{i:9,o:-8},
-    c:"Les industriels poursuivent leur activité, mais les ouvriers restent exposés à une possible contagion."},
+    c:"Les industriels poursuivent leur activité, mais les ouvriers restent exposés à une possible contagion.", dit:{i:"Nous pourrons maintenir les deux usines en activité.",o:"Nous devrons encore travailler près des maisons où la fièvre frappe."}},
  c:{q:"« Je finance de l’eau propre et des soins. »", e:{o:9,p:-8},
-    c:"Les ouvriers obtiennent de l’aide sanitaire, mais le Parlement doit payer les interventions."}},
+    c:"Les ouvriers obtiennent de l’aide sanitaire, mais le Parlement doit payer les interventions.", dit:{o:"Nous aurons de l’eau plus propre et des soins pour nos familles.",p:"Nous devrons financer les soins et l’arrivée d’eau propre."}}},
 
 {n:"19", t:"Une ville sans assez de toits", qui:"Charles Miller, conseiller chargé des logements",
  d:"« Je veux éviter que les nouveaux arrivants dorment à plusieurs familles par pièce. »",
  ex:"La population de Manchester augmente rapidement avec les arrivées de travailleurs. Les familles s’entassent, car les constructions ne suivent pas.",
  l:"Consultez Document 3 (la population) · trace écrite 2 §2. Retenez **urbanisation** : l’augmentation de la population des villes et de leur espace bâti. Comment la croissance des usines provoque-t-elle aussi une crise du logement ?",
+ av:{m:"Nous voulons garder des terrains pour les entrepôts de coton.", o:"Nous demandons des logements avant que plusieurs familles partagent la même pièce."},
  a:{q:"« Je réserve des terrains aux logements. »", e:{o:9,m:-8},
-    c:"Les ouvriers trouvent plus de place pour habiter, mais les marchands perdent des terrains pour leurs entrepôts."},
+    c:"Les ouvriers trouvent plus de place pour habiter, mais les marchands perdent des terrains pour leurs entrepôts.", dit:{m:"Nous manquerons de terrains pour stocker nos ballots de coton.",o:"Nous aurons davantage de place pour habiter près de notre travail."}},
  b:{q:"« Je laisse les propriétaires bâtir librement. »", e:{i:9,o:-8},
-    c:"Les industriels obtiennent des logements rapides pour leurs salariés, mais les ouvriers risquent des maisons trop serrées."},
+    c:"Les industriels obtiennent des logements rapides pour leurs salariés, mais les ouvriers risquent des maisons trop serrées.", dit:{i:"Nous pourrons loger rapidement les nouveaux bras de nos ateliers.",o:"Nous craignons de nous entasser dans des maisons construites trop vite."}},
  c:{q:"« Je limite temporairement les nouvelles installations. »", e:{i:-8,p:9},
-    c:"Le Parlement freine l’encombrement des quartiers, mais les industriels manquent de nouveaux travailleurs."}},
+    c:"Le Parlement freine l’encombrement des quartiers, mais les industriels manquent de nouveaux travailleurs.", dit:{i:"Nous manquerons de travailleurs nouveaux pour faire tourner nos métiers.",p:"Nous limiterons l’arrivée de familles dans des rues déjà pleines."}}},
 
 {n:"20", t:"Le dernier terrain du centre", qui:"Philip Dawson, propriétaire d’un terrain central",
  d:"« Je veux vendre ce terrain au projet qui me paiera le mieux. »",
  ex:"Un terrain libre pourrait accueillir des entrepôts pour le coton. Des habitants préfèrent un jardin ouvert à tous.",
  l:"Consultez Document 2 (Wyld) · trace écrite 2 §2. Retenez **urbanisation** : l’augmentation de la population des villes et de leur espace bâti. Quelle importance accordez-vous à un espace accessible à tous dans une ville qui grandit ?",
+ av:{m:"Nous avons besoin d’entrepôts au centre pour garder notre coton.", o:"Nous voulons un jardin où les familles puissent respirer et se reposer."},
  a:{q:"« Je réserve le terrain aux entrepôts. »", e:{o:-8,m:9},
-    c:"Les marchands gagnent de la place pour leurs marchandises, mais les ouvriers perdent un possible jardin."},
+    c:"Les marchands gagnent de la place pour leurs marchandises, mais les ouvriers perdent un possible jardin.", dit:{m:"Nous pourrons stocker nos ballots de coton près des magasins.",o:"Nous n’aurons plus de terrain libre pour un jardin commun."}},
  b:{q:"« Je soutiens la création du jardin. »", e:{o:9,m:-8},
-    c:"Les ouvriers obtiennent un espace de repos, mais les marchands manquent de stockage."},
+    c:"Les ouvriers obtiennent un espace de repos, mais les marchands manquent de stockage.", dit:{m:"Nous devrons trouver une autre place pour nos entrepôts.",o:"Nous aurons enfin un lieu de promenade loin des ateliers."}},
  c:{q:"« Je partage le terrain entre les deux projets. »", e:{o:-8,m:9},
-    c:"Les marchands disposent d’une partie du sol, mais les ouvriers n’obtiennent qu’un petit jardin."}},
+    c:"Les marchands disposent d’une partie du sol, mais les ouvriers n’obtiennent qu’un petit jardin.", dit:{m:"Nous conserverons une partie du terrain pour nos marchandises.",o:"Nous n’aurons qu’un petit coin de verdure entre les entrepôts."}}},
 
 {n:"21", t:"Une salle pour soigner les pauvres", qui:"Dr. Edward Phillips, médecin des quartiers ouvriers",
  d:"« Je veux soigner les malades même lorsqu’ils ne peuvent pas me payer. »",
  ex:"Un médecin propose une petite salle de soins pour les habitants sans argent. Certains conseillers préfèrent laisser cette aide aux dons privés.",
  l:"Consultez Trace écrite 2 §3. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Comment un médecin pauvre et un conseiller préoccupé par les dépenses voient-ils différemment ce projet ?",
+ av:{i:"Nous ne voulons pas de prélèvements supplémentaires pour une salle de soins.", p:"Nous hésitons à payer des soins que les dons privés finançaient."},
  a:{q:"« Je finance une salle de soins publique. »", e:{o:9,p:-8},
-    c:"Les ouvriers accèdent plus facilement aux soins, mais le Parlement doit assumer une dépense nouvelle."},
+    c:"Les ouvriers accèdent plus facilement aux soins, mais le Parlement doit assumer une dépense nouvelle.", dit:{o:"Nous pourrons consulter un médecin même sans avoir d’argent.",p:"Nous devrons inscrire une nouvelle dépense pour cette salle de soins."}},
  b:{q:"« Je laisse les dons privés financer les soins. »", e:{o:-8,p:9},
-    c:"Le Parlement limite ses dépenses, mais les ouvriers dépendent de la générosité des donateurs."},
+    c:"Le Parlement limite ses dépenses, mais les ouvriers dépendent de la générosité des donateurs.", dit:{o:"Nous ne savons pas si les dons suffiront pour nous soigner.",p:"Nous laissons aux donateurs la charge de soigner les malades."}},
  c:{q:"« Je prête une salle aux médecins bénévoles. »", e:{i:-8,o:9},
-    c:"Les ouvriers obtiennent un lieu de consultation, mais les industriels doivent rechercher les fonds nécessaires."}},
+    c:"Les ouvriers obtiennent un lieu de consultation, mais les industriels doivent rechercher les fonds nécessaires.", dit:{i:"Nous devrons solliciter des dons pour faire vivre cette salle.",o:"Nous aurons au moins une salle où consulter les médecins bénévoles."}}},
 
 {n:"22", t:"Une visite de la reine", qui:"Richard Ellis, organisateur des cérémonies municipales",
  d:"« Je veux offrir à la reine une image digne de notre ville. »",
  ex:"Une visite royale doit traverser Manchester. Des conseillers veulent embellir uniquement les rues du cortège plutôt que montrer les quartiers ouvriers.",
  l:"Consultez Document 2 (Wyld, peint après la visite royale). Retenez **urbanisation** : l’augmentation de la population des villes et de leur espace bâti. Quel point de vue chaque parcours donnera-t-il à la reine sur Manchester ?",
+ av:{m:"Nous voulons montrer aux visiteurs une ville digne de leurs affaires.", o:"Nous voudrions que la reine voie aussi les ruelles où nous habitons."},
  a:{q:"« Je fais repeindre les façades du parcours. »", e:{o:-8,m:9},
-    c:"Les marchands gagnent une belle vitrine pour la ville, mais les ouvriers ne voient pas leurs rues améliorées."},
+    c:"Les marchands gagnent une belle vitrine pour la ville, mais les ouvriers ne voient pas leurs rues améliorées.", dit:{m:"Nous pourrons accueillir la reine devant des façades bien entretenues.",o:"Nous garderons nos ruelles sales derrière les façades repeintes."}},
  b:{q:"« Je choisis un parcours dans les quartiers ouvriers. »", e:{i:-8,o:9},
-    c:"Les ouvriers peuvent montrer leurs difficultés, mais les industriels craignent une mauvaise image."},
+    c:"Les ouvriers peuvent montrer leurs difficultés, mais les industriels craignent une mauvaise image.", dit:{i:"Nous craignons que cette visite fasse oublier les succès de nos usines.",o:"Nous pourrons montrer à la reine nos logements et nos difficultés."}},
  c:{q:"« Je consacre l’argent au nettoyage des ruelles. »", e:{o:9,m:-8},
-    c:"Les ouvriers vivent dans des rues plus propres, mais les marchands perdent les décorations prévues."}},
+    c:"Les ouvriers vivent dans des rues plus propres, mais les marchands perdent les décorations prévues.", dit:{m:"Nous perdons les décorations qui devaient attirer l’attention sur nos commerces.",o:"Nous marcherons dans des ruelles nettoyées après le passage royal."}}},
 
 {n:"23", t:"Une visiteuse dans les ateliers", qui:"Clara Vogel, voyageuse allemande intéressée par les usines",
  d:"« Je veux voir de mes yeux ce que les machines ont changé. »",
  ex:"Une voyageuse allemande veut découvrir les machines de Manchester. Les fabricants souhaitent lui présenter une usine moderne plutôt qu’un atelier aux conditions difficiles.",
  l:"Consultez Document 4 et son bonus. Retenez **mécanisation** : le remplacement d’une partie du travail humain par des machines. Comment la perspective de la visiteuse dépendra-t-elle des ateliers qu’elle verra ?",
+ av:{i:"Nous préférons lui montrer nos machines les plus impressionnantes.", m:"Nous voulons que la voyageuse reparte en parlant des tissus de Manchester."},
  a:{q:"« Je lui montre la plus grande usine. »", e:{i:9,o:-8},
-    c:"Les industriels exposent leurs réussites, mais les ouvriers des petits ateliers restent invisibles."},
+    c:"Les industriels exposent leurs réussites, mais les ouvriers des petits ateliers restent invisibles.", dit:{i:"Nous pourrons lui présenter les machines qui font notre fierté.",o:"Nous resterons invisibles dans les petits ateliers moins modernes."}},
  b:{q:"« Je lui laisse choisir les ateliers. »", e:{i:-8,o:9},
-    c:"Les ouvriers peuvent montrer leur quotidien, mais les industriels perdent le contrôle de la visite."},
+    c:"Les ouvriers peuvent montrer leur quotidien, mais les industriels perdent le contrôle de la visite.", dit:{i:"Nous ne saurons pas quels ateliers elle visitera ni ce qu’elle écrira.",o:"Nous pourrons lui raconter nos journées dans les ateliers ordinaires."}},
  c:{q:"« J’organise deux visites très différentes. »", e:{i:9,m:-8},
-    c:"Les industriels présentent leurs machines, mais les marchands craignent des récits sur les difficultés sociales."}},
+    c:"Les industriels présentent leurs machines, mais les marchands craignent des récits sur les difficultés sociales.", dit:{i:"Nous pourrons montrer nos machines au cours des deux visites.",m:"Nous craignons que les récits de souffrance fassent fuir des clients."}}},
 
 {n:"24", t:"Un enquêteur dans Ancoats", qui:"Friedrich Engels, observateur des quartiers ouvriers",
  d:"« Je veux décrire ce que vivent les familles derrière les murs des fabriques. »",
  ex:"Un Allemand installé à Manchester prend des notes sur la pauvreté d’Ancoats. Certains propriétaires craignent que ses descriptions nuisent à la réputation des usines.",
  l:"Consultez Document 5 et son bonus. Retenez **monde ouvrier** : l’ensemble des personnes qui vivent de leur salaire dans les ateliers et les usines. Pourquoi le regard de cet observateur peut-il différer de celui des propriétaires ?",
+ av:{i:"Nous craignons que les notes d’Engels discréditent nos fabriques.", o:"Nous voulons qu’Engels voie aussi les pièces où vivent nos familles."},
  a:{q:"« Je lui ouvre les quartiers et les ateliers. »", e:{i:-8,o:9},
-    c:"Les ouvriers peuvent faire entendre leurs difficultés, mais les industriels redoutent les critiques."},
+    c:"Les ouvriers peuvent faire entendre leurs difficultés, mais les industriels redoutent les critiques.", dit:{i:"Nous craignons que ses descriptions détournent les acheteurs de nos fabriques.",o:"Nous pourrons lui raconter ce que nous subissons dans les ateliers."}},
  b:{q:"« Je limite son entrée dans les usines. »", e:{i:9,o:-8},
-    c:"Les industriels protègent leur image, mais les ouvriers perdent une occasion d’être entendus."},
+    c:"Les industriels protègent leur image, mais les ouvriers perdent une occasion d’être entendus.", dit:{i:"Nous limiterons les critiques sur nos machines et nos ateliers.",o:"Nous perdrons une occasion de raconter nos journées de travail."}},
  c:{q:"« Je lui propose aussi des entretiens avec les patrons. »", e:{i:9,o:-8},
-    c:"Les industriels exposent leur point de vue, mais les ouvriers craignent que leur parole passe au second plan."}},
+    c:"Les industriels exposent leur point de vue, mais les ouvriers craignent que leur parole passe au second plan.", dit:{i:"Nous pourrons expliquer à Engels pourquoi nous avons bâti ces usines.",o:"Nous craignons que nos témoignages passent derrière ceux des patrons."}}},
 
 {n:"25", t:"Une peinture pour représenter Manchester", qui:"William Wyld, peintre de vues urbaines",
  d:"« Je veux montrer la beauté du paysage sans cacher les cheminées. »",
  ex:"Un peintre propose de représenter Manchester depuis une colline verdoyante. Les cheminées seraient visibles au loin, mais les logements pauvres disparaîtraient de la vue.",
  l:"Consultez Document 2 et son bonus. Retenez **industrialisation** : la transformation d’une société par le développement des usines et de leurs productions. Quelle perspective chaque peinture donne-t-elle des transformations de Manchester ?",
+ av:{m:"Nous souhaitons une vue agréable de Manchester pour nos acheteurs.", o:"Nous voulons que le peintre montre aussi nos logements serrés."},
  a:{q:"« Je commande cette vue depuis la colline. »", e:{o:-8,m:9},
-    c:"Les marchands obtiennent une image flatteuse, mais les ouvriers voient leurs quartiers laissés hors du tableau."},
+    c:"Les marchands obtiennent une image flatteuse, mais les ouvriers voient leurs quartiers laissés hors du tableau.", dit:{m:"Nous aurons une belle vue à montrer aux clients de passage.",o:"Nous ne verrons pas nos rues pauvres dans ce paysage verdoyant."}},
  b:{q:"« Je demande une vue des rues ouvrières. »", e:{i:-8,o:9},
-    c:"Les ouvriers rendent leurs conditions visibles, mais les industriels craignent une image sombre."},
+    c:"Les ouvriers rendent leurs conditions visibles, mais les industriels craignent une image sombre.", dit:{i:"Nous craignons que ce tableau détourne l’attention de nos inventions.",o:"Nous pourrons montrer nos rues et nos maisons telles qu’elles sont."}},
  c:{q:"« Je commande deux vues de la ville. »", e:{o:9,p:-8},
-    c:"Les ouvriers gagnent une représentation de leurs quartiers, mais le Parlement doit financer deux tableaux."}},
+    c:"Les ouvriers gagnent une représentation de leurs quartiers, mais le Parlement doit financer deux tableaux.", dit:{o:"Nous aurons enfin un tableau qui représente nos quartiers.",p:"Nous devrons payer deux peintures au lieu d’une seule."}}},
 
 {n:"26", t:"Un pasteur réclame une enquête", qui:"Reverend John Foster, pasteur d’un quartier ouvrier",
  d:"« Je veux que la ville écoute les familles qui vivent dans ces caves. »",
  ex:"Un pasteur décrit publiquement les caves humides et les maladies. Les fabricants redoutent ses accusations, tandis que des habitants demandent une enquête.",
  l:"Consultez Trace écrite 2 §3. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelle importance ces témoignages peuvent-ils avoir dans la naissance de mesures publiques ?",
+ av:{o:"Nous voulons que le pasteur puisse parler de nos caves humides.", p:"Nous voulons vérifier les accusations avant d’engager des mesures."},
  a:{q:"« J’ouvre une enquête sur les logements. »", e:{i:-8,o:9},
-    c:"Les ouvriers obtiennent une écoute officielle, mais les industriels craignent des contrôles coûteux."},
+    c:"Les ouvriers obtiennent une écoute officielle, mais les industriels craignent des contrôles coûteux.", dit:{i:"Nous craignons que cette enquête impose des travaux coûteux à nos logements.",o:"Nous pourrons enfin témoigner devant ceux qui enquêteront sur nos caves."}},
  b:{q:"« Je demande au pasteur de cesser ses accusations. »", e:{i:9,o:-8},
-    c:"Les industriels préservent leur réputation, mais les ouvriers perdent un défenseur public."},
+    c:"Les industriels préservent leur réputation, mais les ouvriers perdent un défenseur public.", dit:{i:"Nous éviterons que les accusations du pasteur ternissent nos fabriques.",o:"Nous perdrons une voix qui dénonçait les fièvres de nos caves."}},
  c:{q:"« Je l’invite au conseil de salubrité. »", e:{o:9,p:-8},
-    c:"Les ouvriers gagnent un représentant, mais le Parlement doit partager ses décisions avec un critique."}},
+    c:"Les ouvriers gagnent un représentant, mais le Parlement doit partager ses décisions avec un critique.", dit:{o:"Nous aurons quelqu’un pour parler de nos quartiers au conseil.",p:"Nous devrons écouter ce pasteur avant de décider des mesures."}}},
 
 {n:"27", t:"Une foule réclame le vote", qui:"Joseph Fielding, organisateur d’une réunion publique",
  d:"« Je veux que nos demandes de vote puissent être entendues en paix. »",
  ex:"Une foule nombreuse se rassemble près de Manchester pour réclamer des droits politiques. Les magistrats demandent comment agir sans perdre le contrôle de la réunion.",
  l:"Consultez Trace écrite 2 §3 · tableau de vocabulaire. Retenez **inégalité** : une différence de droits, de revenus ou de possibilités entre des groupes. Pourquoi l’absence de droit de vote est-elle aussi importante que les différences de richesse ?",
+ av:{o:"Nous voulons réclamer le vote sans subir la charge des soldats.", p:"Nous voulons éviter que cette réunion tourne à l’affrontement."},
  a:{q:"« J’autorise la réunion sous surveillance. »", e:{o:9,p:-8},
-    c:"Les ouvriers peuvent défendre leurs droits, mais le Parlement redoute une agitation prolongée."},
+    c:"Les ouvriers peuvent défendre leurs droits, mais le Parlement redoute une agitation prolongée.", dit:{o:"Nous pourrons défendre notre droit de vote devant la foule réunie.",p:"Nous devrons surveiller une foule nombreuse malgré les risques de troubles."}},
  b:{q:"« J’ordonne la dispersion de la foule. »", e:{o:-8,p:9},
-    c:"Le Parlement affirme son autorité, mais les ouvriers perdent la possibilité de se réunir."},
+    c:"Le Parlement affirme son autorité, mais les ouvriers perdent la possibilité de se réunir.", dit:{o:"Nous ne pourrons plus présenter ensemble notre demande de vote.",p:"Nous disperserons la réunion avant qu’elle échappe à notre autorité."}},
  c:{q:"« Je propose de recevoir une délégation. »", e:{o:9,m:-8},
-    c:"Les ouvriers peuvent présenter leurs demandes, mais les marchands craignent que la contestation se poursuive."}},
+    c:"Les ouvriers peuvent présenter leurs demandes, mais les marchands craignent que la contestation se poursuive.", dit:{m:"Nous craignons que les rassemblements continuent et gênent nos affaires.",o:"Nous pourrons exposer nos demandes directement aux magistrats."}}},
 
 {n:"28", t:"Le pain et les intérêts des fabricants", qui:"Nathaniel Briggs, fabricant de tissus",
  d:"« Je veux du grain moins cher sans augmenter les salaires de mon usine. »",
  ex:"Des fabricants demandent de supprimer les taxes sur le grain importé au nom du pain moins cher. Ils refusent pourtant une hausse de salaire réclamée par leurs employés.",
  l:"Consultez Trace écrite 2 §3. Retenez **inégalité** : une différence de droits, de revenus ou de possibilités entre des groupes. De quelle perspective parle chaque groupe lorsqu’il prétend défendre le prix du pain ?",
+ av:{o:"Nous voulons payer notre pain moins cher sans perdre notre salaire.", p:"Nous devons entendre les propriétaires terriens aussi bien que les fabricants."},
  a:{q:"« Je soutiens la suppression des taxes. »", e:{o:9,p:-8},
-    c:"Les ouvriers pourraient acheter du pain moins cher, mais les propriétaires terriens perdent leur protection."},
+    c:"Les ouvriers pourraient acheter du pain moins cher, mais les propriétaires terriens perdent leur protection.", dit:{o:"Nous pourrions payer moins pour le pain acheté chaque semaine.",p:"Nous mécontenterons les propriétaires de terres protégés par ces taxes."}},
  b:{q:"« Je défends le maintien des taxes. »", e:{o:-8,p:9},
-    c:"Les propriétaires terriens conservent leur avantage, mais les ouvriers continuent de payer leur pain cher."},
+    c:"Les propriétaires terriens conservent leur avantage, mais les ouvriers continuent de payer leur pain cher.", dit:{o:"Nous continuerons à acheter le pain trop cher pour nos familles.",p:"Nous préserverons les intérêts des propriétaires de terres à grain."}},
  c:{q:"« Je réclame aussi une négociation salariale. »", e:{i:-8,o:9},
-    c:"Les ouvriers gagnent une possibilité de hausse, mais les industriels craignent une augmentation des coûts."}},
+    c:"Les ouvriers gagnent une possibilité de hausse, mais les industriels craignent une augmentation des coûts.", dit:{i:"Nous craignons de devoir relever les salaires dans nos usines.",o:"Nous pourrons aussi demander une paie suffisante pour acheter du pain."}}},
 
 {n:"29", t:"Les égouts sous contrôle de Londres", qui:"Sir Henry Wallace, représentant du gouvernement",
  d:"« Je veux financer les égouts et vérifier que l’argent est bien dépensé. »",
  ex:"L’État propose de financer les égouts de Manchester. En échange, ses inspecteurs superviseraient les travaux et les dépenses de la ville.",
  l:"Consultez Trace écrite 2 §3. Retenez **condition de vie** : l’ensemble des circonstances matérielles dans lesquelles une personne vit. Quelle rupture représente l’intervention de l’État dans la santé des quartiers ?",
+ av:{o:"Nous voulons des égouts sans attendre encore des années.", p:"Nous hésitons à laisser les inspecteurs de Londres décider chez nous."},
  a:{q:"« J’accepte les fonds et les inspecteurs. »", e:{o:9,p:-8},
-    c:"Les ouvriers bénéficient de futurs égouts, mais le Parlement local perd une part de son autonomie."},
+    c:"Les ouvriers bénéficient de futurs égouts, mais le Parlement local perd une part de son autonomie.", dit:{o:"Nous pourrons bientôt voir partir les eaux sales de nos rues.",p:"Nous céderons une partie du contrôle des travaux à Londres."}},
  b:{q:"« Je refuse toute intervention de Londres. »", e:{o:-8,p:9},
-    c:"Le Parlement local garde le contrôle, mais les ouvriers attendent encore des égouts."},
+    c:"Le Parlement local garde le contrôle, mais les ouvriers attendent encore des égouts.", dit:{o:"Nous attendrons encore dans les ruelles où stagnent les eaux sales.",p:"Nous garderons la main sur les chantiers décidés à Manchester."}},
  c:{q:"« Je négocie des contrôles partagés. »", e:{o:9,m:-8},
-    c:"Les ouvriers peuvent obtenir les travaux, mais les marchands craignent des délais de négociation."}},
+    c:"Les ouvriers peuvent obtenir les travaux, mais les marchands craignent des délais de négociation.", dit:{m:"Nous craignons que les discussions retardent les rues utiles à nos livraisons.",o:"Nous pourrons espérer les égouts si les contrôles sont partagés."}}},
 
 {n:"30", t:"Manchester à l’Exposition de 1851", qui:"Francis Cartwright, représentant des fabricants de coton",
  d:"« Je veux que Londres admire nos tissus et les machines qui les fabriquent. »",
  ex:"Londres invite Manchester à présenter ses tissus à une grande exposition. Des journalistes veulent aussi visiter les usines et les quartiers voisins.",
  l:"Consultez Trace écrite 2 §3, conclusion. Retenez **progrès technique** : les améliorations apportées aux outils et aux machines pour fabriquer ou transporter. Quelle importance historique faut-il donner aux inventions face à leurs effets sur les habitants ?",
+ av:{m:"Nous voulons montrer à Londres les tissus que nous vendons.", o:"Nous voulons que les journalistes regardent aussi nos vies autour des usines."},
  a:{q:"« J’envoie les tissus et j’ouvre les visites. »", e:{i:9,m:-8},
-    c:"Les industriels montrent leurs inventions, mais les marchands craignent les critiques des journalistes."},
+    c:"Les industriels montrent leurs inventions, mais les marchands craignent les critiques des journalistes.", dit:{i:"Nous pourrons faire admirer nos machines aux visiteurs de l’exposition.",m:"Nous craignons que les articles sur les quartiers pauvres découragent les acheteurs."}},
  b:{q:"« Je présente seulement les tissus à Londres. »", e:{o:-8,m:9},
-    c:"Les marchands gagnent une vitrine commerciale, mais les ouvriers restent absents du récit."},
+    c:"Les marchands gagnent une vitrine commerciale, mais les ouvriers restent absents du récit.", dit:{m:"Nous pourrons exposer nos tissus sans détour par les quartiers ouvriers.",o:"Nous resterons absents du récit consacré aux étoffes de Manchester."}},
  c:{q:"« J’organise aussi une visite des quartiers ouvriers. »", e:{i:-8,o:9},
-    c:"Les ouvriers peuvent montrer leur vie quotidienne, mais les industriels craignent que les souffrances éclipsent leurs succès."}},
+    c:"Les ouvriers peuvent montrer leur vie quotidienne, mais les industriels craignent que les souffrances éclipsent leurs succès.", dit:{i:"Nous craignons que la visite des quartiers fasse oublier nos machines.",o:"Nous pourrons raconter nos journées et montrer nos logements aux journalistes."}}},
 ];
 
 /* ==================================================================
@@ -3339,7 +3404,10 @@ function choisir(quel){
   E.vues.push(c.t);
   /* A-t-on ouvert le dossier d'enquête avant de trancher ? */
   if(c.f && !(E.lus||[]).includes(c.t)) E.aveugle = (E.aveugle||0) + 1;
-  E.carnet.push({t:c.t, q:r.q, e:r.e, an:(E.mode==="campagne"?AN(E.tour):null),
+  /* « dit » voyage avec la decision : la bulle de chaque acteur se lit
+     apres coup dans le carnet, et c'est lui qui porte la reaction
+     propre a CETTE reponse. */
+  E.carnet.push({t:c.t, q:r.q, e:r.e, dit:r.dit, an:(E.mode==="campagne"?AN(E.tour):null),
                  lu:!c.f || (E.lus||[]).includes(c.t)});
   E.consq=r.c;
   E.tour++;
@@ -3404,7 +3472,11 @@ function impacts(e){
       ${icone(k)}<span class="lb">${N.forces[k].nom}</span><span class="fl">${fleches(e[k])}</span></span>`;
   }).join("");
 }
-function barresForces(){
+/* « chiffres » n'est vrai qu'a l'ecran de fin. Pendant la partie, le
+   joueur decide parce que c'est ce qu'il pense, pas parce qu'il a lu
+   un nombre — les fleches et les mots suffisent a dire ce qui vient
+   de bouger. */
+function barresForces(chiffres){
   oublierSecousse();
   return `<div class="forces">${CLES.map(k=>{
     const v=E.f[k];
@@ -3421,7 +3493,7 @@ function barresForces(){
       ${bul?`onclick="bulle(this,'${k}')"`:""}>
       <span class="sceau"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
         loading="lazy" onerror="this.remove()">${icone(k)}</span>
-      <div class="nom">${N.forces[k].nom} <b>${Math.round(v)}</b></div>
+      <div class="nom">${N.forces[k].nom}${chiffres?` <b>${Math.round(v)}</b>`:""}</div>
       <div class="mini"><i style="width:${v}%;background:${col}"></i></div>
       ${(()=>{ const h=humeur(dv); return h
         ? `<div class="delta ${h.sens}"><span class="fl">${h.fl}</span>${h.mot}</div>` : ""; })()}
@@ -3586,12 +3658,17 @@ function concernes(c){
 function diraActeur(k){
   const d = dernierChoix();
   const v = d && d.e ? (d.e[k]||0) : 0;
-  if(d && v){
-    const logique = (N.forces[k].pourquoi || {})[v>0?"plus":"moins"] || "";
-    return { txt: logique || (v>0 ? "Vous nous avez entendus." : "Nous n'oublierons pas."),
-             sens: v>0 ? "gagne" : (v<=-8 ? "perd-fort" : "perd") };
-  }
-  return { txt: N.forces[k].veut, sens: "attend" };
+  /* LE VISAGE PORTE LA DERNIERE DECISION, LA BULLE PORTE L'AFFAIRE EN
+     COURS. « sens » commande le mouvement du portrait — celui qui a
+     gagne avance, celui qui a perdu recule et tremble — tandis que le
+     texte parle toujours de ce qui est sur le bureau maintenant. Ce
+     qui s'est passe au tour precedent est dit en haut, par
+     « retombee », ou il ne peut pas etre confondu.
+     Pour Detroit, qui n'a pas encore ses dialogues, « veut » sert de
+     filet : le groupe rappelle ce qu'il attend. */
+  const avis = (E.carte && E.carte.av || {})[k];
+  return { txt: avis || N.forces[k].veut,
+           sens: (d && v) ? (v>0 ? "gagne" : (v<=-8 ? "perd-fort" : "perd")) : "attend" };
 }
 
 /* UNE IMAGE QUI MANQUE NE DOIT RIEN CASSER.
@@ -3750,6 +3827,31 @@ function pliProf(){
   </div>`;
 }
 
+/* CE QUE LA DECISION PRECEDENTE A PRODUIT.
+   Il n'y a pas d'ecran de consequence dans ce jeu : on passe de la
+   decision a l'affaire suivante. La phrase qui dit ce qui est arrive
+   doit donc se lire ICI, sur le plateau suivant — sinon elle n'est
+   jamais lue. */
+function retombee(){
+  const d = dernierChoix();
+  if(!E || !E.consq || !d) return "";
+  /* Les deux voix que cette décision a fait parler. Elles sont ici et
+     non dans les bulles : autour de l'affaire du jour, elles auraient
+     commenté une affaire qui n'est plus celle-là. */
+  const voix = Object.keys(d.dit || {}).map(k => {
+    const v = (d.e || {})[k] || 0;
+    return `<span class="rt-v ${v>0?"gagne":"perd"}">
+      <b>${esc(N.forces[k].nom)}</b> ${esc(d.dit[k])}</span>`;
+  }).join("");
+  return `<div class="retombee">
+    <div class="rt-tete">
+      <span class="rt-k">Ce qui est arrivé</span>
+      <p>${esc(E.consq)}</p>
+    </div>
+    ${voix ? `<div class="rt-voix">${voix}</div>` : ""}
+  </div>`;
+}
+
 function rendre(){
   remonter();
   const c=E.carte;
@@ -3769,6 +3871,7 @@ function rendre(){
   ${alerte()}
   ${pliProf()}
   <div class="bureau"><div class="plateau large">
+    ${retombee()}
     ${scene(c, `<div class="rep" ${D()}>
       ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
         <span class="q">${esc(c[k].q)}</span></button>`).join("")}
@@ -5051,7 +5154,7 @@ function rendreFin(){
   app.innerHTML=`
   <div class="tableau">
     <span class="plaque">État des forces à la fin</span>
-    ${barresForces()}
+    ${barresForces(true)}
   </div>
 
   <div class="fin-cachet"><span>Partie terminée</span></div>
