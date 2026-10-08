@@ -1938,11 +1938,56 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   position:fixed; inset:0; z-index:60; display:flex;
   align-items:center; justify-content:center; padding:24px;
   background:rgba(14,10,7,.74);
-  animation:pli-entre .3s ease-out;
+  /* « backwards » et non « both » : le voile est transparent AVANT son
+     tour, jamais apres. */
+  animation:pli-entre .3s ease-out var(--retard,0s) backwards;
+  /* tant qu'elle n'est pas la, le voile n'intercepte rien */
+  pointer-events:none;
 }
+.pli-prof .lettre-prof{pointer-events:auto}
 .pli-prof.parti{animation:pli-sort .26s ease-in forwards}
 @keyframes pli-entre{from{opacity:0}to{opacity:1}}
 @keyframes pli-sort{to{opacity:0}}
+/* ---------- l'enveloppe arrive, le cachet se brise ----------------
+   Elle monte du bas, se pose, et son rabat s'ouvre pendant que la
+   feuille se deplie par-dessus. Un peu plus d'une seconde en tout :
+   assez pour qu'on voie ce qui se passe, trop court pour attendre. */
+.pli-prof .enveloppe{
+  position:absolute; width:300px; height:196px; border-radius:3px;
+  background:linear-gradient(162deg,#E7D7B4,#CDB68C);
+  border:1px solid #A98E5E;
+  box-shadow:0 18px 40px rgba(0,0,0,.55);
+  animation:env-monte .95s cubic-bezier(.2,.85,.3,1) var(--retard,0s) forwards;
+}
+@keyframes env-monte{
+  0%{opacity:0; transform:translateY(90px) rotate(-5deg) scale(.86)}
+  55%{opacity:1; transform:translateY(0) rotate(0) scale(1)}
+  100%{opacity:0; transform:translateY(-10px) scale(1.04)}
+}
+.pli-prof .env-rabat{
+  position:absolute; inset:0 0 auto 0; height:58%;
+  background:linear-gradient(170deg,#DCC79F,#C4AC80);
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:top center;
+  animation:env-ouvre .5s ease-in calc(var(--retard,0s) + .42s) both;
+}
+@keyframes env-ouvre{ to{ transform:rotateX(-168deg) } }
+.pli-prof .env-cire{
+  position:absolute; left:50%; top:48%; width:38px; height:38px;
+  margin:-19px 0 0 -19px; border-radius:50%;
+  background:radial-gradient(circle at 36% 32%,#C4503A,#7E2413 70%,#5A190C);
+  box-shadow:0 2px 6px rgba(0,0,0,.5);
+  animation:cire-brise .3s ease-in calc(var(--retard,0s) + .4s) both;
+}
+@keyframes cire-brise{
+  0%{opacity:1; transform:scale(1)}
+  60%{opacity:1; transform:scale(1.18) rotate(7deg)}
+  100%{opacity:0; transform:scale(.6) rotate(-14deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .pli-prof .enveloppe{display:none}
+}
+
 .lettre-prof{
   max-width:560px; width:100%;
   background:
@@ -1950,13 +1995,37 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
     repeating-linear-gradient(94deg, rgba(160,140,110,.045) 0 2px, transparent 2px 5px),
     linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
   border:1px solid var(--fil); border-left:4px solid var(--rge);
-  border-radius:2px; padding:26px 30px 22px; color:var(--enc);
+  border-radius:2px; padding:30px 34px 24px; color:var(--enc);
   box-shadow:0 22px 60px rgba(0,0,0,.6);
   transform:rotate(-.35deg);
-  animation:pli-pose .34s cubic-bezier(.2,.9,.3,1);
+  animation:pli-deplie .62s cubic-bezier(.22,.9,.26,1) calc(var(--retard,0s) + .62s) both;
+  transform-origin:top center;
 }
-@keyframes pli-pose{from{opacity:0;transform:rotate(-1.6deg) translateY(16px)}
-                    to{opacity:1;transform:rotate(-.35deg) translateY(0)}}
+/* La feuille sort de l'enveloppe et se deplie — sans toucher a son
+   opacite : une lettre bloquee invisible emporterait son bouton avec
+   elle, et la partie s'arreterait la. */
+@keyframes pli-deplie{
+  0%{transform:rotate(-.35deg) translateY(34px) scaleY(.46)}
+  100%{transform:rotate(-.35deg) translateY(0) scaleY(1)}
+}
+/* l'en-tete d'une vraie lettre : d'ou elle vient, et de quand */
+.lettre-prof .lt-entete{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; margin-bottom:16px; padding-bottom:9px;
+  border-bottom:1px solid var(--fil);
+}
+.lettre-prof .lt-ecole{
+  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--rge); font-weight:bold;
+}
+.lettre-prof .lt-date{
+  font-family:var(--serif); font-size:17px; color:var(--enc2);
+}
+.lettre-prof .lt-intro{font-family:var(--serif); font-size:18px; margin-bottom:.5em}
+.lettre-prof .lt-filet{
+  height:1px; margin:15px 0; background:linear-gradient(90deg,
+    transparent, rgba(107,87,65,.45) 15%, rgba(107,87,65,.45) 85%, transparent);
+}
 .lettre-prof .lt-tete{
   font-size:11px; letter-spacing:.18em; text-transform:uppercase;
   color:var(--rge); font-weight:bold; margin-bottom:13px;
@@ -1964,8 +2033,9 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .lettre-prof .lt-x{margin:0;font-size:16px;line-height:1.65;color:var(--enc)}
 .lettre-prof .lt-x strong{color:var(--enc);font-weight:bold}
 .lettre-prof .lt-sig{
-  margin:18px 0 20px; text-align:right; font-family:var(--serif);
-  font-size:20px; color:var(--enc2); letter-spacing:.06em;
+  margin:20px 0 22px; text-align:right; font-family:var(--serif);
+  font-size:25px; color:#4A3B2C; letter-spacing:.1em;
+  transform:rotate(-2.2deg); opacity:.88;
 }
 .lettre-prof button{display:block;margin:0 auto}
 @media(max-width:600px){ .lettre-prof{padding:20px 20px 18px}
@@ -2029,22 +2099,24 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .poste.perd{filter:saturate(.72) brightness(.97); opacity:.86}
 .p-i.perd,.p-o.perd{transform:scale(.95) translateX(-7px)}
 .p-m.perd,.p-p.perd{transform:scale(.95) translateX(7px)}
-.poste.perd .visage{animation:trembler .5s ease-in-out 1}
+/* Trois secousses, apres un court temps mort : la premiere partait
+   avant que l'oeil ait trouve le portrait. */
+.poste.perd .visage{animation:trembler .5s ease-in-out .2s 3}
 
 .poste.perd-fort{filter:saturate(.5) brightness(.94); opacity:.84}
 .p-i.perd-fort,.p-o.perd-fort{transform:scale(.93) translateX(-11px)}
 .p-m.perd-fort,.p-p.perd-fort{transform:scale(.93) translateX(11px)}
-.poste.perd-fort .visage{animation:trembler .42s ease-in-out 3}
+.poste.perd-fort .visage{animation:trembler .44s ease-in-out .2s 6}
 .poste.perd-fort::after{
   content:""; position:absolute; inset:-1px; border-radius:3px;
   box-shadow:inset 0 0 0 1px rgba(166,48,36,.5); pointer-events:none;
 }
 @keyframes trembler{
   0%,100%{transform:translateX(0) rotate(0)}
-  18%{transform:translateX(-3px) rotate(-.9deg)}
-  38%{transform:translateX(3px) rotate(.9deg)}
-  58%{transform:translateX(-2px) rotate(-.6deg)}
-  78%{transform:translateX(2px) rotate(.4deg)}
+  16%{transform:translateX(-4px) rotate(-1.2deg)}
+  36%{transform:translateX(4px) rotate(1.2deg)}
+  56%{transform:translateX(-3px) rotate(-.8deg)}
+  76%{transform:translateX(2px) rotate(.5deg)}
 }
 
 /* ---------- le visage ---------- */
@@ -2097,7 +2169,11 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    jamais sur le texte : deux flotteurs invisibles, mesures apres
    coup par « calerBulles », reservent sa place et le texte la
    contourne. */
+/* Tant que la mise en scene ne l'a pas atteinte, la bulle est la —
+   elle occupe sa place, qui a ete mesuree — mais on ne la voit pas. */
+.poste .dit[data-attente]{opacity:0}
 .poste .dit{
+  transition:opacity .25s ease;
   position:absolute; top:24%; z-index:6; width:200px;
   padding:9px 13px 10px; border-radius:15px;
   background:#FFFCF2; border:1.5px solid rgba(74,56,38,.6);
@@ -2138,22 +2214,66 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .centre .ordre .encoche.ed{float:right}
 .centre .ordre .d{clear:both}
 
-/* Les trois reponses, au milieu du plateau, en bulles. Elles etaient
-   sous la scene : il fallait quitter des yeux l'affaire pour les lire. */
-.centre .question{margin:12px 0 8px;grid-column:auto}
+/* ---------- les trois choix : des plaques, pas des bulles ----------
+   Une bulle est du papier clair, arrondi, avec une queue : c'est ce
+   qu'on vous DIT. Un choix est une plaque sombre a filet d'or, aux
+   coins nets, avec un jeton numerote : c'est ce que vous FAITES. */
+.centre .question{margin:22px 0 10px;grid-column:auto}
 /* Les marges gauche et droite sont posees par « calerBulles » : ce
    sont les deux bulles du bas qui disent de combien il faut se
    serrer. */
-.centre .rep{grid-template-columns:minmax(0,1fr);gap:9px;margin:0;
-  transition:margin .3s ease}
-.centre .choix{
-  border-radius:16px !important; padding:12px 17px !important;
-  transform:none !important; text-align:left;
-  border:1.5px solid rgba(74,56,38,.5) !important;
+.centre .rep{grid-template-columns:minmax(0,1fr);gap:10px;margin:0;
+  counter-reset:choix; transition:margin .3s ease}
+
+.centre .question[data-attente],.centre .rep[data-attente]{
+  opacity:0; pointer-events:none;
 }
-.centre .choix .q{font-size:16px;line-height:1.32}
-.centre .choix:hover{transform:translateY(-2px) !important;
-  border-color:var(--rge) !important}
+.centre .question,.centre .rep{transition:margin .3s ease}
+
+.centre .choix{
+  /* La regle generale des choix est en colonne : le jeton se posait
+     au-dessus du texte au lieu d etre a sa gauche. */
+  display:flex !important; flex-direction:row !important;
+  align-items:center; gap:15px; text-align:left;
+  counter-increment:choix;
+  background:linear-gradient(176deg,#3C2D1F 0%,#241A12 100%) !important;
+  color:#F2E6CE !important;
+  border:1px solid rgba(214,176,106,.4) !important;
+  border-left:3px solid var(--lai) !important;
+  border-radius:3px !important;
+  padding:13px 18px !important;
+  transform:none !important;
+  box-shadow:0 7px 18px rgba(0,0,0,.45);
+}
+/* le jeton : on peut dire « je prends la deux » */
+.centre .choix::before{
+  content:counter(choix);
+  flex:0 0 auto; width:27px; height:27px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--serif); font-size:15.5px; color:#2B2118;
+  background:radial-gradient(circle at 34% 30%, #F0D79A, var(--lai) 70%, #9A7430);
+  box-shadow:0 2px 5px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.centre .choix .q{color:#F6ECD8 !important;font-size:16.5px;line-height:1.3}
+.centre .choix:hover{
+  transform:translateY(-2px) !important;
+  border-color:var(--lai) !important;
+  box-shadow:0 11px 26px rgba(0,0,0,.55), 0 0 0 1px rgba(214,176,106,.28);
+}
+
+/* elles montent l'une apres l'autre, une fois tout le monde entendu */
+/* Pas d'opacite ici : si l'animation ne se jouait pas, la plaque
+   resterait invisible et le joueur n'aurait plus de quoi decider. */
+@keyframes choix-monte{
+  from{transform:translateY(16px)}
+  to{transform:none}
+}
+.centre .rep.montre .choix{animation:choix-monte .42s cubic-bezier(.2,.9,.3,1) backwards}
+.centre .rep.montre .choix:nth-child(2){animation-delay:.1s}
+.centre .rep.montre .choix:nth-child(3){animation-delay:.2s}
+@media(prefers-reduced-motion:reduce){
+  .centre .rep.montre .choix{animation:none}
+}
 /* Le joueur, personnifie : un sous-main vide au bas du centre, qui dit
    sans un mot que la place est la sienne. */
 .centre .moi{
@@ -3792,6 +3912,11 @@ function calerBulles(){
     const b = sc.querySelector(".p-" + cle + " .dit");
     if(!e) continue;
     if(!b){ e.style.width = e.style.height = "0px"; continue; }
+    /* Pendant la mise en scene, une bulle qui n'a pas encore ete
+       ecrite est vide donc minuscule : la mesurer retrecirait
+       l'encoche, et la bulle finirait par passer sur le texte. On
+       garde celle d'avant. */
+    if(!(b.textContent || "").trim()) continue;
     const bb = b.getBoundingClientRect();
     const l = (cote === "eg") ? (bb.right - hg) : (hd - bb.left);
     const h = bb.bottom - ht;
@@ -3819,15 +3944,40 @@ function lettreLue(){
   const el = document.getElementById("pli-prof");
   if(el){ el.classList.add("parti"); setTimeout(()=>el.remove(), 260); }
   try{ SON.papier() }catch(e){}
+  /* la lecture commence maintenant, pas avant */
+  if(E.scene && E.scene.i < E.scene.etapes.length){
+    try{ SON.frappe(true) }catch(e){}
+    jouerEtape();
+  }
 }
 function pliProf(){
   if(!lettreAlire()) return "";
-  return `<div class="pli-prof" id="pli-prof">
+  /* La toute premiere de la partie dit ce que ces courriers seront.
+     Repetee dix-huit fois, cette entree en matiere deviendrait
+     invisible : les suivantes vont droit au fait. */
+  const premiere = !(E.lettresLues || []).length;
+  const intro = premiere ? `
+      <p class="lt-x lt-intro">Chère élève, cher élève,</p>
+      <p class="lt-x">Je vous écrirai avant chacune de vos décisions. Rien de long :
+      juste de quoi relier ce qui arrive sur votre bureau à ce que nous avons vu en
+      classe. Voici le premier.</p>
+      <div class="lt-filet" aria-hidden="true"></div>` : "";
+  /* Le temps de laisser les portraits reagir. Au tout premier tour il
+     n'y a rien a regarder : elle vient presque tout de suite. */
+  const retard = dernierChoix() ? "2.2s" : ".25s";
+  return `<div class="pli-prof" id="pli-prof" style="--retard:${retard}">
+    <div class="enveloppe" aria-hidden="true">
+      <span class="env-rabat"></span><span class="env-cire"></span>
+    </div>
     <article class="lettre-prof">
-      <div class="lt-tete">Un mot de votre professeur</div>
+      <div class="lt-entete">
+        <span class="lt-ecole">Collège Alpin Beau Soleil · Histoire</span>
+        <span class="lt-date">${E.mode === "campagne" ? AN(E.tour) : N.lieu}</span>
+      </div>
+      ${intro}
       <p class="lt-x">${gras(esc(E.carte.l))}</p>
       <div class="lt-sig">J. E.</div>
-      <button class="plein" onclick="lettreLue()">J’ai lu</button>
+      <button class="plein" onclick="lettreLue()">Continuer</button>
     </article>
   </div>`;
 }
@@ -3899,22 +4049,27 @@ function rendre(){
      decisions comme echelle. */
   document.body.style.setProperty("--age",
     Math.min(1, E.tour / (N.tours || 18)).toFixed(3));
-  ecrire(c.t, c.ex, c.d);
-  /* Les images des portraits arrivent apres : on cale une fois tout de
-     suite pour que le premier mot tombe au bon endroit, une fois la
-     mise en page faite, et une fois le chargement termine. */
+  /* LA MESURE PASSE AVANT L'ECRITURE. « ecrire » vide les bulles pour
+     les faire paraitre une a une ; mesure apres lui, « calerBulles »
+     mesurerait du vide et le texte de l'ordre du jour ne contournerait
+     plus rien. */
   calerBulles();
   requestAnimationFrame(calerBulles);
   addEventListener("load", calerBulles, { once:true });
+  ecrire(c.t, c.ex, c.d);
   try{ SON.majTension(); SON.papier() }catch(e){}
   majVue();
 }
 
-/* Un clic n'importe où sur la table pose le reste des dossiers d'un coup. */
+/* Un clic termine d'abord l'étape en cours de la mise en scène. Quand
+   il n'y a plus rien à écrire, il reprend son rôle d'avant : poser le
+   reste des dossiers d'un coup. */
 document.addEventListener("click",e=>{
   if(e.target.closest("button, summary, a")) return;
+  /* la lettre est ouverte : rien a sauter derriere elle */
+  if(document.getElementById("pli-prof")) return;
+  if(finirEcriture()) return;
   app.classList.add("presse");
-  finirEcriture();
 });
 /* On compte les rapports d'enquête réellement ouverts : le rapport final
    dira au professeur qui a enquêté et qui a tranché à l'aveugle. */
@@ -4108,8 +4263,11 @@ function courrier(attr){
   </details>`;
 }
 
-/* Le titre s'inscrit, puis la réplique. On garde le texte de côté pour
-   pouvoir le poser d'un coup si le joueur clique. */
+/* LA MISE EN SCENE.
+   Une ETAPE est une liste de textes a écrire l'un après l'autre :
+   l'ordre du jour en forme une — titre, exposé, réplique —, puis
+   chaque bulle la sienne. Un clic termine l'étape en cours et lance
+   la suivante. */
 function ecrire(titre, expose, replique){
   stopperMachines();
   E.ecrit = {t:titre, ex:expose||"", d:replique};
@@ -4117,22 +4275,88 @@ function ecrire(titre, expose, replique){
         x=app.querySelector(".situ .ex"),
         r=app.querySelector(".situ .d");
   if(!t||!r) return;
-  if(window.SANS_CHRONO || app.classList.contains("presse")){
-    t.textContent=titre; if(x) x.textContent=E.ecrit.ex; r.textContent=replique; return;
+
+  /* Chaque entrée : [où écrire, quoi, vitesse, la bulle à dévoiler]. */
+  const ordre = [[t, titre, 15]];
+  if(x && E.ecrit.ex) ordre.push([x, E.ecrit.ex, 4]);
+  ordre.push([r, replique, 7]);
+  const etapes = [ordre];
+
+  /* L'ordre des bulles est celui du regard, pas celui des données. */
+  for(const k of ["i","m","o","p"]){
+    const b  = app.querySelector(".p-"+k+" .dit");
+    const sp = b && b.querySelector("span");
+    const txt = sp ? sp.textContent : "";
+    if(!txt) continue;
+    sp.textContent = "";
+    b.dataset.attente = "1";
+    etapes.push([[sp, txt, 9, b]]);
+  }
+  E.scene = { etapes, i:0 };
+
+  /* Les trois choix sont la derniere etape : ils n'apparaissent
+     qu'une fois les quatre groupes ayant parle. C'est la premiere des
+     trois separations d'avec les bulles — celle du temps. */
+  for(const sel of [".scene .question", ".scene .rep"]){
+    const el = app.querySelector(sel);
+    if(el) el.dataset.attente = "1";
+  }
+
+  let dro = false;
+  try{ dro = matchMedia("(prefers-reduced-motion: reduce)").matches }catch(e){}
+  if(window.SANS_CHRONO || app.classList.contains("presse") || dro){
+    for(const etape of etapes) poserEtape(etape);
+    E.scene.i = etapes.length;
+    revelerChoix();
+    return;
   }
   t.textContent=""; if(x) x.textContent=""; r.textContent="";
-  /* Toute l'affaire s'écrit : le titre, puis l'exposé, puis la réplique.
-     L'exposé défile vite — il fait près de quatre cents caractères — et
-     un clic n'importe où pose l'ensemble d'un coup. */
+  /* Si une lettre est encore a lire, on ne tape rien : sinon l'ordre
+     du jour serait deja ecrit et les quatre voix dites quand le joueur
+     refermerait la lettre. C'est « lettreLue » qui donnera le depart. */
+  if(lettreAlire()) return;
   try{ SON.frappe(true) }catch(e){}
-  const fini = ()=>{ try{ SON.frappe(false) }catch(e){} };
-  E.machines=[ taper(t, titre, 15, ()=>{
-    try{ SON.chariot() }catch(e){}          /* le titre est posé */
-    if(!x || !E.ecrit.ex){ E.machines.push(taper(r, replique, 7, fini)); return; }
-    E.machines.push(taper(x, E.ecrit.ex, 4, ()=>{
-      E.machines.push(taper(r, replique, 7, fini));
+  jouerEtape();
+}
+
+/* Les trois plaques montent l'une après l'autre. « montre » déclenche
+   l'animation : la poser en même temps qu'on retire l'attente, sinon
+   l'animation se jouerait pendant que le bloc est encore invisible. */
+function revelerChoix(){
+  for(const sel of [".scene .question", ".scene .rep"]){
+    const el = app.querySelector(sel);
+    if(!el) continue;
+    delete el.dataset.attente;
+    el.classList.add("montre");
+  }
+}
+
+/* Poser une étape, c'est écrire d'un coup tout ce qu'elle devait
+   écrire — et montrer la bulle, s'il y en a une. */
+function poserEtape(etape){
+  for(const [el, txt, , b] of etape){
+    el.textContent = txt;
+    if(b) delete b.dataset.attente;
+  }
+}
+
+function jouerEtape(){
+  const s = E && E.scene;
+  if(!s) return;
+  if(s.i >= s.etapes.length){ try{ SON.frappe(false) }catch(e){} revelerChoix(); return; }
+  const etape = s.etapes[s.i];
+  const lancer = j=>{
+    const [el, txt, ms, b] = etape[j];
+    if(b) delete b.dataset.attente;
+    el.textContent = "";
+    E.machines.push(taper(el, txt, ms, ()=>{
+      /* le chariot revient quand le titre est posé */
+      if(j === 0 && etape.length > 1){ try{ SON.chariot() }catch(e){} }
+      if(j + 1 < etape.length){ lancer(j + 1); return; }
+      s.i++; jouerEtape();
     }));
-  }) ];
+  };
+  lancer(0);
 }
 
 function taper(el, txt, ms, fin){
@@ -4150,16 +4374,17 @@ function stopperMachines(){
   try{ SON.frappe(false) }catch(e){}
 }
 
-/* Un clic n'importe où pose le texte en entier. */
+/* Un clic pose l'étape en cours et lance la suivante. Rend « true »
+   tant qu'il restait quelque chose à écrire : au-delà, le clic reprend
+   son rôle d'avant et pose les dossiers. */
 function finirEcriture(){
+  const s = E && E.scene;
+  if(!s || s.i >= s.etapes.length) return false;
   stopperMachines();
-  if(!E || !E.ecrit) return;
-  const t=app.querySelector(".situ .t"),
-        x=app.querySelector(".situ .ex"),
-        r=app.querySelector(".situ .d");
-  if(t) t.textContent=E.ecrit.t;
-  if(x) x.textContent=E.ecrit.ex||"";
-  if(r) r.textContent=E.ecrit.d;
+  poserEtape(s.etapes[s.i]);
+  s.i++;
+  jouerEtape();
+  return true;
 }
 
 /* ==================================================================
