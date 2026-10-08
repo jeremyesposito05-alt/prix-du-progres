@@ -21,7 +21,8 @@
 use strict; use warnings; use utf8;
 binmode(STDOUT, ":encoding(UTF-8)");
 
-my $cible = shift or die "usage: cartes-injecter.pl <index.html> <situations.tsv> <*.md>\n";
+my $cible = shift or die "usage: cartes-injecter.pl <index.html> <I|II> <situations.tsv> <*.md>\n";
+my $NIV   = shift or die "usage\n";
 my $tsv   = shift or die "usage\n";
 my @md    = @ARGV or die "usage\n";
 
@@ -54,17 +55,29 @@ for my $n (@nums){
 printf "  %d situations completes\n", scalar(@nums);
 
 # ================= qui gagne, qui perd =================
-# Les groupes, tels qu'ils se nomment dans les consequences. Les
-# proprietaires terriens n'existent pas comme force : historiquement,
-# ce sont eux que le Parlement represente — c'est le sens meme des
-# Corn Laws. On les y rattache plutot que d'ouvrir une cinquieme force
-# pour deux cartes.
-my %GRP = (
-  i => qr/industriel|fabricant|filateur|patron|propri\x{E9}taire d/i,
-  o => qr/ouvri|fileus|tisserand|famille ouvri/i,
-  m => qr/marchand|n\x{E9}gociant|commer\x{E7}ant/i,
-  p => qr/parlement|londres|\x{C9}tat\b|autorit\x{E9}|inspecteur|propri\x{E9}taires? terriens?/i,
+# Les groupes, tels qu'ils se nomment dans les consequences. Ils ne
+# portent pas les memes noms d'un niveau a l'autre : Manchester a des
+# marchands et un Parlement, Detroit des clients et une opinion.
+#
+# A Manchester, les proprietaires terriens n'existent pas comme force :
+# historiquement, ce sont eux que le Parlement represente — c'est le
+# sens meme des Corn Laws. On les y rattache plutot que d'ouvrir une
+# cinquieme force pour deux cartes.
+my %GROUPES = (
+  I => {
+    i => qr/industriel|fabricant|filateur|patron|propri\x{E9}taire d/i,
+    o => qr/ouvri|fileus|tisserand|famille ouvri/i,
+    m => qr/marchand|n\x{E9}gociant|commer\x{E7}ant/i,
+    p => qr/parlement|londres|\x{C9}tat\b|autorit\x{E9}|inspecteur|propri\x{E9}taires? terriens?/i,
+  },
+  II => {
+    i => qr/actionnaire|direction|propri\x{E9}taire de l/i,
+    o => qr/ouvri|contrema\x{EE}tre|\x{E9}quipe/i,
+    m => qr/client|acheteur|concessionnaire/i,
+    p => qr/opinion|journaliste|presse|public\b/i,
+  },
 );
+my %GRP = %{ $GROUPES{$NIV} or die "ARRET : niveau $NIV inconnu\n" };
 my $BASCULE = qr/\bmais\b|\ben revanche\b|\btandis que\b|\bau prix d|\bcependant\b|\bpourtant\b/i;
 
 # Le PREMIER groupe nomme de chaque cote, et lui seul : « Les
@@ -147,13 +160,13 @@ my $s = do { local $/; <$h> }; close $h;
 utf8::decode($s);
 $s =~ /\r\n/ and die "ARRET : $cible est en CRLF — le normaliser en LF d'abord\n";
 
-my $de = index($s, "const CARTES_I = [");
-$de >= 0 or die "ARRET : CARTES_I introuvable\n";
+my $de = index($s, "const CARTES_$NIV = [");
+$de >= 0 or die "ARRET : CARTES_$NIV introuvable\n";
 my $a = index($s, "\n];\n", $de);
-$a > $de or die "ARRET : fin de CARTES_I introuvable\n";
+$a > $de or die "ARRET : fin de CARTES_$NIV introuvable\n";
 my $vieux = () = (substr($s, $de, $a-$de) =~ /^\{t:/mg);
 
-my $neuf = "const CARTES_I = [\n" . join("\n\n", @blocs) . "\n];\n";
+my $neuf = "const CARTES_$NIV = [\n" . join("\n\n", @blocs) . "\n];\n";
 substr($s, $de, $a + 4 - $de) = $neuf;
 
 utf8::encode($s);

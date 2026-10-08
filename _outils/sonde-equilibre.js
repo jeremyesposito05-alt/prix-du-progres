@@ -39,7 +39,7 @@ window.SANS_CHRONO = true;
       if(mode === "hasard"){ mode = "methodique"; n = 0; }
       else { clearInterval(t); rapport(); return; }
     }
-    nouvellePartie("campagne","I");
+    nouvellePartie("campagne",NIVEAU);
   }
 
   function rapport(){
@@ -58,7 +58,7 @@ window.SANS_CHRONO = true;
     document.body.appendChild(d);
   }
 
-  setTimeout(()=>nouvellePartie("campagne","I"), 80);
+  setTimeout(()=>nouvellePartie("campagne",NIVEAU), 80);
   var t = setInterval(function(){
     if(typeof E === "undefined" || !E) return;
     if(++garde > 60000){ clearInterval(t); rapport(); return; }
