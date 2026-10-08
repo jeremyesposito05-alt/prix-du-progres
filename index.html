@@ -813,8 +813,10 @@ body.surmenu main{max-width:1080px}
 }
 
 /* les quatre temps de l'explication, en fiches de papier */
-.etapes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:820px){.etapes{grid-template-columns:1fr}}
+/* Les temps de l'explication, les uns SOUS les autres. Sur deux
+   colonnes, la classe lisait en zigzag et ne retenait rien. */
+.etapes{display:grid;grid-template-columns:minmax(0,1fr);gap:13px;
+  max-width:740px;margin:0 auto}
 .etape{
   display:flex; gap:15px; align-items:flex-start;
   background:
@@ -841,6 +843,20 @@ body.surmenu main{max-width:1080px}
 }
 .etape p{margin:0;font-size:14.5px;line-height:1.6;color:var(--enc2)}
 .etape p strong{color:var(--enc);font-weight:bold}
+
+/* Le but du jeu. Pose a meme la photographie du decor, il se lisait a
+   travers les cheminees : il lui fallait sa feuille. */
+.but-jeu{
+  max-width:740px; margin:0 auto 16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 26%),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  border:1px solid var(--fil); border-left:4px solid var(--rge);
+  border-radius:2px; padding:15px 20px; color:var(--enc);
+  box-shadow:0 11px 26px rgba(0,0,0,.46);
+  font-size:16.5px; line-height:1.5; text-align:center;
+}
+.but-jeu strong{color:var(--enc);font-weight:bold}
 
 .mini-forces{display:flex;flex-wrap:wrap;gap:15px;margin:0 0 10px}
 .mini-forces span{display:flex;align-items:center;gap:6px}
@@ -959,65 +975,59 @@ body.surmenu main{max-width:1080px}
   border:1px solid var(--fil); box-shadow:0 3px 10px rgba(0,0,0,.4);
 }
 
-/* ---------- la galerie des acteurs --------------------------------
-   Une fiche par force, repliée. L'emblème et le nom suffisent à la
-   reconnaître ; le portrait et la scène récompensent celui qui ouvre. */
-.acteurs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0 6px;
-  align-items:start}   /* une fiche fermee ne doit pas s etirer */
-@media(max-width:820px){.acteurs{grid-template-columns:1fr}}
-
-details.acteur{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.5), transparent 26%),
-    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
-  border:1px solid var(--fil); border-left:4px solid var(--lai); border-radius:2px;
-  color:var(--enc); box-shadow:0 9px 22px rgba(0,0,0,.44); overflow:hidden;
-}
-details.acteur summary{
-  list-style:none; cursor:pointer; display:flex; align-items:center; gap:13px;
-  padding:12px 15px;
-}
-details.acteur summary::-webkit-details-marker{display:none}
-details.acteur[open]{border-left-color:var(--rge)}
-
+/* ---------- la ronde des acteurs ----------------------------------
+   Les quatre groupes, ouverts, aux MEMES places que dans la partie :
+   industriels en haut a gauche, marchands en haut a droite, ouvriers
+   en bas a gauche, Parlement en bas a droite. L'eleve qui entre dans
+   sa premiere decision retrouve un plateau qu'il a deja vu.
+   Les fiches etaient repliees derriere « Ouvrir le dossier » : la
+   classe ne les ouvrait pas. */
 .embleme{margin:0;flex:0 0 auto}
 .embleme img{width:58px;height:58px;object-fit:contain;display:block;
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.3))}
 
-
-.nom-acteur{font-family:var(--serif);font-size:20px;line-height:1.1}
-summary .veut{font-size:12.5px;font-style:italic;color:var(--rge);
-  flex:1 1 100%; order:3; margin-top:-4px}
-@media(min-width:560px){ summary .veut{flex:1 1 auto; order:0; margin-top:0} }
-details.acteur .pli{
-  margin-left:auto; flex:0 0 auto; font-size:10px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--enc2);
-  border:1px solid var(--fil); border-radius:2px; padding:3px 9px;
-  background:rgba(255,255,255,.45); white-space:nowrap;
+.ronde{
+  display:grid; gap:14px 16px; align-items:stretch; margin:22px 0 6px;
+  grid-template-columns:minmax(0,1fr) minmax(0,.72fr) minmax(0,1fr);
 }
-details.acteur .pli::before{content:"Ouvrir le dossier"}
-details.acteur[open] .pli::before{content:"Fermer"}
-details.acteur .pli::after{content:" ▼"}
-details.acteur[open] .pli::after{content:" ▲"}
+.r-i{grid-area:1/1} .r-m{grid-area:1/3}
+.r-o{grid-area:2/1} .r-p{grid-area:2/3}
+.ronde-c{grid-area:1/2/3/3; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:8px 4px}
 
-.acteur .fiche{padding:0 15px 15px;display:grid;gap:0 15px;
-  grid-template-columns:122px minmax(0,1fr)}
-@media(max-width:560px){ .acteur .fiche{grid-template-columns:1fr} }
-.acteur .fiche .role{font-size:14px;line-height:1.6;color:var(--enc2);
-  border-top:1px solid var(--fil);padding-top:12px;margin-top:12px}
-.acteur .fiche .role strong{color:var(--enc)}
+.fich{
+  display:grid; gap:0 14px; grid-template-columns:96px minmax(0,1fr);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.5), transparent 26%),
+    linear-gradient(152deg, var(--pap) 0%, var(--pap2) 100%);
+  border:1px solid var(--fil); border-left:4px solid var(--lai);
+  border-radius:2px; padding:14px 16px; color:var(--enc);
+  box-shadow:0 9px 22px rgba(0,0,0,.44);
+}
+.fich figure{margin:0; grid-row:1 / span 3}
+.fich figure img{
+  width:100%; aspect-ratio:4/5; object-fit:cover; display:block;
+  border:1px solid var(--fil); box-shadow:0 3px 10px rgba(0,0,0,.4);
+  filter:sepia(.12) contrast(1.03);
+}
+.fich .fi-t{font-family:var(--serif);font-size:21px;line-height:1.1}
+.fich .fi-v{font-size:12.5px;font-style:italic;color:var(--rge);margin:3px 0 8px}
+.fich .fi-r{margin:0;font-size:13.5px;line-height:1.55;color:var(--enc2)}
+.fich .fi-r strong{color:var(--enc);font-weight:bold}
 
-.portrait-acteur{margin:12px 0 0;width:100%}
-.portrait-acteur img{
-  width:100%;height:auto;display:block;border:1px solid var(--fil);
-  box-shadow:0 4px 12px rgba(0,0,0,.4);
+.ronde-c .rc-t{
+  margin:0 0 8px; font-family:var(--serif); font-size:clamp(17px,2vw,21px);
+  color:var(--pap); text-shadow:0 2px 14px rgba(0,0,0,.85); line-height:1.2;
 }
-.scene-acteur{grid-column:1 / -1;margin:13px 0 0}
-.scene-acteur img{
-  width:100%;height:auto;display:block;border:1px solid var(--fil);
-  box-shadow:0 6px 18px rgba(0,0,0,.42);
+.ronde-c .rc-x{
+  margin:0; font-size:13.5px; line-height:1.55; color:#CDBCA2;
+  text-shadow:0 2px 10px rgba(0,0,0,.9); max-width:30ch;
 }
-@media(max-width:560px){ .portrait-acteur{float:none;width:100%;margin:0 0 10px} }
+@media(max-width:900px){
+  .ronde{display:flex; flex-direction:column}
+  .ronde-c{order:-1; padding:0 0 4px}
+  .fich{grid-template-columns:76px minmax(0,1fr)}
+}
 
 /* ---------- le blason au tableau ----------------------------------
    L'emblème gravé passe devant le pictogramme. Le pictogramme reste
@@ -1106,17 +1116,9 @@ details.acteur[open] .pli::after{content:" ▲"}
 }
 .titre-ecran .paraphe b{font-weight:normal;font-style:normal;color:rgba(255,255,255,.86)}
 
-/* ---------- la cinquième fiche du tutoriel ------------------------
-   Cinq fiches sur deux colonnes : la dernière reste seule. Calée à
-   gauche, elle déséquilibrait la page ; on la centre sur la largeur
-   d'une colonne, pour qu'on la lise comme les quatre autres. */
-.etapes .etape:last-child:nth-child(odd){
-  grid-column:1 / -1; justify-self:center;
-  width:min(100%, calc(50% - 8px));
-}
-@media(max-width:820px){
-  .etapes .etape:last-child:nth-child(odd){width:100%}
-}
+/* ---------- il n'y a plus qu'une colonne --------------------------
+   Les fiches se suivent : aucune ne reste seule au bout d'un rang,
+   et la regle qui recentrait la derniere n'a plus d'objet. */
 
 /* ---------- le panneau de mission ---------------------------------
    C'est le seul moment où l'on s'adresse au joueur avant la partie :
@@ -1643,6 +1645,14 @@ body.surmenu[data-decor-ecran="menu"] .etape{
 body.surmenu[data-decor-ecran="menu"] .etape:hover{
   box-shadow:0 10px 26px rgba(26,32,71,.14);
 }
+/* Le but suit les fiches : meme papier, meme ombre, l'accent en or. */
+body.surmenu[data-decor-ecran="menu"] .but-jeu{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--bs-filet); border-left:4px solid var(--bs-gold);
+  border-radius:6px; color:var(--bs-gris);
+  box-shadow:0 6px 18px rgba(26,32,71,.1), 0 1px 3px rgba(26,32,71,.08);
+}
+body.surmenu[data-decor-ecran="menu"] .but-jeu strong{color:var(--bs-navy)}
 body.surmenu[data-decor-ecran="menu"] .etape .num{
   color:#fff; background:var(--bs-navy);
   box-shadow:0 2px 6px rgba(26,32,71,.3); border:none;
@@ -1874,17 +1884,9 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 @media(max-width:900px){ .son-reglage .regl i{display:none} }
 @media(max-width:700px){ .son-reglage .regl:last-child{display:none} }
 
-/* Le but du jeu, dit avant tout le reste : les eleves lisaient cinq
-   points sans trouver l'objectif, parce qu'il n'etait ecrit nulle part. */
-.but-jeu{
-  margin:0 0 20px; padding:12px 16px; text-align:center;
-  font-family:var(--serif); font-size:16.5px; line-height:1.45;
-  color:var(--enc); background:rgba(243,190,49,.13);
-  border-top:1px solid rgba(243,190,49,.5);
-  border-bottom:1px solid rgba(243,190,49,.5);
-}
-.but-jeu strong{color:var(--enc)}
-@media(max-width:600px){ .but-jeu{font-size:15px;padding:10px 12px} }
+/* Le but du jeu a sa feuille, plus haut dans la page : un fond dore a
+   13 % pose sur une photographie d'usine ne se lisait pas. */
+@media(max-width:600px){ .but-jeu{font-size:15px;padding:12px 14px} }
 
 /* ==================================================================
    LA SCENE — les quatre acteurs autour de l'affaire
@@ -1897,18 +1899,27 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .plateau.large{max-width:1180px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
 
 .scene{
-  display:grid; gap:12px 16px; align-items:stretch;
-  grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) minmax(0,1fr);
+  display:grid; gap:14px 18px; align-items:stretch;
+  grid-template-columns:minmax(0,.95fr) minmax(0,2fr) minmax(0,.95fr);
   grid-template-rows:auto auto;
-  margin:0 0 18px;
+  margin:0 0 4px;
 }
 .p-i{grid-area:1/1} .p-m{grid-area:1/3}
 .p-o{grid-area:2/1} .p-p{grid-area:2/3}
-.centre{grid-area:1/2/3/3; display:flex; flex-direction:column; gap:10px}
+/* « .centre » sert ailleurs dans le jeu a centrer un texte : sans le
+   prefixe, ce « display:flex » empilait les boutons de l'ecran de
+   niveau sur toute la largeur.
+   Les bulles debordent des postes sur l'ordre du jour : elles ne
+   peuvent le faire que si les postes passent DEVANT le centre. */
+.scene > .centre{grid-area:1/2/3/3; display:flex; flex-direction:column;
+  gap:10px; position:relative; z-index:1}
 
 /* ---------- un poste d'acteur ---------- */
 .poste{
-  position:relative; display:flex; flex-direction:column; gap:6px;
+  /* z-index : sans lui, les deux postes du haut sont peints avant le
+     centre — leurs bulles disparaissaient sous la feuille. */
+  position:relative; z-index:3;
+  display:flex; flex-direction:column; gap:6px;
   padding:10px 11px 11px; border-radius:3px;
   background:linear-gradient(176deg,var(--pap) 0%,var(--pap2) 100%);
   border:1px solid rgba(107,87,65,.3);
@@ -1951,8 +1962,11 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 }
 
 /* ---------- le visage ---------- */
+/* Les portraits sont en 540 x 675, soit 4/5. Le cadre etait carre :
+   il leur coupait la tete. Le cadre prend desormais la forme de
+   l'image, et plus rien n'est rogne. */
 .poste .visage{
-  position:relative; width:100%; aspect-ratio:1/1; max-height:124px;
+  position:relative; width:100%; aspect-ratio:4/5;
   border-radius:2px; overflow:hidden; background:var(--pap2);
   border:1px solid rgba(107,87,65,.28);
   transition:box-shadow .42s ease;
@@ -1975,22 +1989,68 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .poste .tige{height:3px;border-radius:2px;background:rgba(107,87,65,.2);overflow:hidden}
 .poste .tige i{display:block;height:100%;transition:width .6s ease}
 
-/* ---------- ce qu'il dit ---------- */
+/* ---------- ce qu'il dit : une bulle, pas un encart ----------
+   Elle part du visage et mord sur l'ordre du jour. Elle ne passe
+   jamais sur le texte : deux flotteurs invisibles, mesures apres
+   coup par « calerBulles », reservent sa place et le texte la
+   contourne. */
 .poste .dit{
-  position:relative; margin-top:1px; padding:7px 9px; border-radius:2px;
-  background:rgba(255,255,255,.5); border:1px solid rgba(107,87,65,.22);
-  font-size:12.5px; line-height:1.4; color:var(--enc);
+  position:absolute; top:24%; z-index:6; width:200px;
+  padding:9px 13px 10px; border-radius:15px;
+  background:#FFFCF2; border:1.5px solid rgba(74,56,38,.6);
+  box-shadow:0 7px 18px rgba(0,0,0,.42);
+  font-size:13px; line-height:1.38; color:var(--enc);
 }
-.poste .dit::before{
-  content:""; position:absolute; top:-5px; left:12px; width:8px; height:8px;
-  background:rgba(255,255,255,.5); border-left:1px solid rgba(107,87,65,.22);
-  border-top:1px solid rgba(107,87,65,.22); transform:rotate(45deg);
+.p-i .dit,.p-o .dit{left:calc(100% - 90px)}
+.p-m .dit,.p-p .dit{right:calc(100% - 90px)}
+/* la queue : deux triangles, le bord puis le papier */
+.poste .dit::before,.poste .dit::after{
+  content:""; position:absolute; width:0; height:0; border:10px solid transparent;
 }
-.poste.gagne .dit{border-color:rgba(63,106,46,.4)}
-.poste.perd .dit,.poste.perd-fort .dit{border-color:rgba(166,48,36,.35)}
+.poste .dit::before{top:13px}
+.poste .dit::after{top:14px; border-width:9px}
+.p-i .dit::before,.p-o .dit::before{left:-20px; border-right-color:rgba(74,56,38,.6)}
+.p-i .dit::after,.p-o .dit::after{left:-17px; border-right-color:#FFFCF2}
+.p-m .dit::before,.p-p .dit::before{right:-20px; border-left-color:rgba(74,56,38,.6)}
+.p-m .dit::after,.p-p .dit::after{right:-17px; border-left-color:#FFFCF2}
+
+.poste.gagne .dit{border-color:rgba(63,106,46,.65)}
+.p-i.gagne .dit::before,.p-o.gagne .dit::before{border-right-color:rgba(63,106,46,.65)}
+.p-m.gagne .dit::before,.p-p.gagne .dit::before{border-left-color:rgba(63,106,46,.65)}
+.poste.perd .dit,.poste.perd-fort .dit{border-color:rgba(166,48,36,.6)}
+.p-i.perd .dit::before,.p-o.perd .dit::before,
+.p-i.perd-fort .dit::before,.p-o.perd-fort .dit::before{border-right-color:rgba(166,48,36,.6)}
+.p-m.perd .dit::before,.p-p.perd .dit::before,
+.p-m.perd-fort .dit::before,.p-p.perd-fort .dit::before{border-left-color:rgba(166,48,36,.6)}
 
 /* ---------- le centre : l'affaire, et le joueur ---------- */
-.centre .ordre{flex:1;display:flex;flex-direction:column}
+/* En « flex », un flotteur est ignore : l'ordre du jour redevient un
+   bloc, sans quoi le texte ne contournerait rien. */
+.centre .ordre{display:block; position:relative}
+/* Les deux encoches : invisibles, sans contenu, elles ne font que
+   reserver le coin que la bulle occupe. JS leur donne leur taille. */
+.centre .ordre .encoche{display:block;width:0;height:0;margin:0;padding:0;
+  pointer-events:none}
+.centre .ordre .encoche.eg{float:left}
+.centre .ordre .encoche.ed{float:right}
+.centre .ordre .d{clear:both}
+
+/* Les trois reponses, au milieu du plateau, en bulles. Elles etaient
+   sous la scene : il fallait quitter des yeux l'affaire pour les lire. */
+.centre .question{margin:12px 0 8px;grid-column:auto}
+/* Les marges gauche et droite sont posees par « calerBulles » : ce
+   sont les deux bulles du bas qui disent de combien il faut se
+   serrer. */
+.centre .rep{grid-template-columns:minmax(0,1fr);gap:9px;margin:0;
+  transition:margin .3s ease}
+.centre .choix{
+  border-radius:16px !important; padding:12px 17px !important;
+  transform:none !important; text-align:left;
+  border:1.5px solid rgba(74,56,38,.5) !important;
+}
+.centre .choix .q{font-size:16px;line-height:1.32}
+.centre .choix:hover{transform:translateY(-2px) !important;
+  border-color:var(--rge) !important}
 /* Le joueur, personnifie : un sous-main vide au bas du centre, qui dit
    sans un mot que la place est la sienne. */
 .centre .moi{
@@ -2000,27 +2060,47 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 }
 .centre .moi span{display:none}
 
-/* ---------- les dossiers, en bande sous les reponses ---------- */
+/* ---------- les dossiers : trois languettes, pas trois panneaux ----
+   Ferme, un dossier tenait encore un tiers de l'ecran : le carnet
+   s'ouvrait tout seul et deployait l'annee, la population, les sept
+   conditions ; le courrier vide affichait une enveloppe geante pour
+   dire qu'il n'y avait rien. C'est l'encombrement que la classe a
+   reproche au jeu. Desormais : une ligne chacun, et on tire. */
 .appoints{
-  display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;
-  padding-top:14px; border-top:1px solid rgba(107,87,65,.22);
+  display:flex; flex-wrap:wrap; align-items:flex-start; gap:10px;
+  margin-top:22px; padding-top:13px;
+  border-top:1px solid rgba(107,87,65,.22);
 }
-.appoints > *{flex:1 1 220px; min-width:0}
+.appoints > *{flex:1 1 230px; min-width:0; align-self:flex-start}
 .appoints .dossier{margin:0}
+.appoints details:not([open]) > summary{padding:9px 14px}
+.appoints .courrier:not([open]) .env{display:none}
+.appoints .carnet:not([open]) .spirale{display:none}
 
 /* ---------- le telephone : une colonne, les acteurs en rang ---------- */
+/* ---------- le telephone : une colonne, dans l'ordre de lecture ----
+   L'affaire, les quatre acteurs, puis la question. « display:contents »
+   sort les enfants du centre pour qu'ils prennent leur rang entre les
+   postes : sans lui, les reponses arrivaient avant les arguments. */
 @media(max-width:860px){
-  .scene{grid-template-columns:1fr;grid-template-rows:auto}
-  .centre{grid-area:auto;order:-1}
-  .p-i,.p-m,.p-o,.p-p{grid-area:auto}
-  .scene{display:grid}
-  .poste{flex-direction:row;align-items:center;gap:9px;transform:none!important}
-  .poste .visage{width:58px;height:58px;max-height:58px;flex:0 0 58px;aspect-ratio:auto}
-  .poste .ident{flex:0 0 92px}
+  .scene{display:flex; flex-direction:column; gap:11px}
+  .scene > .centre{display:contents}
+  .centre .ordre{order:-2}
+  .poste{order:0}
+  .centre .question{order:1;margin:6px 0 2px}
+  .centre .rep{order:2}
+  .centre .moi{display:none}
+  .centre .ordre .encoche{display:none}
+  .poste{flex-direction:row;align-items:center;gap:10px;transform:none!important}
+  .poste .visage{width:62px;flex:0 0 62px;aspect-ratio:4/5}
+  .poste .ident{flex:0 0 96px}
   .poste .tige{display:none}
-  .poste .dit{flex:1;margin:0}
-  .poste .dit::before{top:12px;left:-5px;border:none;
-    border-left:1px solid rgba(107,87,65,.22);border-bottom:1px solid rgba(107,87,65,.22)}
+  .poste .dit{position:relative;flex:1;width:auto;border-radius:12px;
+    padding:8px 11px;box-shadow:none}
+  .poste .dit::after{display:none}
+  .poste .dit::before{top:16px;left:-19px;right:auto;border-width:9px;
+    border-right-color:rgba(74,56,38,.6) !important;
+    border-left-color:transparent !important}
 }
 @media(prefers-reduced-motion:reduce){
   .poste,.poste .visage{transition:none;animation:none!important;transform:none!important}
@@ -3063,7 +3143,7 @@ function nouvellePartie(mode,niv){
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
-  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:true,crLus:0,courbe:[{t:0,pop:N.pop0}],releve:[{t:0,an:N.a0,i:60,o:60,m:60,p:60}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:false,crLus:0,courbe:[{t:0,pop:N.pop0}],releve:[{t:0,an:N.a0,i:60,o:60,m:60,p:60}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
   piocher(); rendre();
 }
 const ok=c=>!c.req||c.req.every(r=>E.acquis.includes(r));
@@ -3339,7 +3419,7 @@ function poste(k, c, vus){
   </div>`;
 }
 
-function scene(c){
+function scene(c, reponses){
   const vus = concernes(c);
   const d = dernierChoix();
   return `<div class="scene" data-phase="${d?"apres":"avant"}">
@@ -3347,18 +3427,78 @@ function scene(c){
     ${poste("m", c, vus)}
     <div class="centre">
       <div class="situ ordre dossier d-situation">
+        <i class="encoche eg" aria-hidden="true"></i>
+        <i class="encoche ed" aria-hidden="true"></i>
         <span class="onglet">Affaire du jour</span>
         <div class="t"></div>
         <div class="ex"></div>
         <div class="parle">${illuPersonne(c.qui)}<span>${esc(c.qui)}</span></div>
         <div class="d"></div>
       </div>
+      <div class="question">Que décidez-vous ?</div>
+      ${reponses}
       <div class="moi" aria-hidden="true"><span></span></div>
     </div>
     ${poste("o", c, vus)}
     ${poste("p", c, vus)}
   </div>`;
 }
+
+/* LES BULLES ET LE TEXTE QU'ELLES NE DOIVENT PAS COUVRIR.
+   Une bulle est posee par-dessus l'ordre du jour, en absolu : elle
+   ignore le texte, et le texte l'ignore. On mesure donc, apres coup,
+   de combien elle mord sur la feuille, et on donne cette taille aux
+   deux flotteurs places en tete du bloc. Le texte les contourne, donc
+   il contourne les bulles. Mesure plutot que calcul : la largeur des
+   colonnes depend de la fenetre, et une formule se serait trompee. */
+function calerBulles(){
+  const sc = app.querySelector(".scene"); if(!sc) return;
+  const ord = sc.querySelector(".ordre"); if(!ord) return;
+
+  /* Au telephone la scene est une colonne : les bulles ne debordent
+     sur rien, et toute mesure posee ici serait a defaire. */
+  const rep = sc.querySelector(".rep");
+  if(innerWidth <= 860){
+    for(const e of sc.querySelectorAll(".encoche")) e.style.cssText = "";
+    if(rep){ rep.style.marginLeft = rep.style.marginRight = "" }
+    return;
+  }
+
+  /* Les trois reponses se serrent entre les deux bulles du bas. */
+  if(rep){
+    const ce = sc.querySelector(".centre").getBoundingClientRect();
+    const bg = sc.querySelector(".p-o .dit"), bd = sc.querySelector(".p-p .dit");
+    const g = bg ? Math.max(0, bg.getBoundingClientRect().right - ce.left + 14) : 0;
+    const d = bd ? Math.max(0, ce.right - bd.getBoundingClientRect().left + 14) : 0;
+    /* on ne laisse jamais moins de 260 px pour lire une reponse */
+    const place = ce.width - g - d;
+    const k = place < 260 ? Math.max(0, (ce.width - 260) / (g + d || 1)) : 1;
+    rep.style.marginLeft  = Math.round(g * k) + "px";
+    rep.style.marginRight = Math.round(d * k) + "px";
+  }
+
+  const r = ord.getBoundingClientRect();
+  if(!r.width) return;
+  const cs = getComputedStyle(ord);
+  const hg = r.left  + parseFloat(cs.paddingLeft);
+  const hd = r.right - parseFloat(cs.paddingRight);
+  const ht = r.top   + parseFloat(cs.paddingTop);
+  for(const [cote, cle] of [["eg","i"],["ed","m"]]){
+    const e = ord.querySelector(".encoche." + cote);
+    const b = sc.querySelector(".p-" + cle + " .dit");
+    if(!e) continue;
+    if(!b){ e.style.width = e.style.height = "0px"; continue; }
+    const bb = b.getBoundingClientRect();
+    const l = (cote === "eg") ? (bb.right - hg) : (hd - bb.left);
+    const h = bb.bottom - ht;
+    e.style.width  = Math.max(0, Math.round(l) + 14) + "px";
+    e.style.height = Math.max(0, Math.round(h) + 10) + "px";
+  }
+}
+let calage = 0;
+addEventListener("resize", ()=>{
+  clearTimeout(calage); calage = setTimeout(calerBulles, 120);
+});
 
 function rendre(){
   remonter();
@@ -3378,12 +3518,10 @@ function rendre(){
   app.innerHTML=`
   ${alerte()}
   <div class="bureau"><div class="plateau large">
-    ${scene(c)}
-    <div class="question" ${D()}>Que décidez-vous ?</div>
-    <div class="rep ${trois.length===2?"deux":""}" ${D()}>
+    ${scene(c, `<div class="rep" ${D()}>
       ${trois.map(k=>`<button class="choix" onclick="choisir('${k}')">
         <span class="q">${esc(c[k].q)}</span></button>`).join("")}
-    </div>
+    </div>`)}
     <div class="appoints" ${D()}>
       ${c.f?`<details class="dossier d-enquete ${guide?"guide":""}">
           <summary><span class="onglet">Rapport d’enquête</span>
@@ -3398,6 +3536,12 @@ function rendre(){
   `;
   app.classList.remove("presse");
   ecrire(c.t, c.ex, c.d);
+  /* Les images des portraits arrivent apres : on cale une fois tout de
+     suite pour que le premier mot tombe au bon endroit, une fois la
+     mise en page faite, et une fois le chargement termine. */
+  calerBulles();
+  requestAnimationFrame(calerBulles);
+  addEventListener("load", calerBulles, { once:true });
   try{ SON.majTension(); SON.papier() }catch(e){}
   majVue();
 }
@@ -3412,10 +3556,6 @@ document.addEventListener("click",e=>{
    dira au professeur qui a enquêté et qui a tranché à l'aveugle. */
 document.addEventListener("toggle",e=>{
   const t=e.target;
-  if(t.classList&&t.classList.contains("acteur")&&t.open){
-    document.body.dataset.acteursLus =
-      String(document.querySelectorAll("details.acteur[open]").length);
-  }
   if(t.classList&&t.classList.contains("carnet")&&E) E.carnetOuvert = t.open;
   /* un dossier qu'on déplie froisse, un pli qu'on décachette craque */
   if(t.open && t.classList){
@@ -3571,12 +3711,10 @@ function courrier(attr){
   const classe = `courrier dossier ${proche?"attente":""} ${neufs?"neuf":""} ${der&&!proche?"ouvert":""}`;
   const cachet = neufs ? `<span class="cachet" aria-label="${neufs} pli${neufs>1?"s":""} à lire">${neufs}</span>` : "";
 
-  /* Sans pli en attente et sans pli reçu, il n'y a rien à ouvrir : le
-     dossier reste un simple carton, et il ne remue pas. */
-  if(!recus.length && !proche)
-    return `<div class="${classe}" ${attr}>
-      <span class="onglet">Courrier</span>${cachet}
-      <div class="env"></div>${resume}</div>`;
+  /* Sans pli en attente et sans pli reçu, il n'y a rien à ouvrir : on
+     n'affiche rien. Un carton vide occupait un tiers de la bande pour
+     annoncer qu'il était vide. */
+  if(!recus.length && !proche) return "";
 
   /* Ce qu'un messager peut dire sans briser le cachet. */
   const scelle = proche ? `<article class="cr-pli cr-scelle">
@@ -4348,7 +4486,11 @@ function batons(){
 
 function carnet(d){
 
-  const ouvert = (E.carnetOuvert !== false);
+  /* Fermé par défaut. Ouvert, il étalait l'année, la population, la
+     courbe et les sept conditions sous les réponses : trois écrans de
+     chiffres pour une décision qui ne s'en sert pas. Il reste à un
+     clic — son rabat montre déjà l'année et le numéro du tour. */
+  const ouvert = (E.carnetOuvert === true);
   return `<details class="carnet dossier" ${ouvert?"open":""} ${d||""}>
     <summary>
       <span class="onglet">Carnet de bord</span>
@@ -5193,10 +5335,10 @@ const EV_II = [
 const NIVEAUX = {
  I:{ id:"I", titre:"Le prix du progrès", lieu:"Manchester", pays:"Angleterre",
      sous:"Manchester, 1780 — 1851", ord:"1re révolution industrielle",
-     role:"Vous décidez pour Manchester.",
-     qui:"Vous n’êtes ni le patron, ni l’ouvrier, ni le député. Vous êtes celui qui tranche — et <strong>chacune de vos décisions fait un gagnant et un perdant.</strong>",
-     but:"Votre but : mener la ville jusqu’en 1851 sans qu’aucune force ne vous lâche — puis découvrir quelle Manchester vous avez bâtie.",
-     note:"<strong>Pourquoi 1851 ?</strong> Cette année-là, Londres expose sous le Crystal Palace tout ce que l’industrie britannique sait faire, et le recensement établit que le pays compte désormais plus de citadins que de ruraux — une première dans l’histoire. C’est le moment où la société née en 1780 peut enfin se regarder en face.",
+     role:"Manchester, 1780.",
+     qui:"C’est encore une petite ville de drapiers. Elle a du <strong>charbon</strong> tout près, une rivière qui fait tourner les machines, et des marchands qui cherchent à vendre plus loin.",
+     but:"En soixante-dix ans, elle va devenir la première ville industrielle du monde. C’est vous qui décidez comment.",
+     note:"<strong>Jusqu’en 1851.</strong> Cette année-là, l’Angleterre compte pour la première fois plus de citadins que de ruraux.",
      avant:"Plus les industriels sont contents, plus la ville grossit. Et plus elle grossit, <strong>plus les ouvriers s’épuisent tout seuls</strong>, sans que vous ayez rien décidé : les logements ne suivent jamais le rythme des usines.",
      forces:FORCES_I, cartes:CARTES_I, fins:FINS_I, verdict:VERDICT_I, ev:EV_I, quiz:QUIZ_I,
      tours:18, a0:1780, a1:1851, pop0:36267, unite:"Population", unite2:"habitants",
@@ -5212,10 +5354,10 @@ const NIVEAUX = {
      ]},
  II:{ id:"II", titre:"Le prix du progrès", lieu:"Detroit", pays:"États-Unis",
      sous:"Detroit, 1908 — 1932", ord:"2e révolution industrielle",
-     role:"Vous dirigez l’usine.",
-     qui:"Vous n’êtes ni l’ingénieur, ni l’ouvrier de la chaîne, ni l’actionnaire. Vous êtes celui qui tranche — et <strong>chaque gain de productivité se prend quelque part.</strong>",
-     but:"Votre but : mener l’usine jusqu’en 1932 sans qu’aucune force ne vous lâche — puis découvrir quelle entreprise vous avez bâtie.",
-     note:"<strong>Pourquoi 1932 ?</strong> Le 7 mars, plusieurs milliers de chômeurs marchent sur les usines de Dearborn pour demander du travail. La police tire. La chaîne qui avait fait la prospérité de la ville venait de produire du chômage de masse : c’est là que la deuxième révolution industrielle se regarde en face.",
+     role:"Detroit, 1908.",
+     qui:"On y fabrique des automobiles à la main, une par une, pour des gens riches. Autour de la ville : du fer, du <strong>charbon</strong>, du pétrole, des trains — et un pays immense où tout le monde voudrait rouler.",
+     but:"En vingt-cinq ans, l’usine Ford va changer la façon de fabriquer. C’est vous qui la dirigez.",
+     note:"<strong>Jusqu’en 1932.</strong> Le 7 mars, des milliers de chômeurs marchent sur les usines de Dearborn pour demander du travail. La police tire.",
      avant:"Plus les actionnaires sont contents, plus la production monte. Et plus elle monte, <strong>plus la cadence use les ouvriers d’elle-même</strong>, sans que vous ayez rien décidé : la chaîne ne ralentit jamais toute seule.",
      forces:FORCES_II, cartes:CARTES_II, fins:FINS_II, verdict:VERDICT_II, ev:EV_II, quiz:QUIZ_II,
      tours:18, a0:1908, a1:1932, pop0:10600, unite:"Production", unite2:"voitures par an",
@@ -5708,13 +5850,13 @@ function accueil(){
         <h1>Comment on joue</h1>
       </div>
 
-      <p class="but-jeu">Votre but : <strong>conduire votre ville — ou votre usine — jusqu’au bout de la période sans qu’aucun des quatre groupes ne vous abandonne.</strong></p>
+      <p class="but-jeu">Quatre groupes vous jugent. <strong>Gardez-les tous les quatre jusqu’à la fin.</strong></p>
 
       <div class="etapes">
         <div class="etape sans-titre">
           <span class="num">1</span>
           <div>
-            <p>Une situation arrive sur votre bureau. Quelqu’un vient plaider sa cause, et vous avez <strong>trois réponses possibles</strong>.</p>
+            <p>Un problème arrive sur votre bureau. Quelqu’un vient vous demander quelque chose. Vous avez <strong>trois réponses</strong>.</p>
           </div>
         </div>
         <div class="etape sans-titre">
@@ -5722,13 +5864,13 @@ function accueil(){
           <div>
             <div class="mini-forces">${ROLES.map(r=>`<span>
               ${icone(r.k)}<i>${esc(r.t)}</i></span>`).join("")}</div>
-            <p>Vous choisissez. Chaque réponse <strong>contente un groupe et en fâche un autre</strong> : aucune ne plaît à tout le monde.</p>
+            <p>Vous choisissez. Chaque réponse <strong>fait un content et un mécontent</strong>. Aucune ne plaît aux quatre.</p>
           </div>
         </div>
         <div class="etape sans-titre">
           <span class="num">3</span>
           <div>
-            <p>Si un groupe vous lâche tout à fait, <strong>la partie s’arrête</strong>. Sinon vous allez au bout, et vous découvrez ce que vous avez bâti.</p>
+            <p>Si un groupe vous abandonne, <strong>la partie s’arrête</strong>. Sinon vous allez au bout, et vous voyez la ville que vous avez faite.</p>
           </div>
         </div>
       </div>
@@ -5739,6 +5881,19 @@ function accueil(){
       <p class="note-menu">Les personnages qui vous parlent sont des figures composites.
       Les événements datés, eux, sont authentiques — le jeu cite ses sources.</p>
     </div>
+  </div>`;
+}
+
+/* Une fiche d'acteur, ouverte : le portrait entier, le nom, ce qu'il
+   veut, et son rôle. C'est le seul endroit du jeu où on les présente
+   au calme — autant qu'ils soient lus. */
+function fichActeur(k){
+  return `<div class="fich r-${k}">
+    <figure><img src="img/acteurs/${N.id}-${k}-portrait.jpg" alt="" loading="lazy"
+      onerror="this.closest('figure').remove()"></figure>
+    <div class="fi-t">${esc(N.forces[k].nom)}</div>
+    <div class="fi-v">${esc(N.forces[k].veut)}</div>
+    <p class="fi-r">${gras(esc(N.forces[k].role))}</p>
   </div>`;
 }
 
@@ -5761,9 +5916,9 @@ function menuNiveau(id){
   <div class="role">
     <div class="r">${N.role}</div>
     <p class="r-qui">${N.qui}</p>
-    <p class="r-but"><strong>Si l’une des quatre forces tombe à zéro, la partie s’arrête.</strong> ${N.but}</p>
+    <p class="r-but">${N.but}</p>
     <p class="note-role">${N.note}</p>
-    <p class="note-source">Ceux qui viennent vous parler sont des figures composites : ils n’ont pas porté ces noms, mais chacun dit ce que disaient les gens de sa condition. Les deux seuls témoignages authentiques du jeu vous attendent à la fin de la partie.</p>
+    <p class="note-source">Les personnages sont inventés ; ce qu’ils disent, non. Les deux seuls témoignages authentiques vous attendent à la fin de la partie.</p>
   </div>
     <figure class="mission-illu mi-d">
       <img src="img/niveau/${N.id}-droite.jpg" alt="${esc(N.vues.d)}" loading="lazy"
@@ -5772,22 +5927,15 @@ function menuNiveau(id){
   </div>
   <p class="mission-note">Ces deux vues sont des <strong>illustrations</strong>, pas des documents
   d’époque : elles montrent le contraste, elles ne le prouvent pas.</p>
-  <div class="acteurs">${CLES.map(k=>`<details class="acteur">
-     <summary>
-       <figure class="embleme"><img src="img/acteurs/${N.id}-${k}-embleme.jpg" alt=""
-         onerror="this.closest('figure').remove()"></figure>
-       <span class="nom-acteur">${N.forces[k].nom}</span>
-       <span class="veut">${esc(N.forces[k].veut)}</span>
-       <span class="pli"></span>
-     </summary>
-     <div class="fiche">
-       <figure class="portrait-acteur"><img src="img/acteurs/${N.id}-${k}-portrait.jpg" alt="" loading="lazy"
-         onerror="this.closest('figure').remove()"></figure>
-       <div class="role">${gras(esc(N.forces[k].role))}</div>
-       <figure class="scene-acteur"><img src="img/acteurs/${N.id}-${k}-scene.jpg" alt="" loading="lazy"
-         onerror="this.closest('figure').remove()"></figure>
-     </div>
-   </details>`).join("")}</div>
+  <div class="ronde">
+    ${["i","m"].map(fichActeur).join("")}
+    <div class="ronde-c">
+      <p class="rc-t">Les quatre groupes qui vous jugent</p>
+      <p class="rc-x">Chaque décision en contente un et en fâche un autre.
+      Si l’un d’eux vous abandonne tout à fait, la partie s’arrête.</p>
+    </div>
+    ${["o","p"].map(fichActeur).join("")}
+  </div>
   <p class="centre" style="margin:24px 0 8px">
     <button class="plein" onclick="nouvellePartie('campagne',N.id)">Campagne · ${N.tours} décisions jusqu’en ${N.a1}</button>
     <button onclick="nouvellePartie('infini',N.id)">Survie${rec?` · record ${fmt(rec)} ${N.unite2}`:""}</button>
