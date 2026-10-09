@@ -3850,10 +3850,13 @@ function diraActeur(k){
      texte parle toujours de ce qui est sur le bureau maintenant. Ce
      qui s'est passe au tour precedent est dit en haut, par
      « retombee », ou il ne peut pas etre confondu.
-     Pour Detroit, qui n'a pas encore ses dialogues, « veut » sert de
-     filet : le groupe rappelle ce qu'il attend. */
+     QUI N'A RIEN A DIRE SE TAIT. Les deux acteurs que la carte
+     concerne ont un avis ecrit pour elle ; les deux autres n'en ont
+     pas, et affichaient alors leur phrase generale — la meme a chaque
+     tour, sans rapport avec l'affaire. On rend une chaine vide : le
+     poste ne dessine aucune bulle. Le silence dit qui est concerne. */
   const avis = (E.carte && E.carte.av || {})[k];
-  return { txt: avis || N.forces[k].veut,
+  return { txt: avis || "",
            sens: (d && v) ? (v>0 ? "gagne" : (v<=-8 ? "perd-fort" : "perd")) : "attend" };
 }
 
@@ -3900,7 +3903,7 @@ function poste(k, c, vus){
       ${mot?`<span class="et">${mot}</span>`:""}
     </div>
     <div class="tige"><i style="width:${Math.max(3,v)}%;background:${col}"></i></div>
-    <div class="dit"><span>${esc(dit.txt)}</span></div>
+    ${dit.txt ? `<div class="dit"><span>${esc(dit.txt)}</span></div>` : ""}
   </div>`;
 }
 
