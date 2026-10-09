@@ -3564,11 +3564,16 @@ function nouvellePartie(mode,niv){
   remonter(true);
   if(niv) N=NIVEAUX[niv];
   document.body.classList.remove("surmenu");
-  document.body.dataset.niveau=N.id; peindreVille(); chercherVue();
+  /* « chercherVue » choisit le decor d apres l avancement de la partie.
+     Appele ici, il lisait encore le tour de la partie PRECEDENTE : une
+     seconde partie commencait sur le bureau de la fin. Il est descendu
+     sous la creation de l etat. */
+  document.body.dataset.niveau=N.id; peindreVille();
   try{ SON.ambiance(N.id) }catch(e){}
   if(E&&E.timer){ clearInterval(E.timer); }
   stopperMachines();
   E={mode,tour:0,lus:[],f:{i:60,o:60,m:60,p:60},pop:N.pop0,acquis:[],vues:[],carnet:[],carnetOuvert:false,crLus:0,courbe:[{t:0,pop:N.pop0}],releve:[{t:0,an:N.a0,i:60,o:60,m:60,p:60}],secousse:[],aveugle:0,avertiAveugle:false,evVus:[],derEv:-9,graines:[],consq:null,fini:null,timer:null};
+  chercherVue();
   piocher(); rendre();
 }
 /* Les sept conditions ont ete retirees du jeu : plus rien ne les
@@ -5632,56 +5637,61 @@ const CARTES_II = [
  d:"« Je veux des livraisons régulières sans subir les prix des fournisseurs. »",
  ex:"Les fournisseurs d’acier augmentent leurs prix ensemble. Nos ingénieurs proposent de construire nos propres fours pour fabriquer l’acier.",
  l:"Révisez Trace écrite 3 §1. Le terme **industrialisation** désigne le développement des usines et de la fabrication grâce aux machines. Quelles causes expliquent la situation, et quelles conséquences votre choix aura-t-il ?",
+ av:{i:"Nous voulons fabriquer notre acier plutôt que subir les prix des fournisseurs.", o:"Nous voulons des fours sûrs avant de travailler près du métal brûlant."},
  a:{q:"« Je fais construire nos fours. »", e:{i:9,o:-8},
-    c:"Les actionnaires gagnent une source d’acier sûre, mais les ouvriers affrontent des travaux dangereux."},
+    c:"Les actionnaires gagnent une source d’acier sûre, mais les ouvriers affrontent des travaux dangereux.", dit:{i:"Nous pourrons compter sur notre propre acier pour les prochaines voitures.",o:"Nous craignons les brûlures dans ces nouveaux fours."}},
  b:{q:"« Je conserve les fournisseurs actuels. »", e:{i:-8,o:9},
-    c:"Les ouvriers évitent ces nouveaux risques, mais les actionnaires restent dépendants des prix extérieurs."},
+    c:"Les ouvriers évitent ces nouveaux risques, mais les actionnaires restent dépendants des prix extérieurs.", dit:{i:"Nous resterons à la merci des hausses des fournisseurs.",o:"Nous évitons les dangers liés à la fabrication de l’acier."}},
  c:{q:"« Je négocie un contrat de longue durée. »", e:{i:-8,m:9},
-    c:"Les clients profitent de prix plus stables, mais les actionnaires acceptent un engagement coûteux."}},
+    c:"Les clients profitent de prix plus stables, mais les actionnaires acceptent un engagement coûteux.", dit:{i:"Nous devrons payer cet acier même si son prix baisse ailleurs.",m:"Nous espérons que le contrat stabilisera le prix de nos voitures."}}},
 
 {n:"02", t:"Le choix du site industriel", qui:"Charles Houghton, ingénieur chargé des transports",
  d:"« Je veux recevoir les matières premières sans bloquer les rues. »",
  ex:"Notre usine du centre manque de place pour les voitures. Un terrain près de la rivière offre un port et un accès au chemin de fer.",
  l:"Révisez Trace écrite 3 §1. Le terme **production de masse** désigne la fabrication de très grandes quantités de produits semblables. Qu’est-ce qui resterait pareil, et qu’est-ce qui changerait avec votre décision ?",
+ av:{m:"Nous voulons des voitures livrées sans longs retards de transport.", o:"Nous préférons garder nos emplois près de nos logements."},
  a:{q:"« Je construis près du port. »", e:{i:9,o:-8},
-    c:"Les actionnaires gagnent des livraisons facilitées, mais les ouvriers doivent s’éloigner de leur quartier."},
+    c:"Les actionnaires gagnent des livraisons facilitées, mais les ouvriers doivent s’éloigner de leur quartier.", dit:{i:"Nous recevrons plus facilement les matériaux par bateau et par train.",o:"Nous devrons traverser la ville pour rejoindre la nouvelle usine."}},
  b:{q:"« Je développe les ateliers du centre. »", e:{i:-8,o:9},
-    c:"Les ouvriers gardent leur trajet habituel, mais les actionnaires manquent d’espace pour grandir."},
+    c:"Les ouvriers gardent leur trajet habituel, mais les actionnaires manquent d’espace pour grandir.", dit:{i:"Nous manquerons encore de place pour agrandir les chaînes.",o:"Nous conservons notre trajet quotidien vers les ateliers du centre."}},
  c:{q:"« Je partage les ateliers entre deux sites. »", e:{i:-8,m:9},
-    c:"Les clients espèrent davantage de voitures, mais les actionnaires financent deux installations."}},
+    c:"Les clients espèrent davantage de voitures, mais les actionnaires financent deux installations.", dit:{i:"Nous devrons entretenir deux usines au lieu d’une.",m:"Nous espérons que deux sites permettront de livrer davantage de voitures."}}},
 
 {n:"03", t:"Une automobile pour quel public", qui:"Arthur Miller, directeur des ventes",
  d:"« Je veux une voiture que nous puissions vendre dans tout le pays. »",
  ex:"Les Américains sont nombreux à vouloir se déplacer en voiture. Nos vendeurs hésitent entre un modèle luxueux et une automobile simple.",
  l:"Révisez Trace écrite 3 §1. Le terme **production de masse** désigne la fabrication de très grandes quantités de produits semblables. Quelles causes expliquent la situation, et quelles conséquences votre choix aura-t-il ?",
+ av:{i:"Nous voulons connaître les gains possibles avant de choisir les acheteurs.", m:"Nous voulons une voiture simple que nos familles puissent acheter."},
  a:{q:"« Je fabrique une voiture simple. »", e:{i:-8,m:9},
-    c:"Les clients accèdent à une voiture moins chère, mais les actionnaires renoncent aux prix élevés du luxe."},
+    c:"Les clients accèdent à une voiture moins chère, mais les actionnaires renoncent aux prix élevés du luxe.", dit:{i:"Nous abandonnons les sommes élevées payées par les clients riches.",m:"Nous pourrons envisager une automobile sans fortune personnelle."}},
  b:{q:"« Je vise les acheteurs fortunés. »", e:{i:9,m:-8},
-    c:"Les actionnaires préservent de fortes recettes par voiture, mais les clients modestes restent exclus."},
+    c:"Les actionnaires préservent de fortes recettes par voiture, mais les clients modestes restent exclus.", dit:{i:"Nous gagnerons davantage sur chaque automobile de luxe.",m:"Nous ne pourrons toujours pas acheter ces voitures trop chères."}},
  c:{q:"« Je propose deux versions distinctes. »", e:{o:-8,m:9},
-    c:"Les clients gagnent du choix, mais les ouvriers doivent apprendre deux fabrications."}},
+    c:"Les clients gagnent du choix, mais les ouvriers doivent apprendre deux fabrications.", dit:{m:"Nous aurons le choix entre une voiture simple et une luxueuse.",o:"Nous devrons apprendre à fabriquer deux modèles différents."}}},
 
 {n:"04", t:"Un modèle unique pour nos ateliers", qui:"Thomas Reed, mécanicien d’assemblage",
  d:"« Je veux cesser de chercher une pièce différente pour chaque voiture. »",
  ex:"Six versions de voiture compliquent le travail des ateliers. Un mécanicien propose de fabriquer les mêmes pièces pour un seul modèle.",
  l:"Révisez Trace écrite 3 §3 · vocabulaire. Le terme **standardisation** désigne la fabrication de pièces ou de produits selon un modèle identique. Qu’est-ce qui resterait pareil, et qu’est-ce qui changerait avec votre décision ?",
+ av:{m:"Nous voulons retrouver facilement les mêmes pièces en cas de panne.", o:"Nous craignons de répéter le même montage toute la journée."},
  a:{q:"« Je conserve un modèle unique. »", e:{o:-8,m:9},
-    c:"Les clients trouvent plus facilement des pièces de rechange, mais les ouvriers répètent davantage les mêmes tâches."},
+    c:"Les clients trouvent plus facilement des pièces de rechange, mais les ouvriers répètent davantage les mêmes tâches.", dit:{m:"Nous pourrons remplacer une pièce sans chercher six versions.",o:"Nous risquons de refaire sans cesse les mêmes gestes."}},
  b:{q:"« Je maintiens les six versions. »", e:{i:-8,m:9},
-    c:"Les clients conservent un large choix, mais les actionnaires paient des fabrications complexes."},
+    c:"Les clients conservent un large choix, mais les actionnaires paient des fabrications complexes.", dit:{i:"Nous continuerons à payer pour six fabrications compliquées.",m:"Nous garderons le choix parmi les six voitures proposées."}},
  c:{q:"« Je garde deux modèles seulement. »", e:{i:9,m:-8},
-    c:"Les actionnaires simplifient les ateliers, mais les clients perdent plusieurs versions."}},
+    c:"Les actionnaires simplifient les ateliers, mais les clients perdent plusieurs versions.", dit:{i:"Nous simplifierons les ateliers avec seulement deux modèles.",m:"Nous perdrons plusieurs modèles que nous aimions comparer."}}},
 
 {n:"05", t:"Le pari d’une nouvelle Ford", qui:"James Couzens, responsable de l’entreprise",
  d:"« Je veux lancer une voiture robuste que beaucoup pourront acheter. »",
  ex:"En 1908, nos ateliers savent déjà construire des voitures. Un projet nouveau permettrait d’en fabriquer beaucoup plus à un prix accessible.",
  l:"Révisez Trace écrite 3 §2 · partie I. Le terme **innovation** désigne une nouveauté appliquée qui transforme les façons de fabriquer ou de vivre. Pourquoi cette décision pourrait-elle compter dans l’histoire de l’usine ?",
+ av:{i:"Nous craignons de financer un modèle dont personne ne connaît les ventes.", o:"Nous voulons être formés avant de fabriquer cette nouvelle voiture."},
  a:{q:"« Je lance le nouveau modèle. »", e:{i:-8,m:9},
-    c:"Les clients espèrent un véhicule accessible, mais les actionnaires financent une fabrication encore incertaine."},
+    c:"Les clients espèrent un véhicule accessible, mais les actionnaires financent une fabrication encore incertaine.", dit:{i:"Nous devons engager notre argent sans connaître le succès du modèle.",m:"Nous pourrons enfin attendre une Ford moins chère."}},
  b:{q:"« Je perfectionne la voiture actuelle. »", e:{i:9,m:-8},
-    c:"Les actionnaires protègent leurs investissements existants, mais les clients attendent une automobile moins chère."},
+    c:"Les actionnaires protègent leurs investissements existants, mais les clients attendent une automobile moins chère.", dit:{i:"Nous conservons des ateliers que nous savons déjà faire fonctionner.",m:"Nous attendrons encore une automobile à prix abordable."}},
  c:{q:"« Je teste le modèle avant son lancement. »", e:{o:9,m:-8},
-    c:"Les ouvriers apprennent progressivement la nouvelle fabrication, mais les clients attendent sa sortie."}},
+    c:"Les ouvriers apprennent progressivement la nouvelle fabrication, mais les clients attendent sa sortie.", dit:{m:"Nous devrons patienter jusqu’à la sortie de cette Ford.",o:"Nous apprendrons le nouveau montage avant la vente."}}},
 
 {n:"06", t:"Des pièces qui ne s’ajustent pas", qui:"Frederick Hall, chef du contrôle des pièces",
  d:"« Je veux assembler les voitures sans devoir corriger chaque pièce. »",

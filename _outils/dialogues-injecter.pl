@@ -203,5 +203,7 @@ printf "\n  %d repliques posees sur %d cartes\n", $mis, $cartes_vues;
 if(@sautees){
   printf "  %d carte(s) sans repliques, laissees en l'etat : %s\n",
     scalar(@sautees), join(" ", @sautees);
-  print  "  (elles gardent les deux phrases generales de leur force)\n";
+  print  "  (soit elles gardent les deux phrases generales de leur force,
+   soit elles ont deja recu les leurs lors d une injection precedente)
+";
 }
