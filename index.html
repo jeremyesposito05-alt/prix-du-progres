@@ -2118,13 +2118,24 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    ================================================================== */
 /* La scene gere sa propre grille : le plateau ne doit plus imposer
    ses trois colonnes, sinon elle se retrouve coincee dans la premiere. */
-.plateau.large{max-width:1180px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
+.plateau.large{max-width:1340px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
 
+/* Les colonnes des acteurs gagnent ce que les gouttieres perdent :
+   le medaillon est plus large, et les quatre se tiennent plus pres
+   de l'ordre du jour. */
 .scene{
-  display:grid; gap:14px 18px; align-items:stretch;
-  grid-template-columns:minmax(0,.95fr) minmax(0,2fr) minmax(0,.95fr);
+  display:grid; gap:12px 10px; align-items:start;
+  /* 1 / 1,6 / 1 sur 1340 px : la colonne du centre garde les 587 px
+     qu'elle avait, au pixel pres — c'est elle qui decide du nombre de
+     lignes, donc de la hauteur de la page. Tout le reste va aux
+     medaillons. */
+  grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) minmax(0,1fr);
   grid-template-rows:auto auto;
   margin:0 0 4px;
+  /* 282 px : le plus grand diametre tel que deux rangees tiennent
+     encore dans la hauteur que la colonne du centre impose de toute
+     facon. Mesure, pas choisi. */
+  --rond:282px;
 }
 .p-i{grid-area:1/1} .p-m{grid-area:1/3}
 .p-o{grid-area:2/1} .p-p{grid-area:2/3}
@@ -2141,22 +2152,36 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   /* z-index : sans lui, les deux postes du haut sont peints avant le
      centre — leurs bulles disparaissaient sous la feuille. */
   position:relative; z-index:3;
-  display:flex; flex-direction:column; gap:6px;
-  padding:10px 11px 11px; border-radius:3px;
-  background:linear-gradient(176deg,var(--pap) 0%,var(--pap2) 100%);
-  border:1px solid rgba(107,87,65,.3);
-  box-shadow:0 2px 7px rgba(43,33,24,.17);
+  display:flex; flex-direction:column; gap:5px;
+  /* Plus de cadre de papier : le medaillon porte son propre bord, et
+     les onze pixels de marge passent dans le diametre. */
+  padding:0;
+  width:min(100%,var(--rond));
   transition:transform .42s cubic-bezier(.22,.9,.26,1),
-             box-shadow .42s ease, filter .42s ease, opacity .42s ease;
-  transform:scale(.975); opacity:.9;
+             filter .42s ease, opacity .42s ease;
+  transform:scale(.975); opacity:.88;
 }
+/* chacun se range du cote de l'ordre du jour */
+.p-i,.p-o{justify-self:end}
+.p-m,.p-p{justify-self:start}
 /* Concerne par l'affaire : il se penche un peu, sans qu'on le dise. */
 .poste.concerne{opacity:1}
 .p-i.concerne,.p-o.concerne{transform:scale(1) translateX(5px)}
 .p-m.concerne,.p-p.concerne{transform:scale(1) translateX(-5px)}
 
+/* IL A LA PAROLE. La mise en scene ecrit les bulles une a une : celui
+   dont la bulle s'ecrit s'avance d'un pas et passe devant les autres.
+   Quand tout est dit, plus personne n'est « maintenant » et le regard
+   est libre pour les trois choix. */
+.poste.parle{opacity:1}
+.poste.dit-maintenant{z-index:7; opacity:1}
+.poste.dit-maintenant .visage{border-color:rgba(216,179,112,.75);
+  box-shadow:0 10px 26px rgba(43,33,24,.45), 0 0 0 4px rgba(216,179,112,.2)}
+.p-i.dit-maintenant,.p-o.dit-maintenant{transform:scale(1.075) translateX(10px)}
+.p-m.dit-maintenant,.p-p.dit-maintenant{transform:scale(1.075) translateX(-10px)}
+
 /* Il a gagne : il AVANCE vers le joueur. */
-.poste.gagne{opacity:1; box-shadow:0 7px 010px rgba(43,33,24,.3), 0 0 0 1px rgba(63,106,46,.4)}
+.poste.gagne{opacity:1}
 .p-i.gagne,.p-o.gagne{transform:scale(1.045) translateX(12px)}
 .p-m.gagne,.p-p.gagne{transform:scale(1.045) translateX(-12px)}
 .poste.gagne .visage{box-shadow:0 0 0 2px rgba(63,106,46,.55)}
@@ -2173,10 +2198,7 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .p-i.perd-fort,.p-o.perd-fort{transform:scale(.93) translateX(-11px)}
 .p-m.perd-fort,.p-p.perd-fort{transform:scale(.93) translateX(11px)}
 .poste.perd-fort .visage{animation:trembler .44s ease-in-out .2s 6}
-.poste.perd-fort::after{
-  content:""; position:absolute; inset:-1px; border-radius:3px;
-  box-shadow:inset 0 0 0 1px rgba(166,48,36,.5); pointer-events:none;
-}
+.poste.perd-fort .visage{box-shadow:0 0 0 2px rgba(166,48,36,.5)}
 @keyframes trembler{
   0%,100%{transform:translateX(0) rotate(0)}
   16%{transform:translateX(-4px) rotate(-1.2deg)}
@@ -2190,17 +2212,20 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    il leur coupait la tete. Le cadre prend desormais la forme de
    l'image, et plus rien n'est rogne. */
 .poste .visage{
-  position:relative; width:100%; aspect-ratio:4/5;
-  border-radius:2px; overflow:hidden; background:var(--pap2);
-  border:1px solid rgba(107,87,65,.28);
-  transition:box-shadow .42s ease;
+  position:relative; width:100%; aspect-ratio:1;
+  border-radius:50%; overflow:hidden; background:var(--pap2);
+  border:3px solid rgba(107,87,65,.4);
+  box-shadow:0 6px 16px rgba(43,33,24,.3);
+  transition:box-shadow .42s ease, border-color .42s ease;
 }
+.poste.gagne .visage{border-color:rgba(63,106,46,.6)}
 /* LE TEMPS PASSE SUR LES VISAGES.
    « --age » va de 0 au premier tour a 1 au dernier. Le sepia monte, la
    couleur se retire, le contraste durcit : la meme image n'est jamais
    deux fois la meme, et cinq portraits par acteur deviennent un
    continuum sur dix-huit decisions. Aucune image de plus a produire. */
 .poste .visage img{width:100%;height:100%;object-fit:cover;display:block;
+  object-position:50% 14%;
   filter:sepia(calc(.14 + var(--age,0) * .3))
          saturate(calc(1 - var(--age,0) * .34))
          contrast(calc(1.03 + var(--age,0) * .14))
@@ -2210,8 +2235,8 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .poste .visage::after{
   content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
   opacity:calc(var(--age,0) * .55);
-  background:radial-gradient(ellipse at 50% 40%,
-    transparent 42%, rgba(28,19,11,.62) 100%);
+  background:radial-gradient(circle at 50% 42%,
+    transparent 40%, rgba(28,19,11,.66) 100%);
   transition:opacity 1.2s ease;
 }
 .poste .visage .jeton{
@@ -2221,13 +2246,36 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 .poste .visage img ~ .jeton{display:none}
 .poste .visage svg{width:46%;height:46%}
 
-.poste .ident{display:flex;flex-direction:column;gap:1px;line-height:1.2}
-.poste .nm{font-family:var(--serif);font-size:15px;color:var(--enc)}
-.poste .et{font-size:10.5px;color:var(--rge);letter-spacing:.03em}
+/* Il mord sur le bas du rond : trente-quatre pixels par rangee rendus
+   au diametre, et le nom reste lisible — il porte son ombre. */
+/* Un cartouche, pas un voile : sur un atelier clair, un degrade ne
+   tient pas. Le gain de place reste — il mord toujours sur le rond. */
+.poste .ident{display:flex;flex-direction:column;gap:0;line-height:1.16;
+  text-align:center;align-items:center;
+  position:relative; z-index:2; margin-top:-36px; pointer-events:none;
+  width:84%; margin-left:auto; margin-right:auto;
+  padding:4px 10px 5px; border-radius:4px;
+  background:linear-gradient(176deg,rgba(32,23,15,.93) 0%,rgba(18,12,7,.95) 100%);
+  border:1px solid rgba(216,179,112,.34);
+  box-shadow:0 4px 12px rgba(0,0,0,.5)}
+body[data-niveau="II"] .poste .ident{
+  background:linear-gradient(176deg,rgba(20,26,36,.93) 0%,rgba(12,16,23,.95) 100%);
+  border-color:rgba(150,185,220,.32)}
+.poste .nm{font-family:var(--serif);font-size:16.5px;color:#F2E7D2;
+  letter-spacing:.01em; white-space:nowrap}
+body[data-niveau="II"] .poste .nm{color:#E6EEF7}
+.poste .et{font-size:10px;color:#D8B370;letter-spacing:.06em;
+  text-transform:uppercase; white-space:nowrap}
+body[data-niveau="II"] .poste .et{color:#9EC2E0}
 .poste.critique .et{font-weight:bold}
 
 /* la jauge, sans un chiffre */
-.poste .tige{height:3px;border-radius:2px;background:rgba(107,87,65,.2);overflow:hidden}
+/* Elle passe DANS le cartouche : plus rien ne depasse du rond, et la
+   rangee ne coute que les quelques pixels du bas de la plaque. */
+.poste .tige{height:4px;border-radius:2px;width:84%;
+  margin:-4px auto 0; position:relative; z-index:3;
+  background:rgba(0,0,0,.5);overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4)}
 .poste .tige i{display:block;height:100%;transition:width .6s ease}
 
 /* ---------- ce qu'il dit : une bulle, pas un encart ----------
@@ -2246,8 +2294,8 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   box-shadow:0 7px 18px rgba(0,0,0,.42);
   font-size:13px; line-height:1.38; color:var(--enc);
 }
-.p-i .dit,.p-o .dit{left:calc(100% - 90px)}
-.p-m .dit,.p-p .dit{right:calc(100% - 90px)}
+.p-i .dit,.p-o .dit{left:calc(100% - 58px)}
+.p-m .dit,.p-p .dit{right:calc(100% - 58px)}
 /* la queue : deux triangles, le bord puis le papier */
 .poste .dit::before,.poste .dit::after{
   content:""; position:absolute; width:0; height:0; border:10px solid transparent;
@@ -2295,14 +2343,15 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    portraits se jouait hors champ. Au-dessous de neuf cents pixels de
    haut, le cadre redevient carre et l'image se cale sur le haut :
    la tete reste, le bas part. */
-@media(max-height:900px){
-  .poste .visage{aspect-ratio:1/1}
-  .poste .visage img{object-position:50% 16%}
-}
-@media(max-height:760px){
-  .poste .visage{aspect-ratio:4/3}
-  .poste .nm{font-size:13.5px}
-  .scene{gap:10px 16px}
+/* Un ecran bas ne coupe plus la tete : il reduit le diametre. Le
+   visage reste entier, du premier au dernier pixel. */
+/* Plus de palier par hauteur d'ecran : la mesure a montre que ce
+   n'est pas la fenetre qui commande la hauteur de la scene, mais la
+   colonne du centre — et elle ne change pas avec la fenetre. Les
+   paliers retrecissaient les visages sans rien gagner. Seul reste un
+   ecran vraiment bas, ou la bande de nom se resserre. */
+@media(max-height:700px){
+  .poste .nm{font-size:14.5px} .poste .et{display:none}
 }
 
 /* ---------- les trois choix : des plaques, pas des bulles ----------
@@ -2406,7 +2455,10 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   .centre .moi{display:none}
   .centre .ordre .encoche{display:none}
   .poste{flex-direction:row;align-items:center;gap:10px;transform:none!important}
-  .poste .visage{width:62px;flex:0 0 62px;aspect-ratio:4/5}
+  .poste{width:auto}
+  .poste .visage{width:62px;flex:0 0 62px;aspect-ratio:1;border-width:2px}
+  .poste .ident{text-align:left;align-items:flex-start;
+    margin-top:0;background:none;padding:0}
   .poste .ident{flex:0 0 96px}
   .poste .tige{display:none}
   .poste .dit{position:relative;flex:1;width:auto;border-radius:12px;
@@ -4517,6 +4569,7 @@ function ecrire(titre, expose, replique){
    l'animation : la poser en même temps qu'on retire l'attente, sinon
    l'animation se jouerait pendant que le bloc est encore invisible. */
 function revelerChoix(){
+  finParole();
   for(const sel of [".scene .question", ".scene .rep", ".scene .apres"]){
     const el = app.querySelector(sel);
     if(!el) continue;
@@ -4525,12 +4578,28 @@ function revelerChoix(){
   }
 }
 
+/* QUI PARLE AVANCE. Le poste dont la bulle vient d'etre decouverte
+   prend « dit-maintenant » ; celui d'avant le rend mais garde
+   « parle », donc sa bulle et sa pleine presence. */
+function avance(b){
+  if(!b) return;
+  const p = b.closest(".poste"); if(!p) return;
+  for(const q of app.querySelectorAll(".poste.dit-maintenant"))
+    if(q !== p) q.classList.remove("dit-maintenant");
+  p.classList.add("parle", "dit-maintenant");
+}
+/* Plus personne n'a la parole : le regard va aux trois choix. */
+function finParole(){
+  for(const q of app.querySelectorAll(".poste.dit-maintenant"))
+    q.classList.remove("dit-maintenant");
+}
+
 /* Poser une étape, c'est écrire d'un coup tout ce qu'elle devait
    écrire — et montrer la bulle, s'il y en a une. */
 function poserEtape(etape){
   for(const [el, txt, , b] of etape){
     el.textContent = txt;
-    if(b) delete b.dataset.attente;
+    if(b){ delete b.dataset.attente; avance(b) }
   }
 }
 
@@ -4551,7 +4620,7 @@ function jouerEtape(){
   const etape = s.etapes[s.i];
   const lancer = j=>{
     const [el, txt, ms, b] = etape[j];
-    if(b) delete b.dataset.attente;
+    if(b){ delete b.dataset.attente; avance(b) }
     el.textContent = "";
     E.machines.push(taper(el, txt, ms, ()=>{
       /* le chariot revient quand le titre est posé */
