@@ -2169,6 +2169,9 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
      pour que le plateau tienne d'une seule matiere.
      Une GRILLE et non une rangee : la jauge est la soeur du bloc du
      nom, pas sa fille — en rangee elle se posait a COTE du nom. */
+  /* « container-type » pour que le nom puisse se caler sur la largeur
+     de SA carte, et non sur celle de la fenetre. */
+  container-type:inline-size;
   display:grid; grid-template-columns:var(--rond) minmax(0,1fr);
   grid-template-rows:auto auto; align-items:center;
   column-gap:18px; row-gap:0;
@@ -2283,8 +2286,11 @@ body[data-niveau="II"] .poste .visage{border-color:rgba(150,185,220,.3)}
   display:flex;flex-direction:column;gap:1px;line-height:1.16;
   min-width:0; text-align:left; align-items:flex-start;
   pointer-events:none}
-.poste .nm{font-family:var(--serif);font-size:23px;color:#F2E7D2;
-  letter-spacing:.01em; line-height:1.1}
+.poste .nm{font-family:var(--serif);color:#F2E7D2;
+  letter-spacing:.01em; line-height:1.1;
+  /* il ne casse jamais : c'est sa taille qui cede */
+  white-space:nowrap;
+  font-size:clamp(13px, 7.4cqi, 23px)}
 body[data-niveau="II"] .poste .nm{color:#E6EEF7}
 .poste .et{font-size:10px;color:#D8B370;letter-spacing:.06em;
   text-transform:uppercase; white-space:nowrap}
@@ -2318,8 +2324,10 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
   box-shadow:0 9px 22px rgba(0,0,0,.5);
   font-size:14.5px; line-height:1.36; color:var(--enc);
 }
-.p-i .dit,.p-o .dit{left:38px}
-.p-m .dit,.p-p .dit{left:38px; right:auto}
+.p-i .dit,.p-o .dit{left:38px; right:auto}
+/* colonne de droite : calee sur le bord droit de la carte, elle
+   s'ouvre vers l'ordre du jour au lieu du bord de la page. */
+.p-m .dit,.p-p .dit{right:0; left:auto}
 /* la queue : deux triangles, le bord puis le papier, pointes vers le bas */
 .poste .dit::before,.poste .dit::after{
   content:""; position:absolute; width:0; height:0; border:11px solid transparent;
@@ -2418,20 +2426,15 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
 @media(max-width:1150px){
   .scene{--rond:124px}
   .poste{padding:11px 13px 11px 11px; column-gap:13px}
-  .poste .nm{font-size:19px}
   .poste .tige{max-width:160px; height:6px}
 }
 @media(max-width:1000px){
   .scene{--rond:104px; padding-top:88px}
   .scene > .centre{margin-top:-72px}
   .poste{padding:9px 11px 9px 9px; column-gap:11px}
-  .poste .nm{font-size:17px}
   .poste .tige{max-width:130px; margin-top:6px}
   .poste .dit{font-size:13.5px; padding:9px 12px 10px; max-width:min(260px,96%)}
 }
-/* un nom trop long passe a la ligne plutot que de deborder */
-.poste .nm{overflow-wrap:anywhere}
-
 @media(max-width:1100px){
   .tranche.centre .rep{gap:11px}
   .tranche.centre .choix{padding:12px 13px 13px !important; min-height:78px; gap:11px}

@@ -6,7 +6,7 @@
   const st=document.createElement("style");
   st.textContent="*{transition:none !important}";
   document.head.appendChild(st);
-  setTimeout(()=>{ nouvellePartie("campagne","I");
+  setTimeout(()=>{ nouvellePartie("campagne","II");
                    document.body.classList.remove("surtitre","surmenu"); }, 60);
   let n=0;
   const t=setInterval(()=>{
