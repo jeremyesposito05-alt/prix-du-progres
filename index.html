@@ -5220,9 +5220,17 @@ function poserDecor(ecran){
 
   /* L'écran de choix et le tutoriel se passent aujourd'hui, à Beau
      Soleil : on n'entre dans le siècle qu'en ouvrant une époque. */
+  const id = (typeof N!=="undefined" && N) ? N.id : "I";
+  /* La pièce est la même, la ville qu'on voit par la baie ne l'est
+     pas : trois états, au premier et au deuxième tiers de la partie.
+     Repli en cascade — la phase, puis le décor unique du niveau, puis
+     celui de Manchester : tant qu'une image manque, rien ne casse. */
   const voulu = (ecran === "menu")
     ? ["img/decor/menu.jpg", "img/decor/bureau-I.jpg"]
-    : ["img/decor/bureau-" + ((typeof N!=="undefined" && N) ? N.id : "I") + ".jpg"];
+    : ["img/decor/bureau-" + id + "-" + phaseVue() + ".jpg",
+       "img/decor/bureau-" + id + "-" + phaseVue() + ".png",
+       "img/decor/bureau-" + id + ".jpg",
+       "img/decor/bureau-I.jpg"];
 
   if(el.dataset.voulu === voulu[0]) return;     // déjà en place
   el.dataset.voulu = voulu[0];
