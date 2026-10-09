@@ -68,7 +68,7 @@ sub js {
 }
 
 # ================= verification, puis ecriture =================
-my (@mal, $mis, $cartes_vues);
+my (@mal, @sautees, $mis, $cartes_vues);
 my @neuves;
 for my $c (@cartes){
   next unless $c =~ /\S/;
@@ -76,7 +76,9 @@ for my $c (@cartes){
   unless(defined $n){ push @neuves, $c; next }
   $cartes_vues++;
   my $r = $R{$n};
-  unless($r){ push @mal, "carte $n : aucune replique rendue"; push @neuves, $c; next }
+  # Une carte sans repliques n est pas une erreur : elle garde les deux
+  # phrases generales de sa force. On la signale, on ne bloque pas.
+  unless($r){ push @sautees, $n; push @neuves, $c; next }
 
   # --- les deux avis ---
   my @av = sort keys %{$r->{AVIS} || {}};
@@ -171,16 +173,35 @@ function diraActeur(k){
 }
 AP
 
+# Les deux branchements JS sont communs aux deux niveaux : poses pour
+# Manchester, ils sont deja la quand on injecte Detroit. Un
+# branchement deja fait n'est pas une erreur — on ne bloque que s'il
+# est introuvable DANS LES DEUX ETATS.
 my $mauvais = 0;
 for my $p (@T){
-  my ($nom, $av) = @$p;
+  my ($nom, $av, $ap) = @$p;
   my $n = () = ($s =~ /\Q$av\E/g);
-  if($n != 1){ printf "  MANQUE  %-50s %d occurrence(s)\n", $nom, $n; $mauvais++ }
+  next if $n == 1;
+  # Le branchement a pu etre REMANIE depuis — « diraActeur » l'a ete
+  # quand les reactions sont montees dans le bandeau. On le reconnait
+  # donc a un marqueur de comportement, pas a son texte exact.
+  my $marque = ($nom =~ /carnet/) ? "dit:r.dit" : "E.carte.av";
+  if(index($s, $marque) >= 0){ $p->[3] = "deja"; next }
+  printf "  MANQUE  %-50s %d occurrence(s)\n", $nom, $n; $mauvais++;
 }
 die "\nARRET : $mauvais branchement(s) introuvable(s). Rien n'a ete ecrit.\n" if $mauvais;
-for my $p (@T){ my ($nom,$av,$ap)=@$p; $s =~ s/\Q$av\E/$ap/; printf "  ok  %s\n", $nom }
+for my $p (@T){
+  my ($nom, $av, $ap, $deja) = @$p;
+  if($deja){ printf "  --  %s (deja en place)\n", $nom; next }
+  $s =~ s/\Q$av\E/$ap/; printf "  ok  %s\n", $nom;
+}
 
 utf8::encode($s);
 open(my $o, ">:raw", $cible) or die "$cible: $!";
 print $o $s; close $o;
 printf "\n  %d repliques posees sur %d cartes\n", $mis, $cartes_vues;
+if(@sautees){
+  printf "  %d carte(s) sans repliques, laissees en l'etat : %s\n",
+    scalar(@sautees), join(" ", @sautees);
+  print  "  (elles gardent les deux phrases generales de leur force)\n";
+}
