@@ -21,6 +21,8 @@ use strict; use warnings; use utf8;
 binmode(STDOUT, ":encoding(UTF-8)");
 
 my $cible = shift or die "usage: quiz-injecter.pl <index.html> <*.md>\n";
+my $ECART = 10;   # ecart de longueur tolere entre un leurre et la bonne reponse
+@ARGV = grep { m{^--ecart=([0-9]+)$} ? ($ECART = $1, 0) : 1 } @ARGV;
 my @md = @ARGV or die "usage: quiz-injecter.pl <index.html> <*.md>\n";
 
 open(my $h, "<:raw", $cible) or die "$cible: $!";
@@ -86,8 +88,8 @@ for my $q (@Q){
     push @mal, "$nom : guillemet droit — il casserait le jeu"      if $t =~ /"/;
     push @mal, "$nom : vide"                                        if $t !~ /\S/;
     my $e = abs(length($t) - $lj);
-    push @mal, sprintf("%s : %d caracteres contre %d — ecart de %d, dix au plus\n        %s",
-                       $nom, length($t), $lj, $e, $t)               if $e > 10;
+    push @mal, sprintf("%s : %d caracteres contre %d — ecart de %d, %d au plus\n        %s",
+                       $nom, length($t), $lj, $e, $ECART, $t)  if $e > $ECART;
     push @mal, "$nom : identique a la bonne reponse"                if $t eq $q->{ref};
   }
   push @mal, "$ou : les deux leurres sont identiques"

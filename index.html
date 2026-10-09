@@ -2118,24 +2118,25 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    ================================================================== */
 /* La scene gere sa propre grille : le plateau ne doit plus imposer
    ses trois colonnes, sinon elle se retrouve coincee dans la premiere. */
-.plateau.large{max-width:1340px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
+.plateau.large{max-width:1400px;margin:0 auto;grid-template-columns:minmax(0,1fr)}
 
 /* Les colonnes des acteurs gagnent ce que les gouttieres perdent :
    le medaillon est plus large, et les quatre se tiennent plus pres
    de l'ordre du jour. */
 .scene{
-  display:grid; gap:12px 10px; align-items:start;
-  /* 1 / 1,6 / 1 sur 1340 px : la colonne du centre garde les 587 px
-     qu'elle avait, au pixel pres — c'est elle qui decide du nombre de
-     lignes, donc de la hauteur de la page. Tout le reste va aux
-     medaillons. */
-  grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) minmax(0,1fr);
+  display:grid; gap:26px 12px; align-items:start;
+  /* La colonne laterale ne porte plus un medaillon nu mais une carte
+     — medaillon, nom et jauge cote a cote. Elle est donc plus large
+     et bien moins haute : deux rangees de cartes font moins que deux
+     rangees de medaillons, et l'ordre du jour garde sa largeur. */
+  grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,1fr);
   grid-template-rows:auto auto;
-  margin:0 0 4px;
-  /* 282 px : le plus grand diametre tel que deux rangees tiennent
-     encore dans la hauteur que la colonne du centre impose de toute
-     facon. Mesure, pas choisi. */
-  --rond:282px;
+  /* Les bulles se posent AU-DESSUS des cartes : sans cet air, celles
+     de la rangee du haut passaient sous le bandeau du titre. La scene
+     peut se le permettre, elle a perdu plus de deux cents pixels en
+     passant aux cartes. */
+  margin:0 0 4px; padding-top:104px;
+  --rond:150px;
 }
 .p-i{grid-area:1/1} .p-m{grid-area:1/3}
 .p-o{grid-area:2/1} .p-p{grid-area:2/3}
@@ -2145,25 +2146,36 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    Les bulles debordent des postes sur l'ordre du jour : elles ne
    peuvent le faire que si les postes passent DEVANT le centre. */
 .scene > .centre{grid-area:1/2/3/3; display:flex; flex-direction:column;
-  gap:10px; position:relative; z-index:1}
+  gap:10px; position:relative; z-index:1;
+  /* il remonte dans l'air pris pour les bulles : rien ne se pose
+     au-dessus de lui */
+  margin-top:-84px}
 
 /* ---------- un poste d'acteur ---------- */
 .poste{
   /* z-index : sans lui, les deux postes du haut sont peints avant le
      centre — leurs bulles disparaissaient sous la feuille. */
   position:relative; z-index:3;
-  display:flex; flex-direction:column; gap:5px;
-  /* Plus de cadre de papier : le medaillon porte son propre bord, et
-     les onze pixels de marge passent dans le diametre. */
-  padding:0;
-  width:min(100%,var(--rond));
+  /* Une carte : medaillon a gauche, nom et jauge a droite. Memes
+     materiaux que les plaques de choix — plaque sombre, filet d'or —
+     pour que le plateau tienne d'une seule matiere.
+     Une GRILLE et non une rangee : la jauge est la soeur du bloc du
+     nom, pas sa fille — en rangee elle se posait a COTE du nom. */
+  display:grid; grid-template-columns:var(--rond) minmax(0,1fr);
+  grid-template-rows:auto auto; align-items:center;
+  column-gap:18px; row-gap:0;
+  padding:14px 20px 14px 14px; border-radius:6px; width:100%;
+  background:linear-gradient(176deg,rgba(34,25,16,.93) 0%,rgba(17,12,7,.96) 100%);
+  border:1px solid rgba(214,176,106,.22);
+  box-shadow:0 6px 18px rgba(0,0,0,.42);
   transition:transform .42s cubic-bezier(.22,.9,.26,1),
-             filter .42s ease, opacity .42s ease;
-  transform:scale(.975); opacity:.88;
+             filter .42s ease, opacity .42s ease,
+             border-color .42s ease, box-shadow .42s ease;
+  transform:scale(.985); opacity:.9;
 }
-/* chacun se range du cote de l'ordre du jour */
-.p-i,.p-o{justify-self:end}
-.p-m,.p-p{justify-self:start}
+body[data-niveau="II"] .poste{
+  background:linear-gradient(176deg,rgba(21,28,38,.93) 0%,rgba(11,15,22,.96) 100%);
+  border-color:rgba(150,185,220,.22)}
 /* Concerne par l'affaire : il se penche un peu, sans qu'on le dise. */
 .poste.concerne{opacity:1}
 .p-i.concerne,.p-o.concerne{transform:scale(1) translateX(5px)}
@@ -2174,11 +2186,17 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    Quand tout est dit, plus personne n'est « maintenant » et le regard
    est libre pour les trois choix. */
 .poste.parle{opacity:1}
-.poste.dit-maintenant{z-index:7; opacity:1}
-.poste.dit-maintenant .visage{border-color:rgba(216,179,112,.75);
-  box-shadow:0 10px 26px rgba(43,33,24,.45), 0 0 0 4px rgba(216,179,112,.2)}
-.p-i.dit-maintenant,.p-o.dit-maintenant{transform:scale(1.075) translateX(10px)}
-.p-m.dit-maintenant,.p-p.dit-maintenant{transform:scale(1.075) translateX(-10px)}
+.poste.dit-maintenant{z-index:7; opacity:1;
+  border-color:rgba(216,179,112,.6);
+  box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.poste.dit-maintenant .visage{border-color:rgba(216,179,112,.85);
+  box-shadow:0 8px 22px rgba(0,0,0,.5), 0 0 0 5px rgba(216,179,112,.18)}
+/* LE GROS PLAN. Le portrait se rapproche dans son medaillon pendant
+   qu'il parle : rien a charger, une transformation sur l'image qui
+   est deja la. */
+.poste.dit-maintenant .visage img{transform:scale(1.17)}
+.p-i.dit-maintenant,.p-o.dit-maintenant{transform:scale(1.045) translateX(8px)}
+.p-m.dit-maintenant,.p-p.dit-maintenant{transform:scale(1.045) translateX(-8px)}
 
 /* Il a gagne : il AVANCE vers le joueur. */
 .poste.gagne{opacity:1}
@@ -2212,12 +2230,13 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    il leur coupait la tete. Le cadre prend desormais la forme de
    l'image, et plus rien n'est rogne. */
 .poste .visage{
-  position:relative; width:100%; aspect-ratio:1;
+  position:relative; width:var(--rond); flex:0 0 var(--rond); aspect-ratio:1;
   border-radius:50%; overflow:hidden; background:var(--pap2);
-  border:3px solid rgba(107,87,65,.4);
-  box-shadow:0 6px 16px rgba(43,33,24,.3);
+  border:3px solid rgba(214,176,106,.3);
+  box-shadow:0 5px 14px rgba(0,0,0,.45);
   transition:box-shadow .42s ease, border-color .42s ease;
 }
+body[data-niveau="II"] .poste .visage{border-color:rgba(150,185,220,.3)}
 .poste.gagne .visage{border-color:rgba(63,106,46,.6)}
 /* LE TEMPS PASSE SUR LES VISAGES.
    « --age » va de 0 au premier tour a 1 au dernier. Le sepia monte, la
@@ -2226,11 +2245,12 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    continuum sur dix-huit decisions. Aucune image de plus a produire. */
 .poste .visage img{width:100%;height:100%;object-fit:cover;display:block;
   object-position:50% 14%;
+  transform-origin:50% 24%;
   filter:sepia(calc(.14 + var(--age,0) * .3))
          saturate(calc(1 - var(--age,0) * .34))
          contrast(calc(1.03 + var(--age,0) * .14))
          brightness(calc(1 - var(--age,0) * .08));
-  transition:filter 1.2s ease}
+  transition:filter 1.2s ease, transform .55s cubic-bezier(.22,.9,.26,1)}
 /* et le vignettage se ferme autour du visage */
 .poste .visage::after{
   content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
@@ -2248,21 +2268,15 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 
 /* Il mord sur le bas du rond : trente-quatre pixels par rangee rendus
    au diametre, et le nom reste lisible — il porte son ombre. */
-/* Un cartouche, pas un voile : sur un atelier clair, un degrade ne
-   tient pas. Le gain de place reste — il mord toujours sur le rond. */
-.poste .ident{display:flex;flex-direction:column;gap:0;line-height:1.16;
-  text-align:center;align-items:center;
-  position:relative; z-index:2; margin-top:-36px; pointer-events:none;
-  width:84%; margin-left:auto; margin-right:auto;
-  padding:4px 10px 5px; border-radius:4px;
-  background:linear-gradient(176deg,rgba(32,23,15,.93) 0%,rgba(18,12,7,.95) 100%);
-  border:1px solid rgba(216,179,112,.34);
-  box-shadow:0 4px 12px rgba(0,0,0,.5)}
-body[data-niveau="II"] .poste .ident{
-  background:linear-gradient(176deg,rgba(20,26,36,.93) 0%,rgba(12,16,23,.95) 100%);
-  border-color:rgba(150,185,220,.32)}
-.poste .nm{font-family:var(--serif);font-size:16.5px;color:#F2E7D2;
-  letter-spacing:.01em; white-space:nowrap}
+/* Le cartouche n'a plus lieu d'etre : la carte EST le fond sombre.
+   Le nom se pose simplement a droite du medaillon. */
+.poste .visage{grid-area:1/1/3/2}
+.poste .ident{grid-area:1/2/2/3; align-self:end;
+  display:flex;flex-direction:column;gap:1px;line-height:1.16;
+  min-width:0; text-align:left; align-items:flex-start;
+  pointer-events:none}
+.poste .nm{font-family:var(--serif);font-size:23px;color:#F2E7D2;
+  letter-spacing:.01em; line-height:1.1}
 body[data-niveau="II"] .poste .nm{color:#E6EEF7}
 .poste .et{font-size:10px;color:#D8B370;letter-spacing:.06em;
   text-transform:uppercase; white-space:nowrap}
@@ -2270,12 +2284,10 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
 .poste.critique .et{font-weight:bold}
 
 /* la jauge, sans un chiffre */
-/* Elle passe DANS le cartouche : plus rien ne depasse du rond, et la
-   rangee ne coute que les quelques pixels du bas de la plaque. */
-.poste .tige{height:4px;border-radius:2px;width:84%;
-  margin:-4px auto 0; position:relative; z-index:3;
-  background:rgba(0,0,0,.5);overflow:hidden;
-  box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.poste .tige{grid-area:2/2/3/3; align-self:start;
+  height:7px;border-radius:4px;width:100%;max-width:200px;
+  margin:9px 0 0; background:rgba(0,0,0,.55);overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
 .poste .tige i{display:block;height:100%;transition:width .6s ease}
 
 /* ---------- ce qu'il dit : une bulle, pas un encart ----------
@@ -2286,35 +2298,32 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
 /* Tant que la mise en scene ne l'a pas atteinte, la bulle est la —
    elle occupe sa place, qui a ete mesuree — mais on ne la voit pas. */
 .poste .dit[data-attente]{opacity:0}
+/* Elle se pose AU-DESSUS de la carte, la queue plantee sur le
+   medaillon : elle ne passe plus sur l'ordre du jour, et on voit d'un
+   coup d'oeil de quelle bouche elle sort. */
 .poste .dit{
   transition:opacity .25s ease;
-  position:absolute; top:24%; z-index:6; width:200px;
-  padding:9px 13px 10px; border-radius:15px;
+  position:absolute; bottom:calc(100% - 26px); top:auto; z-index:6;
+  width:max-content; max-width:min(300px, 94%);
+  padding:11px 15px 12px; border-radius:16px;
   background:#FFFCF2; border:1.5px solid rgba(74,56,38,.6);
-  box-shadow:0 7px 18px rgba(0,0,0,.42);
-  font-size:13px; line-height:1.38; color:var(--enc);
+  box-shadow:0 9px 22px rgba(0,0,0,.5);
+  font-size:14.5px; line-height:1.36; color:var(--enc);
 }
-.p-i .dit,.p-o .dit{left:calc(100% - 58px)}
-.p-m .dit,.p-p .dit{right:calc(100% - 58px)}
-/* la queue : deux triangles, le bord puis le papier */
+.p-i .dit,.p-o .dit{left:38px}
+.p-m .dit,.p-p .dit{left:38px; right:auto}
+/* la queue : deux triangles, le bord puis le papier, pointes vers le bas */
 .poste .dit::before,.poste .dit::after{
-  content:""; position:absolute; width:0; height:0; border:10px solid transparent;
+  content:""; position:absolute; width:0; height:0; border:11px solid transparent;
 }
-.poste .dit::before{top:13px}
-.poste .dit::after{top:14px; border-width:9px}
-.p-i .dit::before,.p-o .dit::before{left:-20px; border-right-color:rgba(74,56,38,.6)}
-.p-i .dit::after,.p-o .dit::after{left:-17px; border-right-color:#FFFCF2}
-.p-m .dit::before,.p-p .dit::before{right:-20px; border-left-color:rgba(74,56,38,.6)}
-.p-m .dit::after,.p-p .dit::after{right:-17px; border-left-color:#FFFCF2}
+.poste .dit::before{top:100%; left:26px; border-top-color:rgba(74,56,38,.6)}
+.poste .dit::after{top:calc(100% - 3px); left:27px; border-width:10px;
+  border-top-color:#FFFCF2}
 
 .poste.gagne .dit{border-color:rgba(63,106,46,.65)}
-.p-i.gagne .dit::before,.p-o.gagne .dit::before{border-right-color:rgba(63,106,46,.65)}
-.p-m.gagne .dit::before,.p-p.gagne .dit::before{border-left-color:rgba(63,106,46,.65)}
+.poste.gagne .dit::before{border-top-color:rgba(63,106,46,.65)}
 .poste.perd .dit,.poste.perd-fort .dit{border-color:rgba(166,48,36,.6)}
-.p-i.perd .dit::before,.p-o.perd .dit::before,
-.p-i.perd-fort .dit::before,.p-o.perd-fort .dit::before{border-right-color:rgba(166,48,36,.6)}
-.p-m.perd .dit::before,.p-p.perd .dit::before,
-.p-m.perd-fort .dit::before,.p-p.perd-fort .dit::before{border-left-color:rgba(166,48,36,.6)}
+.poste.perd .dit::before,.poste.perd-fort .dit::before{border-top-color:rgba(166,48,36,.6)}
 
 /* ---------- le centre : l'affaire, et le joueur ---------- */
 /* En « flex », un flotteur est ignore : l'ordre du jour redevient un
@@ -2327,6 +2336,19 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
 .centre .ordre .encoche.eg{float:left}
 .centre .ordre .encoche.ed{float:right}
 .centre .ordre .d{clear:both}
+
+/* ---------- LE CURSEUR DE LA MACHINE A ECRIRE ----------
+   Il clignote au bout de la ligne qu'on est en train de frapper, et
+   disparait des qu'elle est posee. C'est ce qui manquait au bruit de
+   frappe : le son disait qu'on tapait, rien ne le MONTRAIT. */
+.frappe::after{
+  content:""; display:inline-block; vertical-align:-.14em;
+  width:.46em; height:1.02em; margin-left:2px;
+  background:currentColor; opacity:.8;
+  animation:curseur .68s step-end infinite;
+}
+@keyframes curseur{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.frappe::after{animation:none;opacity:.5}}
 
 /* ---------- l'ecran de ce qui est arrive --------------------------
    Meme scene, meme centre, mais l'onglet est rouge et le bouton
@@ -2358,10 +2380,30 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
    Une bulle est du papier clair, arrondi, avec une queue : c'est ce
    qu'on vous DIT. Un choix est une plaque sombre a filet d'or, aux
    coins nets, avec un jeton numerote : c'est ce que vous FAITES. */
+/* ---------- LE BANDEAU DES CHOIX ----------
+   Sorti de la colonne du centre, il prend toute la largeur : trois
+   plaques cote a cote au lieu d'une pile. Une rangee coute environ
+   95 px de hauteur la ou la pile en coutait 200, et la question
+   devient une vraie bascule en travers de l'ecran. */
+/* Pas de marge automatique : dans une grille, des marges auto dans
+   l'axe en ligne annulent l'etirement et la boite se reduit a son
+   contenu — mesure, 401 px au lieu de 1400. */
+.tranche{margin:18px 0 0}
+.tranche.centre .question{display:flex; align-items:center; gap:20px;
+  margin:0 0 15px; grid-column:auto; white-space:nowrap}
+.tranche.centre .question::before,.tranche.centre .question::after{
+  content:""; flex:1 1 auto; height:1px; min-width:30px;
+  background:linear-gradient(90deg,transparent,rgba(214,176,106,.55),transparent)}
+/* « .centre .rep » a la meme specificite et etait ecrite apres : il
+   faut la classe du bandeau EN PLUS pour l'emporter. */
+.tranche.centre .rep{display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px; margin:0; counter-reset:choix}
+@media(max-width:1040px){
+  .tranche.centre .rep{grid-template-columns:minmax(0,1fr)}
+  .tranche.centre .question{white-space:normal}
+}
 .centre .question{margin:22px 0 10px;grid-column:auto}
-/* Les marges gauche et droite sont posees par « calerBulles » : ce
-   sont les deux bulles du bas qui disent de combien il faut se
-   serrer. */
 .centre .rep{grid-template-columns:minmax(0,1fr);gap:10px;margin:0;
   counter-reset:choix; transition:margin .3s ease}
 
@@ -2370,6 +2412,15 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
 }
 .centre .question,.centre .rep{transition:margin .3s ease}
 
+/* Dans le bandeau, la plaque est plus haute que large : le jeton
+   passe au-dessus du texte, et les trois se lisent d'un coup. */
+.tranche.centre .choix{
+  align-items:flex-start !important;
+  padding:16px 18px 18px !important;
+  min-height:94px;
+}
+.tranche.centre .choix .q{font-size:17px !important; line-height:1.34}
+.tranche.centre .apres{margin:0}
 .centre .choix{
   /* La regle generale des choix est en colonne : le jeton se posait
      au-dessus du texte au lieu d etre a sa gauche. */
@@ -2450,15 +2501,19 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
   .scene > .centre{display:contents}
   .centre .ordre{order:-2}
   .poste{order:0}
-  .centre .question{order:1;margin:6px 0 2px}
-  .centre .rep{order:2}
+  .tranche .question{order:1;margin:6px 0 2px;white-space:normal}
+  .tranche .rep{order:2}
   .centre .moi{display:none}
   .centre .ordre .encoche{display:none}
   .poste{flex-direction:row;align-items:center;gap:10px;transform:none!important}
-  .poste{width:auto}
+  .poste{width:auto;padding:9px 11px}
   .poste .visage{width:62px;flex:0 0 62px;aspect-ratio:1;border-width:2px}
-  .poste .ident{text-align:left;align-items:flex-start;
-    margin-top:0;background:none;padding:0}
+  .poste .ident{flex:0 0 96px}
+  .poste .nm{font-size:15px}
+  .poste .dit{position:relative;bottom:auto;max-width:none;width:auto}
+  .poste .dit::before{top:16px;left:-19px;border-width:9px;
+    border-top-color:transparent !important;
+    border-right-color:rgba(74,56,38,.6) !important}
   .poste .ident{flex:0 0 96px}
   .poste .tige{display:none}
   .poste .dit{position:relative;flex:1;width:auto;border-radius:12px;
@@ -4029,12 +4084,14 @@ function scene(c, reponses, mode){
           :`${illuPersonne(c.qui)}<span>${esc(c.qui)}</span>`}</div>
         <div class="d"></div>
       </div>
-      ${cq?"":`<div class="question">Que décidez-vous ?</div>`}
-      ${reponses}
       <div class="moi" aria-hidden="true"><span></span></div>
     </div>
     ${poste("o", c, vus)}
     ${poste("p", c, vus)}
+  </div>
+  <div class="tranche centre">
+    ${cq?"":`<div class="question">Que décidez-vous ?</div>`}
+    ${reponses}
   </div>`;
 }
 
@@ -4058,19 +4115,17 @@ function calerBulles(){
     return;
   }
 
-  /* Les trois reponses se serrent entre les deux bulles du bas. */
-  if(rep){
-    const ce = sc.querySelector(".centre").getBoundingClientRect();
-    const bg = sc.querySelector(".p-o .dit"), bd = sc.querySelector(".p-p .dit");
-    const g = bg ? Math.max(0, bg.getBoundingClientRect().right - ce.left + 14) : 0;
-    const d = bd ? Math.max(0, ce.right - bd.getBoundingClientRect().left + 14) : 0;
-    /* on ne laisse jamais moins de 260 px pour lire une reponse */
-    const place = ce.width - g - d;
-    const k = place < 260 ? Math.max(0, (ce.width - 260) / (g + d || 1)) : 1;
-    rep.style.marginLeft  = Math.round(g * k) + "px";
-    rep.style.marginRight = Math.round(d * k) + "px";
-  }
+  /* LES BULLES NE MORDENT PLUS SUR L'ORDRE DU JOUR. Elles se posent
+     au-dessus de la carte de leur acteur, dans la colonne laterale :
+     il n'y a plus rien a reserver au texte, et les trois choix ne
+     sont plus coinces entre elles puisqu'ils sont passes en bandeau
+     sous la scene. La fonction se contente donc d'effacer ce que les
+     versions precedentes avaient pose. */
+  for(const e of sc.querySelectorAll(".encoche")) e.style.cssText = "";
+  if(rep){ rep.style.marginLeft = rep.style.marginRight = "" }
+  return;
 
+  /* eslint-disable no-unreachable */
   const r = ord.getBoundingClientRect();
   if(!r.width) return;
   const cs = getComputedStyle(ord);
@@ -4597,6 +4652,7 @@ function finParole(){
 /* Poser une étape, c'est écrire d'un coup tout ce qu'elle devait
    écrire — et montrer la bulle, s'il y en a une. */
 function poserEtape(etape){
+  for(const e of app.querySelectorAll(".frappe")) e.classList.remove("frappe");
   for(const [el, txt, , b] of etape){
     el.textContent = txt;
     if(b){ delete b.dataset.attente; avance(b) }
@@ -4634,14 +4690,20 @@ function jouerEtape(){
 
 function taper(el, txt, ms, fin){
   let i=0;
+  /* une seule ligne porte le curseur a la fois */
+  for(const e of app.querySelectorAll(".frappe")) e.classList.remove("frappe");
+  el.classList.add("frappe");
   const id=setInterval(()=>{
     el.textContent = txt.slice(0, ++i);
-    if(i>=txt.length){ clearInterval(id); if(fin) fin(); }
+    if(i>=txt.length){ clearInterval(id); el.classList.remove("frappe");
+                       if(fin) fin(); }
   }, ms);
   return id;
 }
 
 function stopperMachines(){
+  try{ for(const e of app.querySelectorAll(".frappe")) e.classList.remove("frappe") }
+  catch(e){}
   if(E && E.machines) E.machines.forEach(clearInterval);
   if(E) E.machines=[];
   try{ SON.frappe(false) }catch(e){}
@@ -4803,8 +4865,8 @@ const QUIZ_I = [
 {c:"Un poste fixe par ouvrier",
  q:"Qu’appelle-t-on la division du travail ?",
  r:["Découper la fabrication en tâches simples confiées chacune à un ouvrier différent",
-    "Partager la fabrication entre plusieurs usines qui produisent chacune un objet entier",
-    "Répartir les bénéfices de chaque produit entre les ouvriers selon le temps travaillé"],
+    "Confier la fabrication de chaque objet entier à une usine différente",
+    "Partager les recettes de chaque vente entre les ouvriers selon leur poste"],
  b:0, x:"Adam Smith l’a décrite dès 1776 à propos d’une fabrique d’épingles. On produit beaucoup plus, mais chacun ne sait plus faire qu’un fragment du métier."},
 
 {c:"Le pain devient trop cher",
@@ -4831,8 +4893,8 @@ const QUIZ_I = [
 {ev:"Peterloo",
  q:"Que s’est-il passé à Peterloo, à Manchester, le 16 août 1819 ?",
  r:["La cavalerie a chargé une foule réunie pour réclamer le droit de vote",
-    "Des ouvriers ont attaqué des usines pour réduire leur temps de travail",
-    "La police a dispersé des ouvriers venus réclamer la suppression des machines"],
+    "Des ouvriers ont incendié une usine pour obtenir une hausse",
+    "La police a dispersé une foule opposée aux nouvelles machines"],
  b:0, x:"Soixante mille personnes s’étaient rassemblées ; on compte dix-huit morts. Le nom parodie **Waterloo**, quatre ans plus tôt."},
 
 {ev:"La grève des bouchons",
@@ -4854,8 +4916,8 @@ const QUIZ_II = [
 {c:"La voiture avance vers l’ouvrier",
  q:"Qu’est-ce que le travail à la chaîne, adopté chez Ford en 1913 ?",
  r:["La pièce se déplace devant des ouvriers immobiles, chacun faisant un seul geste",
-    "Les ouvriers circulent entre les voitures, chacun réalisant plusieurs opérations",
-    "Chaque ouvrier construit une voiture entière avec les mêmes outils et les mêmes pièces"],
+    "Les ouvriers passent de voiture en voiture pour effectuer divers gestes",
+    "Chaque ouvrier assemble seul une voiture, avec des pièces identiques"],
  b:0, x:"L’idée vient des abattoirs de Chicago. Le temps de montage d’un châssis tombe de **12 h 30 à 1 h 33** : c’est le cœur de la **production de masse**."},
 
 {c:"Une usine que les ouvriers quittent",
@@ -4873,8 +4935,8 @@ const QUIZ_II = [
 {c:"Le noir ou davantage de couleurs",
  q:"Pourquoi toutes les Ford T étaient-elles noires ?",
  r:["Seule cette peinture séchait assez vite pour suivre la cadence de la chaîne",
-    "Cette peinture coûtait moins cher et permettait de réduire le prix de chaque voiture",
-    "Henry Ford jugeait cette couleur plus élégante et voulait l’imposer à ses clients"],
+    "Le noir coûtait moins cher et réduisait le prix final des voitures",
+    "Henry Ford préférait le noir et refusait les autres teintes proposées"],
  b:0, x:"Une contrainte technique devenue règle commerciale. La **standardisation** rend le prix bas possible — mais suppose que le client renonce à choisir."},
 
 {c:"L’acier, trop cher",
@@ -4887,8 +4949,8 @@ const QUIZ_II = [
 {c:"Un seul geste par poste",
  q:"Quelle conséquence le travail à la chaîne a-t-il sur le savoir-faire de l’ouvrier ?",
  r:["Il n’en a plus besoin : on le forme en une heure, et on le remplace aussi vite",
-    "Il doit apprendre davantage de métiers pour intervenir à toutes les étapes de la voiture",
-    "Il choisit lui-même les opérations à faire et décide de la vitesse de production"],
+    "Il doit maîtriser toutes les étapes pour remplacer ses collègues absents",
+    "Il décide des gestes à réaliser et règle lui-même le rythme du travail"],
  b:0, x:"Marx parlait d’**aliénation** pour ce rapport où le travailleur devient étranger à ce qu’il produit. Gramsci observe en 1934 que l’homme réduit au geste continue pourtant de penser."},
 
 {c:"La concurrence change de voiture",
@@ -4915,8 +4977,8 @@ const QUIZ_II = [
 {c:"La vitesse du tapis roulant",
  q:"Qu’est-ce que l’organisation scientifique du travail, théorisée par Frederick Taylor ?",
  r:["Chronométrer chaque geste et confier à un bureau le soin de dire comment travailler",
-    "Laisser chaque équipe choisir ses gestes et organiser seule les étapes de fabrication",
-    "Confier à chaque ouvrier la conception du produit et le contrôle de son propre temps"],
+    "Laisser les équipes organiser seules les gestes et les étapes du travail",
+    "Confier à chaque ouvrier le choix des outils et du temps de fabrication"],
  b:0, x:"Le **taylorisme** précède le fordisme et le rend possible : sans temps mesurés, une chaîne ne peut pas être réglée. Le savoir passe de l’ouvrier au bureau des méthodes."},
 
 {c:"Des pièces qui ne s’ajustent pas",
