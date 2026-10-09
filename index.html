@@ -1923,6 +1923,9 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   padding-left:9px; border-left:2px solid rgba(107,87,65,.4);
 }
 .retombee .rt-v b{color:var(--enc); font-weight:bold; margin-right:3px}
+.retombee .rt-t{font-style:normal}
+.retombee .rt-v[data-attente]{opacity:0}
+.retombee .rt-v{transition:opacity .25s ease}
 .retombee .rt-v.gagne{border-left-color:rgba(63,106,46,.75)}
 .retombee .rt-v.perd{border-left-color:rgba(166,48,36,.7)}
 @media(max-width:600px){ .retombee{gap:5px} .retombee p{font-size:13.5px} }
@@ -4008,12 +4011,26 @@ function lettreLue(){
   const el = document.getElementById("pli-prof");
   if(el){ el.classList.add("parti"); setTimeout(()=>el.remove(), 260); }
   try{ SON.papier() }catch(e){}
-  /* la lecture commence maintenant, pas avant */
+  /* la suite reprend la ou la retombee s'etait arretee */
   if(E.scene && E.scene.i < E.scene.etapes.length){
     try{ SON.frappe(true) }catch(e){}
-    jouerEtape();
+    setTimeout(jouerEtape, 280);
   }
 }
+/* La lettre est POSEE au moment voulu, pas rendue d'avance puis
+   cachee : une animation CSS part au rendu de l'element, et non a son
+   apparition — cachee puis devoilee, elle se serait jouee dans le
+   vide. */
+function ouvrirLettre(){
+  if(document.getElementById("pli-prof")) return;
+  const html = pliProf();
+  if(!html) return;
+  const b = document.createElement("div");
+  b.innerHTML = html;
+  const el = b.firstElementChild;
+  if(el) app.appendChild(el);
+}
+
 function pliProf(){
   if(!lettreAlire()) return "";
   /* La toute premiere de la partie dit, en une phrase, ce que ces
@@ -4023,9 +4040,10 @@ function pliProf(){
       chaque décision — juste de quoi relier ce qui arrive sur votre bureau à ce que
       nous avons vu en classe.</p>` : "";
 
-  /* Le temps de laisser les portraits reagir. Au tout premier tour il
-     n'y a rien a regarder : elle vient presque tout de suite. */
-  const retard = dernierChoix() ? "2.2s" : ".25s";
+  /* Plus de delai : la lettre n'est posee qu'au moment ou la retombee
+     a fini de s'ecrire. Il reste un souffle pour que l'enveloppe ne
+     saute pas a la figure. */
+  const retard = ".2s";
   const d = decoupeLettre(E.carte.l);
 
   /* Decoupee, elle se lit en trois temps. Non decoupee — si un texte
@@ -4096,15 +4114,17 @@ function retombee(){
   /* Les deux voix que cette décision a fait parler. Elles sont ici et
      non dans les bulles : autour de l'affaire du jour, elles auraient
      commenté une affaire qui n'est plus celle-là. */
+  /* Chaque texte a son propre element : c'est « ecrire » qui les
+     remplit, un par un, a la machine. */
   const voix = Object.keys(d.dit || {}).map(k => {
     const v = (d.e || {})[k] || 0;
-    return `<span class="rt-v ${v>0?"gagne":"perd"}">
-      <b>${esc(N.forces[k].nom)}</b> ${esc(d.dit[k])}</span>`;
+    return `<span class="rt-v ${v>0?"gagne":"perd"}" data-attente="1">
+      <b>${esc(N.forces[k].nom)}</b> <i class="rt-t">${esc(d.dit[k])}</i></span>`;
   }).join("");
   return `<div class="retombee">
     <div class="rt-tete">
       <span class="rt-k">Ce qui est arrivé</span>
-      <p>${esc(E.consq)}</p>
+      <p class="rt-x">${esc(E.consq)}</p>
     </div>
     ${voix ? `<div class="rt-voix">${voix}</div>` : ""}
   </div>`;
@@ -4127,7 +4147,6 @@ function rendre(){
      l'attention a l'affaire du jour. */
   app.innerHTML=`
   ${alerte()}
-  ${pliProf()}
   <div class="bureau"><div class="plateau large">
     ${retombee()}
     ${scene(c, `<div class="rep" ${D()}>
@@ -4379,11 +4398,33 @@ function ecrire(titre, expose, replique){
         r=app.querySelector(".situ .d");
   if(!t||!r) return;
 
+  /* LA RETOMBEE PASSE DEVANT. Ce que la decision precedente a produit
+     s'ecrit avant tout le reste : la phrase, puis les deux voix. La
+     lettre n'arrivera qu'ensuite — elle n'attend plus un delai fixe,
+     elle attend que ce soit lu. */
+  const etapes = [];
+  const rx = app.querySelector(".retombee .rt-x");
+  if(rx && rx.textContent){
+    etapes.push([[rx, rx.textContent, 11]]);
+    const vs = [...app.querySelectorAll(".retombee .rt-v")];
+    const lot = [];
+    for(const v of vs){
+      const el = v.querySelector(".rt-t");
+      if(!el || !el.textContent) continue;
+      lot.push([el, el.textContent, 9, v]);
+      el.textContent = "";
+    }
+    if(lot.length) etapes.push(lot);
+    rx.textContent = "";
+  }
+  /* C'est ici que la lettre s'ouvrira, une fois la retombee lue. */
+  const pause = etapes.length;
+
   /* Chaque entrée : [où écrire, quoi, vitesse, la bulle à dévoiler]. */
   const ordre = [[t, titre, 15]];
   if(x && E.ecrit.ex) ordre.push([x, E.ecrit.ex, 4]);
   ordre.push([r, replique, 7]);
-  const etapes = [ordre];
+  etapes.push(ordre);
 
   /* L'ordre des bulles est celui du regard, pas celui des données. */
   for(const k of ["i","m","o","p"]){
@@ -4395,7 +4436,7 @@ function ecrire(titre, expose, replique){
     b.dataset.attente = "1";
     etapes.push([[sp, txt, 9, b]]);
   }
-  E.scene = { etapes, i:0 };
+  E.scene = { etapes, i:0, pause };
 
   /* Les trois choix sont la derniere etape : ils n'apparaissent
      qu'une fois les quatre groupes ayant parle. C'est la premiere des
@@ -4411,13 +4452,13 @@ function ecrire(titre, expose, replique){
     for(const etape of etapes) poserEtape(etape);
     E.scene.i = etapes.length;
     revelerChoix();
+    /* La lettre reste obligatoire meme sans animation : sans cela,
+       un eleve qui a demande a reduire les animations ne la verrait
+       jamais, et le lien avec le cours disparaitrait pour lui. */
+    if(lettreAlire()) ouvrirLettre();
     return;
   }
   t.textContent=""; if(x) x.textContent=""; r.textContent="";
-  /* Si une lettre est encore a lire, on ne tape rien : sinon l'ordre
-     du jour serait deja ecrit et les quatre voix dites quand le joueur
-     refermerait la lettre. C'est « lettreLue » qui donnera le depart. */
-  if(lettreAlire()) return;
   try{ SON.frappe(true) }catch(e){}
   jouerEtape();
 }
@@ -4446,6 +4487,13 @@ function poserEtape(etape){
 function jouerEtape(){
   const s = E && E.scene;
   if(!s) return;
+  /* Le courrier n'attend plus un delai fixe : il attend que ce qui
+     vient d'arriver ait ete ecrit. */
+  if(s.i === s.pause && lettreAlire() && !document.getElementById("pli-prof")){
+    try{ SON.frappe(false) }catch(e){}
+    ouvrirLettre();
+    return;
+  }
   if(s.i >= s.etapes.length){ try{ SON.frappe(false) }catch(e){} revelerChoix(); return; }
   const etape = s.etapes[s.i];
   const lancer = j=>{
