@@ -1947,7 +1947,12 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
    ================================================================== */
 .pli-prof{
   position:fixed; inset:0; z-index:60; display:flex;
-  align-items:center; justify-content:center; padding:24px;
+  /* « center » seul fait deborder une lettre trop haute des DEUX
+     cotes, haut compris, donc inatteignable. Les marges automatiques
+     centrent tant qu'il y a la place et cedent quand il n'y en a
+     plus. */
+  align-items:flex-start; justify-content:center; padding:20px;
+  overflow-y:auto; overscroll-behavior:contain;
   /* assez sombre pour qu'on lise, assez clair pour qu'on voie que les
      quatre portraits sont toujours autour */
   background:rgba(14,10,7,.5);
@@ -2004,9 +2009,24 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
 @media(prefers-reduced-motion:reduce){
   .pli-prof .enveloppe{display:none}
 }
+/* Un ecran bas : on rend a la lettre les pixels que les marges et
+   les interlignes lui prenaient, avant de la faire defiler. */
+@media(max-height:760px){
+  .pli-prof{padding:10px}
+  .lettre-prof{max-height:calc(100vh - 20px); padding:20px 24px 16px}
+  .courrier-prof .cp-titre{margin-bottom:10px}
+  .cp-ouverture{margin-bottom:11px; padding-bottom:9px}
+  .cp-ouverture p{margin-bottom:6px}
+  .cp-lien{margin-bottom:11px}
+}
 
 .lettre-prof{
   max-width:560px; width:100%;
+  /* Elle ne peut plus etre plus haute que l'ecran. Et c'est son TEXTE
+     qui defile, pas elle : le bouton vit hors de la zone qui defile,
+     donc rien ne peut passer derriere lui. */
+  margin:auto; max-height:calc(100vh - 40px);
+  display:flex; flex-direction:column; overflow:hidden;
   background:
     linear-gradient(180deg, rgba(255,255,255,.55), transparent 22%),
     repeating-linear-gradient(94deg, rgba(160,140,110,.045) 0 2px, transparent 2px 5px),
@@ -2111,7 +2131,17 @@ body.surmenu[data-decor-ecran="menu"] footer .signature b{color:var(--bs-navy)}
   font-size:25px; color:#4A3B2C; letter-spacing:.1em;
   transform:rotate(-2.2deg); opacity:.88;
 }
-.lettre-prof button{display:block;margin:0 auto}
+/* « min-height:0 » : sans lui, un enfant de colonne flexible refuse
+   de devenir plus court que son contenu, et le defilement ne part
+   jamais. */
+.lettre-prof .cp-corps{overflow-y:auto; overscroll-behavior:contain;
+  min-height:0; flex:1 1 auto;
+  /* un filet de papier en haut et en bas dit qu'il reste du texte */
+  mask-image:linear-gradient(180deg,transparent 0,#000 10px,
+             #000 calc(100% - 10px),transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 10px,
+             #000 calc(100% - 10px),transparent 100%)}
+.lettre-prof button{display:block; margin:16px auto 0; flex:0 0 auto}
 @media(max-width:600px){ .lettre-prof{padding:20px 20px 18px}
   .lettre-prof .lt-x{font-size:15px} }
 @media(prefers-reduced-motion:reduce){
@@ -4265,6 +4295,13 @@ function lettreLue(){
    cachee : une animation CSS part au rendu de l'element, et non a son
    apparition — cachee puis devoilee, elle se serait jouee dans le
    vide. */
+/* SORTIE DE SECOURS. Rien de ce qui s'affiche ne doit pouvoir rendre
+   la partie injouable. Si la lettre debordait malgre tout, la touche
+   d'echappement la referme comme le bouton. */
+addEventListener("keydown", e => {
+  if(e.key === "Escape" && document.getElementById("pli-prof")) lettreLue();
+});
+
 function ouvrirLettre(){
   if(document.getElementById("pli-prof")) return;
   const html = pliProf();
@@ -4323,6 +4360,7 @@ function pliProf(){
       <span class="env-rabat"></span><span class="env-cire"></span>
     </div>
     <article class="lettre-prof courrier-prof">
+      <div class="cp-corps">
       <div class="cp-tete">
         <span class="cp-qui">Le courrier du professeur</span>
         <span class="cp-ou">${esc(N.lieu)}${
@@ -4338,6 +4376,7 @@ function pliProf(){
       </div>
       ${intro}
       ${corps}
+      </div>
       <button class="plein" onclick="lettreLue()">J’ai compris · place au choix</button>
     </article>
   </div>`;
