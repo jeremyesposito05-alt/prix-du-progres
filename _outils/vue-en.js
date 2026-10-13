@@ -1,4 +1,3 @@
-window.ECRAN="tuto";
 (function(){
   const st=document.createElement("style");
   st.textContent="*{transition:none !important;animation:none !important}";

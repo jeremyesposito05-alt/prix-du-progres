@@ -761,6 +761,9 @@ body.surtitre footer{opacity:0}
 .langues button + button{border-left:1px solid rgba(214,176,106,.35)}
 .langues button:hover{background:rgba(214,176,106,.22)}
 .langues button.on{background:var(--lai,#D6B06A); color:#241C16}
+/* Sur l'ecran de titre ils sont DANS la rangee, pas au-dessus
+   d'elle : le recouvrement devient impossible par construction. */
+.te-haut .langues{position:static; flex:0 0 auto}
 .menu-ecran .langues{top:14px; right:16px}
 @media(max-width:700px){
   .langues{top:10px; right:10px}
@@ -7103,8 +7106,8 @@ function titre(){
       <img class="logo-bs" src="img/logo-beausoleil.png" alt="Collège Alpin Beau Soleil"
            onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-txt',textContent:'COLLÈGE ALPIN BEAU SOLEIL'}))">
       <div class="surtitre-txt">${tx("lieux")}</div>
+      ${boutonsLangue()}
     </div>
-    ${boutonsLangue()}
 
     <div class="dedans">
       <h1>Le prix<br><span>du progrès</span></h1>
