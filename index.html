@@ -2581,32 +2581,64 @@ body[data-niveau="II"] .poste .et{color:#9EC2E0}
    L'affaire, les quatre acteurs, puis la question. « display:contents »
    sort les enfants du centre pour qu'ils prennent leur rang entre les
    postes : sans lui, les reponses arrivaient avant les arguments. */
+/* ---------- LE TELEPHONE ----------
+   Le plateau devient une colonne : ordre du jour, les quatre cartes,
+   la question, les trois choix. Et la carte d'acteur garde sa grille,
+   mais a TROIS rangees — portrait et nom en haut, jauge dessous,
+   bulle en travers des deux colonnes, en bas.
+
+   Sans case assignee, la bulle etait placee d'office par le
+   navigateur dans la premiere case libre, large d'un mot : c'est le
+   defaut observe le 14 octobre. Sur un ecran etroit, lire d'abord qui
+   parle puis ce qu'il dit est de toute facon la bonne lecture. */
 @media(max-width:860px){
-  .scene{display:flex; flex-direction:column; gap:11px}
-  .scene > .centre{display:contents}
-  .centre .ordre{order:-2}
+  /* « align-items:stretch » : la scene garde le « start » de sa
+     grille de bureau, et en colonne cela fait retrecir chaque carte
+     a la largeur de son contenu — la colonne du texte tombe alors a
+     ZERO pixel et la bulle se replie en un mot par ligne. C'etait la
+     vraie cause, trouvee en relevant les styles calcules de la
+     carte : « cols=62px 0px ». */
+  .scene{display:flex; flex-direction:column; gap:11px;
+    align-items:stretch; padding-top:0; --rond:62px}
+  /* Pas de « display:contents » ici : un parent sans boite ne peint
+     plus ses enfants de maniere fiable — l'ordre du jour avait sa
+     place, son texte et sa visibilite, et n'apparaissait pas a
+     l'ecran. « .centre » reste un bloc, et c'est lui qui passe en
+     tete de la colonne. */
+  .scene > .centre{display:block; margin-top:0; order:-2;
+    position:relative; z-index:2}
   .poste{order:0}
   .tranche .question{order:1;margin:6px 0 2px;white-space:normal}
   .tranche .rep{order:2}
   .centre .moi{display:none}
   .centre .ordre .encoche{display:none}
-  .poste{flex-direction:row;align-items:center;gap:10px;transform:none!important}
-  .poste{width:auto;padding:9px 11px}
-  .poste .visage{width:62px;flex:0 0 62px;aspect-ratio:1;border-width:2px}
-  .poste .ident{flex:0 0 96px}
+
+  .poste{width:auto; padding:9px 11px; transform:none!important;
+    grid-template-columns:var(--rond) minmax(0,1fr);
+    grid-template-rows:auto auto auto; column-gap:10px}
+  .poste .visage{border-width:2px}
+  .poste .ident{grid-area:1/2/2/3}
   .poste .nm{font-size:15px}
-  .poste .dit{position:relative;bottom:auto;max-width:none;width:auto}
-  .poste .dit::before{top:16px;left:-19px;border-width:9px;
+  .poste .et{display:block}
+  .poste .tige{grid-area:2/2/3/3; max-width:none; height:5px; margin-top:5px}
+
+  .poste .dit{grid-area:3/1/4/3;
+    position:relative; top:auto; bottom:auto; left:auto; right:auto;
+    width:auto; max-width:none; margin:11px 0 0;
+    border-radius:13px; padding:9px 12px;
+    box-shadow:0 3px 10px rgba(0,0,0,.28); font-size:14px}
+  /* la queue pointe vers le HAUT, vers le portrait qui est au-dessus */
+  .poste .dit::before{top:-20px; bottom:auto; left:22px; right:auto;
+    border-width:10px;
     border-top-color:transparent !important;
-    border-right-color:rgba(74,56,38,.6) !important}
-  .poste .ident{flex:0 0 96px}
-  .poste .tige{display:none}
-  .poste .dit{position:relative;flex:1;width:auto;border-radius:12px;
-    padding:8px 11px;box-shadow:none}
-  .poste .dit::after{display:none}
-  .poste .dit::before{top:16px;left:-19px;right:auto;border-width:9px;
-    border-right-color:rgba(74,56,38,.6) !important;
-    border-left-color:transparent !important}
+    border-bottom-color:rgba(74,56,38,.6) !important}
+  .poste .dit::after{top:-17px; bottom:auto; left:23px; right:auto;
+    border-width:9px; display:block;
+    border-top-color:transparent !important;
+    border-bottom-color:#FFFCF2 !important}
+  .poste.gagne .dit::before{border-bottom-color:rgba(63,106,46,.65) !important}
+  .poste.perd .dit::before,.poste.perd-fort .dit::before{
+    border-bottom-color:rgba(166,48,36,.6) !important}
 }
 @media(prefers-reduced-motion:reduce){
   .poste,.poste .visage{transition:none;animation:none!important;transform:none!important}
