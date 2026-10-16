@@ -258,6 +258,7 @@ body[data-niveau="II"] .d-lettre{background:#1E2229}
 .d-enquete .pli{font-size:10.5px;color:var(--ong);border:1px solid var(--ong);border-radius:2px;
   padding:3px 9px;letter-spacing:.1em;text-transform:uppercase;margin-left:auto;white-space:nowrap}
 .d-enquete .pli::before{content:"Ouvrir"}
+html[lang="en"] .d-enquete .pli::before{content:"Open"}
 .d-enquete[open] .pli::before{content:"Fermer"}
 .d-enquete .pli::after{content:" ▼"}
 .d-enquete[open] .pli::after{content:" ▲"}
@@ -1473,6 +1474,7 @@ header .marque img ~ svg.blason{display:none}
   padding:3px 9px; background:rgba(255,255,255,.45); white-space:nowrap;
 }
 .carnet .pli::before{content:"Ouvrir"}
+html[lang="en"] .carnet .pli::before{content:"Open"}
 .carnet[open] .pli::before{content:"Fermer"}
 .carnet .pli::after{content:" ▼"}
 .carnet[open] .pli::after{content:" ▲"}
@@ -3496,6 +3498,9 @@ const TXT = {
     unite2:{I:"habitants", II:"voitures par an"},
     musique:"Musique", bruitages:"Bruitages",
     accueil:"Revenir à l’accueil",
+    lien:"Le lien avec le cours",
+    pr1:"Bonjour. Je suis M. Esposito, votre professeur d’histoire. C’est moi qui ai écrit les affaires que vous allez trancher, et toutes sont tirées de ce que {lieu} a réellement vécu.",
+    pr2:"Je vous glisserai un mot avant chaque décision. Il ne vous dira jamais quoi choisir : il vous rappelle ce que nous avons vu en classe sur ce point, vous donne le mot qui le nomme, et vous pose la question à se poser avant de trancher.",
     q1t:"Quitter la partie en cours ?",
     q1x:"Vous en êtes à la décision",
     q1y:"Tout sera perdu : vos décisions, votre carnet de bord et votre trace de travail.",
@@ -3545,6 +3550,9 @@ const TXT = {
     unite2:{I:"inhabitants", II:"cars per year"},
     musique:"Music", bruitages:"Sound",
     accueil:"Back to the home screen",
+    lien:"The link with the course",
+    pr1:"Hello. I am Mr Esposito, your history teacher. I wrote the cases you are about to decide, and every one of them is drawn from what {lieu} really went through.",
+    pr2:"I will slip you a note before each decision. It will never tell you what to choose: it reminds you what we studied in class on that point, gives you the word that names it, and asks you the question to ask yourself before deciding.",
     q1t:"Leave the game in progress?",
     q1x:"You are at decision",
     q1y:"Everything will be lost: your decisions, your logbook and your work record.",
@@ -3592,6 +3600,15 @@ function habillage(){
   if(f) f.innerHTML = tx("pied") + `<br><span class="signature">`
       + tx("paraphe") + ` <b>Jeremy Esposito</b> · Collège Alpin Beau Soleil</span>`;
 }
+
+/* AU CHARGEMENT, ET PAS SEULEMENT AU CHANGEMENT DE LANGUE.
+   L'en-tete et le pied sont dans le document, pas dans « app » : rien
+   ne les redessine. Sans cet appel, celui qui revient en anglais
+   retrouvait « Musique » et « Bruitages » en francais.
+   La langue du document est posee ici aussi : la feuille de style s'en
+   sert pour les libelles qu'elle ecrit elle-meme. */
+document.documentElement.lang = LANG;
+if(LANG === "en") habillage();
 
 function boutonsLangue(){
   return `<div class="langues" role="group" aria-label="Language">
@@ -4551,13 +4568,8 @@ function pliProf(){
      surtout ce qu'ils ne font pas. Un eleve qui croit y trouver la
      bonne reponse ne les lit plus des qu'il a compris que non. */
   const intro = premiere ? `<div class="cp-ouverture">
-      <p>Bonjour. Je suis M. Esposito, votre professeur d’histoire. C’est moi qui ai
-      écrit les affaires que vous allez trancher, et toutes sont tirées de ce que
-      ${esc(N.lieu)} a réellement vécu.</p>
-      <p>Je vous glisserai un mot avant chaque décision. Il ne vous dira jamais quoi
-      choisir : il vous rappelle ce que nous avons vu en classe sur ce point, vous
-      donne le mot qui le nomme, et vous pose la question à se poser avant de
-      trancher.</p></div>` : "";
+      <p>${tx("pr1").replace("{lieu}", esc(N.lieu))}</p>
+      <p>${tx("pr2")}</p></div>` : "";
 
   const d = decoupeLettre(E.carte.l);
 
@@ -4568,7 +4580,7 @@ function pliProf(){
      trancher. Nommer avant d'avoir explique, c'etait donner du
      vocabulaire et appeler cela un lien avec le cours. */
   const lien = E.carte.li
-    ? `<p class="cp-lien"><span>Le lien avec le cours</span>${esc(E.carte.li)}</p>`
+    ? `<p class="cp-lien"><span>${tx("lien")}</span>${esc(E.carte.li)}</p>`
     : "";
 
   const corps = d ? `
